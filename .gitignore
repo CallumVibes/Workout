@@ -1,6 +1,8 @@
 # Generated fresh by CI on every build — no need to commit it
 android/
+ios/
 node_modules/
+Payload/
 package-lock.json
 out/
 .DS_Store

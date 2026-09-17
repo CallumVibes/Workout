@@ -56,8 +56,12 @@ Amber is an Android app, so NIP-55 only works in the installed APK — not in a 
 www/index.html                    the entire app
 capacitor.config.json             app id, name, notification icon
 package.json                      Capacitor + plugins
+www/manifest.webmanifest          makes it installable from a browser
+www/sw.js                         offline support
+www/icon-*.png                    app icons
 scripts/patch-android.py          permissions, deep link, signer visibility
 .github/workflows/android.yml     builds the APK
+.github/workflows/ios.yml         builds an unsigned .ipa on a Mac runner
 ```
 
 The `android/` folder is deliberately **not** committed. CI generates it on every run, which means you never need Android Studio or a desktop machine.
@@ -91,6 +95,16 @@ It skips any day you've already checked in or trained, and it reschedules every 
 
 Reminders do nothing in a browser — they need the installed app. Android will ask for notification permission the first time you turn them on.
 
+## Equipment
+
+Setup asks what the person owns — nothing, dumbbells, bands, a pull-up bar, or any combination — and the sessions are built from that. Each exercise declares the kit it needs, and each session slot is a *movement pattern* (squat, push, pull, hinge, core) with an ordered list of candidates. The first candidate whose kit is available wins.
+
+That means a bodyweight-only user still gets a pulling exercise, which matters: without one, a home programme trains the front of the body and nothing else, and round shoulders are the result. Under-table rows and doorframe rows fill that gap; pike push-ups cover overhead pressing.
+
+If the person says their dumbbells are adjustable, progression changes. Instead of only climbing the variation ladder, the app offers to add weight and drop back to the bottom of the rep range — the simpler lever when you have it.
+
+The Learn tab and the ladder editor both filter to what the person can actually do, so nobody reads a guide for kit they do not own.
+
 ## Coming back after a break
 
 Fourteen days or more without a session and the Today screen offers to drop every exercise back a rung (two rungs after eight weeks). Nothing about your history or streaks changes. You can decline, and it will not ask again for three days.
@@ -100,6 +114,37 @@ Fourteen days or more without a session and the Today screen offers to drop ever
 Everything is stored on the device in `localStorage`. Nothing is uploaded and there is no account.
 
 **You → Export as a file** writes a JSON backup, and **Import a file** reads one back in. Import merges rather than overwrites: existing sessions are kept, duplicates are ignored, and ladder positions take whichever is further along — the same rules as the nostr restore. Android can also clear WebView storage when space runs low, which is rare but real — if you get attached to a long streak, worth migrating to `@capacitor/preferences`, which survives that.
+
+## iOS
+
+Three ways to run this on an iPhone, in order of effort.
+
+### 1. Add to Home Screen — works today, no Mac, no account
+
+Open the page in Safari, tap Share, then **Add to Home Screen**. It installs as a proper app: own icon, no browser chrome, works offline, data kept separately from Safari.
+
+Everything works except the daily reminder. iOS does not let home-screen web apps schedule their own local notifications, and no amount of code gets around it. The reminder screen says so rather than pretending, and suggests a repeating phone alarm at the same time, which does the same job.
+
+Amber is Android-only, so nostr sign-in on iOS is limited to pasting an npub (read-only). A NIP-46 remote signer would fix that properly and is the right long-term answer.
+
+### 2. Native build, sideloaded
+
+`.github/workflows/ios.yml` builds an unsigned `.ipa` on a macOS runner. Run it from the Actions tab — it is deliberately not on the push trigger, because macOS minutes cost roughly ten times what Linux ones do on private repos.
+
+The output is unsigned, so it will not install by itself. Tools like AltStore or Sideloadly re-sign it with a free Apple ID and install it over USB. Apps signed with a free account expire after seven days and need refreshing.
+
+This version does get local notifications, because it is a real app rather than a web page.
+
+### 3. App Store
+
+Needs an Apple Developer account at £79 a year, a signing certificate and provisioning profile stored as repo secrets, and review. Only worth it if other people are going to use this.
+
+### What differs on iOS
+
+- **Reminders**: home-screen app no, native build yes
+- **Amber sign-in**: no — Android only. npub read-only works, NIP-46 would be the fix
+- **Relay connections**: fine in both
+- **Storage**: iOS clears web app storage after about seven days of not opening it, so export or sign in for backup matters more here than on Android
 
 ## Releasing properly
 
