@@ -7,6 +7,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#E9EBE6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#191B18" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Groundwork">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
 <style>
 :root{
   --bg:#E9EBE6; --surface:#F6F7F3; --edge:#D3D7CD;
@@ -35,6 +44,7 @@
 html,body{margin:0;padding:0}
 body{
   background:var(--bg); color:var(--ink);
+  padding-top:env(safe-area-inset-top);
   font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   font-size:16px; line-height:1.5;
   padding-bottom:calc(84px + env(safe-area-inset-bottom));
@@ -76,6 +86,26 @@ button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
 .dotline i.checked{background:var(--brass)}
 .dotline i.trained{background:var(--pine)}
 .card.checkin{border-color:var(--brass)}
+.menu{background:var(--surface);border:1px solid var(--edge);border-radius:14px;overflow:hidden}
+.menurow{display:flex;width:100%;align-items:center;gap:12px;padding:15px 16px;text-align:left;border-top:1px solid var(--edge)}
+.menu .menurow:first-child{border-top:none}
+.menurow:active{background:var(--bg)}
+.menurow .ml{flex:1;min-width:0}
+.menurow .mn{display:block;font-size:15.5px}
+.menurow .ms{display:block;font-size:12.5px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.menurow .chev{color:var(--muted);flex:0 0 auto}
+.subbar{display:flex;align-items:center;gap:6px;margin:0 0 18px;margin-left:-8px}
+.subbar button{padding:8px;color:var(--muted);display:grid;place-items:center}
+.subbar h1{font-size:19px}
+.pickrow{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 2px;border-top:1px solid var(--edge);font-size:15px;text-align:left}
+.pickrow.on{color:var(--pine);font-weight:500}
+.kitopt{display:block;width:100%;text-align:left;border:1.5px solid var(--edge);background:var(--bg);
+  border-radius:11px;padding:12px 14px;margin-bottom:8px}
+.kitopt .kn{display:block;font-size:14.5px;font-weight:500}
+.kitopt .kd{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+.kitopt.on{border-color:var(--pine);background:var(--pine-soft)}
+.kitopt.on .kn{color:var(--pine);font-weight:600}
 .av{width:38px;height:38px;border-radius:50%;background:var(--edge);color:var(--ink);display:grid;place-items:center;
   font-family:"Familjen Grotesk",sans-serif;font-weight:700;font-size:16px;flex:0 0 auto}
 .chip{border:1px solid var(--edge);border-radius:999px;padding:6px 11px;font-size:12.5px;color:var(--muted);background:var(--bg);flex:0 0 auto}
@@ -216,7 +246,7 @@ const P = {
 };
 const EX = [
   {
-    id:'squat', alt:['split','bridge'], name:'Goblet squat', trains:'Thighs, glutes, core', reps:[8,14], sets:3, load:true,
+    id:'squat', kit:'none', alt:['split','bridge'], name:'Goblet squat', trains:'Thighs, glutes, core', reps:[8,14], sets:3, load:true,
     ladder:[
       {n:'Bodyweight squat', h:'Arms straight out in front to balance.'},
       {n:'Goblet squat', h:'Hold one dumbbell against your chest.'},
@@ -233,7 +263,7 @@ const EX = [
     }
   },
   {
-    id:'pushup', alt:['press','ohp'], name:'Push-up', trains:'Chest, shoulders, triceps', reps:[5,12], sets:3, load:false,
+    id:'pushup', kit:'none', alt:['press','ohp'], name:'Push-up', trains:'Chest, shoulders, triceps', reps:[5,12], sets:3, load:false,
     ladder:[
       {n:'Wall push-up', h:'Hands on a wall, feet a step back.'},
       {n:'Counter push-up', h:'Hands on a kitchen worktop or windowsill.'},
@@ -252,7 +282,7 @@ const EX = [
     }
   },
   {
-    id:'row', alt:['curl','rdl'], name:'One-arm dumbbell row', trains:'Upper back, biceps', reps:[8,14], sets:3, load:true,
+    id:'row', kit:'db', alt:['curl','rdl'], name:'One-arm dumbbell row', trains:'Upper back, biceps', reps:[8,14], sets:3, load:true,
     ladder:[
       {n:'One-arm row', h:'Free hand on a chair, one dumbbell in the other.'},
       {n:'Paused row', h:'Hold 2 seconds with the dumbbell at your ribs.'},
@@ -269,7 +299,7 @@ const EX = [
     }
   },
   {
-    id:'bridge', alt:['rdl','squat'], name:'Glute bridge', trains:'Glutes, hamstrings', reps:[10,20], sets:3, load:true,
+    id:'bridge', kit:'none', alt:['rdl','squat'], name:'Glute bridge', trains:'Glutes, hamstrings', reps:[10,20], sets:3, load:true,
     ladder:[
       {n:'Glute bridge', h:'Both feet on the floor, arms by your sides.'},
       {n:'Paused glute bridge', h:'Squeeze hard for 3 seconds at the top of each rep.'},
@@ -286,7 +316,7 @@ const EX = [
     }
   },
   {
-    id:'plank', alt:['bridge','deadbug'], name:'Plank', trains:'Whole midsection', reps:[20,60], sets:3, load:false, unit:'sec', hold:true,
+    id:'plank', kit:'none', alt:['bridge','deadbug'], name:'Plank', trains:'Whole midsection', reps:[20,60], sets:3, load:false, unit:'sec', hold:true,
     ladder:[
       {n:'Wall plank', h:'Forearms on a wall, feet a step back.'},
       {n:'Knee plank', h:'Forearms and knees on the floor.'},
@@ -303,7 +333,7 @@ const EX = [
     }
   },
   {
-    id:'split', alt:['squat','bridge'], name:'Split squat', trains:'One leg at a time — thighs, glutes', reps:[6,12], sets:3, load:true,
+    id:'split', kit:'none', alt:['squat','bridge'], name:'Split squat', trains:'One leg at a time — thighs, glutes', reps:[6,12], sets:3, load:true,
     ladder:[
       {n:'Supported split squat', h:'Hold a chair or doorframe for balance.'},
       {n:'Split squat', h:'No hands. Feet in a long stride.'},
@@ -320,7 +350,7 @@ const EX = [
     }
   },
   {
-    id:'press', alt:['pushup','ohp'], name:'Dumbbell floor press', trains:'Chest, triceps, shoulders', reps:[8,14], sets:3, load:true,
+    id:'press', kit:'db', alt:['pushup','ohp'], name:'Dumbbell floor press', trains:'Chest, triceps, shoulders', reps:[8,14], sets:3, load:true,
     ladder:[
       {n:'Floor press', h:'Lie on your back, knees bent, press both dumbbells up.'},
       {n:'Slow floor press', h:'4 seconds lowering, press up normally.'},
@@ -337,7 +367,7 @@ const EX = [
     }
   },
   {
-    id:'rdl', alt:['bridge','split'], name:'Romanian deadlift', trains:'Hamstrings, glutes, lower back', reps:[8,14], sets:3, load:true,
+    id:'rdl', kit:'db', alt:['bridge','split'], name:'Romanian deadlift', trains:'Hamstrings, glutes, lower back', reps:[8,14], sets:3, load:true,
     ladder:[
       {n:'Hip hinge, hands on hips', h:'Learn the movement with no weight first.'},
       {n:'Dumbbell RDL', h:'A dumbbell in each hand, sliding down your thighs.'},
@@ -354,7 +384,7 @@ const EX = [
     }
   },
   {
-    id:'ohp', alt:['press','pushup'], name:'Overhead press', trains:'Shoulders, triceps', reps:[6,12], sets:3, load:true,
+    id:'ohp', kit:'db', alt:['press','pushup'], name:'Overhead press', trains:'Shoulders, triceps', reps:[6,12], sets:3, load:true,
     ladder:[
       {n:'Seated overhead press', h:'Sit upright on a chair, press both dumbbells overhead.'},
       {n:'Standing overhead press', h:'Stand tall, no leg help.'},
@@ -371,7 +401,7 @@ const EX = [
     }
   },
   {
-    id:'curl', alt:['row','pushup'], name:'Dumbbell curl', trains:'Biceps, forearms', reps:[8,15], sets:3, load:true,
+    id:'curl', kit:'db', alt:['row','pushup'], name:'Dumbbell curl', trains:'Biceps, forearms', reps:[8,15], sets:3, load:true,
     ladder:[
       {n:'Standing curl', h:'Both dumbbells, palms facing forward.'},
       {n:'Slow-lowering curl', h:'Curl up in 1 second, lower over 4.'},
@@ -389,7 +419,7 @@ const EX = [
   }
 ];
 EX.push({
-  id:'deadbug', alt:['plank','bridge'], name:'Dead bug', trains:'Deep midsection', reps:[6,12], sets:3, load:false,
+  id:'deadbug', kit:'none', alt:['plank','bridge'], name:'Dead bug', trains:'Deep midsection', reps:[6,12], sets:3, load:false,
   ladder:[
     {n:'Dead bug, arms only', h:'Lie on your back, knees up, lower one arm at a time.'},
     {n:'Dead bug, legs only', h:'Knees up, straighten one leg towards the floor at a time.'},
@@ -411,11 +441,126 @@ const SESSIONS = {
   B:{name:'Session B', ex:['split','press','rdl','ohp','curl'], cool:['hipflex','ham','tri']}
 };
 
+/* Five exercises that fill the gaps for people without a pair of dumbbells.
+   The pulling ones matter most: without them a bodyweight-only programme has
+   nothing for the back at all, which is how people end up round-shouldered. */
+EX.push(
+{
+  id:'tablerow', kit:'none', pat:'pull', alt:['pushup','plank'], name:'Under-table row', trains:'Upper back, biceps', reps:[5,12], sets:3, load:false,
+  ladder:[
+    {n:'Standing doorframe row', h:'Hold a doorframe, lean back with straight arms, pull yourself upright.'},
+    {n:'High under-table row', h:'Lie under a sturdy table, knees bent, feet flat.'},
+    {n:'Under-table row', h:'Lie under the table with legs straight out.'},
+    {n:'Slow under-table row', h:'Pull up fast, take four seconds to lower.'},
+    {n:'Feet-raised table row', h:'Heels up on a chair so your body is level.'}
+  ],
+  cues:['Lie under a sturdy table and grip the edge with both hands, a bit wider than your shoulders.','Squeeze your glutes so your body is one straight line from heels to head.','Pull your chest up towards the edge, driving your elbows back past your ribs.','Lower all the way until your arms are straight, then go again.'],
+  wrong:'Bending at the hips to make it easier. If your body folds, bend your knees and start from there instead.',
+  working:'The muscles between your shoulder blades. Test the table with your weight before you trust it.',
+  pose:{
+    a:{h:[78,57],n:[70,61],p:[48,71],ka:[34,79],fa:[20,87],kb:[34,79],fb:[20,87],ea:[72,48],wa:[74,36],eb:[72,48],wb:[74,36],floor:90},
+    b:{h:[78,47],n:[70,51],p:[48,63],ka:[34,73],fa:[20,85],kb:[34,73],fb:[20,85],ea:[62,44],wa:[74,36],eb:[62,44],wb:[74,36],floor:90}}
+},
+{
+  id:'pikepush', kit:'none', pat:'shoulder', alt:['pushup','plank'], name:'Pike push-up', trains:'Shoulders, triceps', reps:[4,10], sets:3, load:false,
+  ladder:[
+    {n:'Wall pike push-up', h:'Hands on a wall at hip height, hips bent, press your head towards the wall.'},
+    {n:'Floor pike push-up', h:'Hands and feet on the floor, hips high like an upside-down V.'},
+    {n:'Feet-raised pike push-up', h:'Feet on a step or sofa so your hips stack higher.'},
+    {n:'Slow pike push-up', h:'Four seconds down towards the floor.'},
+    {n:'Deficit pike push-up', h:'Hands on books so your head travels below them.'}
+  ],
+  cues:['Start in a push-up position, then walk your feet in and push your hips up high.','Your body should look like an upside-down V, arms and back in one line.','Bend your elbows and lower the top of your head towards the floor between your hands.','Press back up until your arms are straight.'],
+  wrong:'Letting the hips drop so it turns back into a push-up. The higher the hips, the more the shoulders do.',
+  working:'The tops of your shoulders. This is the closest you get to an overhead press with no weight at all.',
+  pose:{
+    a:{h:[27,55],n:[35,47],p:[57,26],ka:[73,45],fa:[89,65],kb:[73,45],fb:[89,65],ea:[29,55],wa:[22,65],eb:[29,55],wb:[22,65],floor:67},
+    b:{h:[22,63],n:[33,54],p:[57,28],ka:[73,46],fa:[89,65],kb:[73,46],fb:[89,65],ea:[37,61],wa:[22,65],eb:[37,61],wb:[22,65],floor:67}}
+},
+{
+  id:'pullup', kit:'bar', pat:'pull', alt:['tablerow','row'], name:'Pull-up', trains:'Upper back, biceps', reps:[3,10], sets:3, load:false,
+  ladder:[
+    {n:'Dead hang', h:'Just hang from the bar for time. Builds the grip everything else needs.'},
+    {n:'Jumping pull-up', h:'Jump to the top, then lower yourself as slowly as you can.'},
+    {n:'Negative pull-up', h:'Start at the top, take five seconds to lower. Nothing else.'},
+    {n:'Pull-up', h:'From a dead hang to chin over the bar.'},
+    {n:'Slow pull-up', h:'Up in one second, four seconds down.'}
+  ],
+  cues:['Hang from the bar with hands a bit wider than your shoulders, arms straight.','Pull your shoulder blades down before your arms do anything.','Drive your elbows down towards your ribs until your chin clears the bar.','Lower all the way until your arms are straight again.'],
+  wrong:'Kicking your legs to get up. Squeeze your glutes and keep your body still.',
+  working:'The sides of your back and your biceps. Expect months on negatives before a full one, and that is normal.',
+  pose:{
+    a:{h:[50,29],n:[50,35],p:[50,58],ka:[50,74],fa:[50,86],kb:[50,74],fb:[50,86],ea:[43,23],wa:[47,11],eb:[57,23],wb:[53,11],floor:90},
+    b:{h:[50,17],n:[50,23],p:[50,47],ka:[50,64],fa:[50,78],kb:[50,64],fb:[50,78],ea:[39,21],wa:[47,11],eb:[61,21],wb:[53,11],floor:90}}
+},
+{
+  id:'bandrow', kit:'band', pat:'pull', alt:['tablerow','row'], name:'Band row', trains:'Upper back, biceps', reps:[8,15], sets:3, load:false,
+  ladder:[
+    {n:'Seated band row', h:'Sit down, band round your feet, pull to your stomach.'},
+    {n:'Standing band row', h:'Band anchored at chest height, step back for tension.'},
+    {n:'Slow band row', h:'Pull fast, take four seconds to let it back.'},
+    {n:'One-arm band row', h:'One side at a time, no twisting.'},
+    {n:'Double-band row', h:'Two bands, or step further back for more stretch.'}
+  ],
+  cues:['Anchor the band at chest height, or loop it round your feet while sitting.','Start with your arms straight and the band already under a little tension.','Pull your elbows back past your ribs, squeezing your shoulder blades together.','Let it back slowly — the band will try to snap your arms forward.'],
+  wrong:'Standing too close so there is no tension at the start. Step back until it pulls from the first inch.',
+  working:'Between the shoulder blades. Bands get harder as they stretch, so the squeeze at the end is the hardest part.',
+  pose:{
+    a:{h:[50,19],n:[50,31],p:[50,58],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[58,38],wa:[70,34],eb:[58,38],wb:[70,34],floor:95},
+    b:{h:[50,19],n:[50,31],p:[50,58],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[40,36],wa:[54,40],eb:[40,36],wb:[54,40],floor:95}}
+},
+{
+  id:'bandcurl', kit:'band', pat:'arms', alt:['tablerow','curl'], name:'Band curl', trains:'Biceps, forearms', reps:[10,18], sets:3, load:false,
+  ladder:[
+    {n:'Two-hand band curl', h:'Stand on the band, curl both hands up together.'},
+    {n:'Slow band curl', h:'Up in one second, four seconds down.'},
+    {n:'One-arm band curl', h:'Stand on the band, one hand at a time.'},
+    {n:'Wide-stance band curl', h:'Feet further apart for more tension throughout.'},
+    {n:'Paused band curl', h:'Squeeze hard for two seconds at the top of every rep.'}
+  ],
+  cues:['Stand on the middle of the band with a handle or end in each hand.','Elbows pinned to your ribs, palms facing forward.','Curl up without letting your upper arms move.','Fight the band on the way down — that is where the work is.'],
+  wrong:'Letting the band yank your arms straight. If you cannot control the lowering, stand with your feet closer together.',
+  working:'The front of your upper arm. Bands are kindest to the elbows of anyone starting out.',
+  pose:{
+    a:{h:[50,19],n:[50,31],p:[50,58],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[45,45],wa:[45,60],eb:[55,45],wb:[55,60],floor:95},
+    b:{h:[50,19],n:[50,31],p:[50,58],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[45,45],wa:[48,34],eb:[55,45],wb:[52,34],floor:95}}
+});
+
+/* What the person actually owns */
+const KIT=[
+  {id:'none', n:'Just me and the floor', d:'Plus a chair, a table and a doorway'},
+  {id:'db',   n:'Dumbbells', d:'One pair, or a fixed set'},
+  {id:'band', n:'Resistance bands', d:'Any loop or tube band'},
+  {id:'bar',  n:'Pull-up bar', d:'Doorway or wall mounted'}
+];
+function hasKit(k){ return k==='none' || (S.kit||['none']).indexOf(k)>=0; }
+function kitList(){ return S.kit&&S.kit.length?S.kit:['none']; }
+
+/* Slots are movement patterns, not fixed exercises, so the session rebuilds
+   itself from whatever is to hand. First available candidate wins. */
+const PLAN={
+  A:[['squat'],['pushup','press'],['pullup','row','bandrow','tablerow'],['bridge','rdl'],['plank','deadbug']],
+  B:[['split','squat'],['press','pushup'],['rdl','bridge'],['ohp','pikepush'],['curl','bandcurl','tablerow']]
+};
+function sessionFor(key){
+  const base=SESSIONS[key];
+  const picked=[], used=new Set();
+  PLAN[key].forEach(cands=>{
+    let pick=cands.find(id=>{ const e=byId(id); return e&&hasKit(e.kit||'db')&&!used.has(id); })
+          || cands.find(id=>{ const e=byId(id); return e&&hasKit(e.kit||'db'); });
+    if(pick){ picked.push(pick); used.add(pick); }
+  });
+  return {name:base.name, cool:base.cool, ex:picked.length?picked:base.ex};
+}
+/* Adjustable or multiple pairs means adding weight is the better lever */
+function canAddWeight(){ return hasKit('db') && S.dbAdjustable; }
+
 const GUIDES = [
+  {t:'Why the Crew screen hides weights',b:`It only ever shows how <b>often</b> people train, never what they lifted.<br><br>If it showed the numbers, anyone starting out would come off worst against people who have been at it for years — and beginners are exactly the people who most need to keep going. Comparison is the fastest way to talk yourself out of something you have only just started.<br><br>Turning up three times a week looks identical whoever you are, and turning up is the thing worth copying.`},
   {t:'When to stretch, and when not to',b:`Two different things get called stretching, and mixing them up is why stretching has a mixed reputation.<br><br><b>Before training: moving stretches.</b> Arm circles, bodyweight squats, hip hinges. These warm the joint and rehearse the movement. Good.<br><br><b>Before training: long static holds.</b> Sitting in a hamstring stretch for a minute measurably weakens the muscle for the next twenty minutes or so. Skip it.<br><br><b>After training: long static holds.</b> Now they are useful. The muscle is warm, you are done lifting, and you are giving back the range the session just took.<br><br>That is exactly how the app is built: dynamic moves on the rest-day check-in, static holds at the end of a session. Stretch to mild tension and no further. If it is sharp, or you cannot breathe normally, back off.`},
   {t:'What actually makes a muscle grow', b:`Three things, in order of how much they matter.<br><br><b>1. Hard sets.</b> A set only counts if the last two or three reps are genuinely difficult. Stopping when it starts to burn is the single commonest reason people train for months and look the same.<br><br><b>2. Doing a bit more over time.</b> One more rep, a slower lowering, a harder version of the movement. That is progressive overload, and it is the whole game.<br><br><b>3. Food and sleep.</b> Muscle is built out of protein while you sleep. Aim for a decent protein source at every meal and seven-plus hours in bed. You cannot out-train four hours of sleep.<br><br>Notice that "which exercise" is not on the list. The exercises here are fine. What you do with them is what matters.`},
   {t:'How hard is hard enough?', b:`Use this scale on the last set of each exercise:<br><br><b>Too easy</b> — you finish and could have done six more. The set did almost nothing.<br><b>About right</b> — you finish with one or two reps left in you. Reps are slowing down, form still good.<br><b>Too far</b> — form falls apart, you are jerking the weight. Not more effective, just riskier.<br><br>Aim for "about right" on every set. It should feel uncomfortable and completely achievable at the same time. That feeling is the target, and you will get better at finding it after about three weeks.`},
-  {t:'Picking a weight with only two dumbbells', b:`You have a fixed pair, so you cannot just add 2kg when things get easy. Instead you make the movement harder. Use these levers roughly in this order:<br><br><b>More reps</b> — work up to the top of the rep range.<br><b>Slower lowering</b> — take four seconds to lower. This alone can double how hard a set feels.<br><b>Bigger range</b> — stand on a book, elevate your feet, go deeper.<br><b>Pause at the hard point</b> — three seconds at the bottom, no bounce.<br><b>One limb at a time</b> — instantly doubles the load on that side.<br><b>Shorter rests</b> — drop from 90 seconds to 60.<br><br>The app tracks where you are on each exercise's ladder and tells you when to step up. You will get a long way before you ever need heavier dumbbells.`},
+  {t:'Making an exercise harder without more weight', b:`If you have a fixed pair of dumbbells, bands, or nothing at all, you cannot just add 2kg when things get easy. Instead you make the movement harder. Use these levers roughly in this order:<br><br><b>More reps</b> — work up to the top of the rep range.<br><b>Slower lowering</b> — take four seconds to lower. This alone can double how hard a set feels.<br><b>Bigger range</b> — stand on a book, elevate your feet, go deeper.<br><b>Pause at the hard point</b> — three seconds at the bottom, no bounce.<br><b>One limb at a time</b> — instantly doubles the load on that side.<br><b>Shorter rests</b> — drop from 90 seconds to 60.<br><br>The app tracks where you are on each exercise's ladder and tells you when to step up. If your dumbbells are adjustable, it will offer you the weight instead, since that is the simpler lever when you have it. You will get a long way before equipment is what holds you back.`},
   {t:'How often, and why rest days matter', b:`Three sessions a week, with a day off between them. Something like Monday, Wednesday, Friday — but any three days work, and the app does not care which ones you pick.<br><br>Training breaks muscle down. The building happens afterwards, while you rest and sleep. Train the same muscles two days running and you interrupt the repair you are trying to cause.<br><br>This is why the streak here counts <b>weeks, not days</b>. Three sessions in a week is a full week, whether you do them Monday-Wednesday-Friday or all at the weekend. A daily streak would push you to train when you should be recovering, which is the opposite of what you want.`},
   {t:'Soreness is not a scorecard', b:`Aching for two days after a session feels like proof it worked. It is not. Soreness mostly tells you that you did something <b>new</b>, not something <b>effective</b>. It fades after a few weeks of the same movements even as you keep getting stronger.<br><br>Judge a session by the numbers instead: did you beat last time, by a rep or by a harder version? That is the only honest measure, and it is the one the app keeps for you.<br><br>Mild stiffness for a day or two is normal, especially at the start. Sharp pain in a joint is not — stop, drop a rung on the ladder, and rebuild from there.`},
   {t:'What to expect, and when', b:`<b>Weeks 1–3.</b> You get noticeably better at the movements and your numbers jump. Almost all of that is your nervous system learning, not new muscle. It still counts — it is the foundation.<br><br><b>Weeks 4–10.</b> Real muscle starts to show up. Clothes fit differently before the mirror shows much. Progress becomes slower and steadier, which is the point at which most people quit.<br><br><b>Month 3 onwards.</b> Visible change, if you have kept the sessions honest and eaten enough. Beginners build faster than they ever will again, so the work you do now pays the most.<br><br>Three sessions a week for twelve weeks is thirty-six sessions. That is the whole ask.`},
@@ -514,6 +659,7 @@ const KEY='groundwork.v1';
 let S = {
   setup:false,
   unit:'kg', db:10, target:3, restSec:90,
+  kit:['none'], dbAdjustable:false,
   levels:{}, weights:{}, ready:{},
   logs:[], badges:[], checkins:{}
 };
@@ -736,7 +882,7 @@ function renderTabs(){
   document.getElementById('tabs').innerHTML = '<div class="tabrow">' + TABS.map(t=>
     `<button class="${t.id===tab?'on':''}" onclick="go('${t.id}')" aria-label="${t.n}"><svg viewBox="0 0 24 24">${t.ic}</svg><span>${t.n}</span></button>`).join('') + '</div>';
 }
-function go(t){ stopAll(); tab=t; renderTabs(); render(); window.scrollTo(0,0); }
+function go(t){ stopAll(); sub=null; tab=t; renderTabs(); render(); window.scrollTo(0,0); }
 
 function render(){
   if(!S.setup){ return viewSetup(); }
@@ -753,11 +899,19 @@ function viewSetup(){
     <p class="muted" style="margin-top:14px;max-width:44ch">Full-body strength training built around a pair of dumbbells and whatever furniture you already own. Every movement has a guide. The app decides when you're ready for a harder version.</p>
     <div class="card" style="margin-top:24px">
       <h2 style="font-size:16px">Set up</h2>
-      <label class="row" style="border-top:none"><span>Your dumbbells weigh</span>
-        <span class="rowctl">
-          <input type="number" class="qty" id="s_db" value="10" min="0.5" step="0.5">
-          <select class="unit" id="s_unit"><option value="kg">kg</option><option value="lb">lb</option></select>
-        </span></label>
+      <div style="padding:4px 0 2px"><span style="font-size:15px">What have you got?</span>
+        <p class="tiny muted" style="margin:4px 0 10px">Pick everything that applies. The sessions are built from what you actually own, so none of it is wasted.</p>
+        <div id="kitpick">${KIT.map(k=>`<button type="button" class="kitopt${k.id==='none'?' on':''}" data-kit="${k.id}" onclick="toggleKit(this)">
+          <span class="kn">${k.n}</span><span class="kd">${k.d}</span></button>`).join('')}</div></div>
+      <div id="dbrow" class="hidden">
+        <label class="row"><span>Your dumbbells weigh</span>
+          <span class="rowctl">
+            <input type="number" class="qty" id="s_db" value="10" min="0.5" step="0.5">
+            <select class="unit" id="s_unit"><option value="kg">kg</option><option value="lb">lb</option></select>
+          </span></label>
+        <label class="row"><span>Can you change the weight?<br><span class="tiny muted">Adjustable, or several pairs</span></span>
+          <input type="checkbox" id="s_adj" style="width:20px;height:20px;flex:0 0 auto;accent-color:var(--pine)"></label>
+      </div>
       <label class="row"><span>Sessions per week</span>
         <select id="s_tgt"><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option></select></label>
       <p class="tiny muted" style="margin:14px 0 0">Not sure what your dumbbells weigh? Guess. You can change it any time, and it only affects the numbers you log.</p>
@@ -766,8 +920,22 @@ function viewSetup(){
     <p class="tiny muted" style="margin-top:18px">Everything is stored on this device only. If you're new to lifting and have a heart or joint condition, have a word with your GP before starting.</p>
   </div>`;
 }
+function toggleKit(btn){
+  const id=btn.dataset.kit, on=btn.classList.toggle('on');
+  if(id!=='none'&&on) document.querySelector('.kitopt[data-kit=none]')?.classList.remove('on');
+  const any=[...document.querySelectorAll('.kitopt.on')].some(b=>b.dataset.kit!=='none');
+  if(!any) document.querySelector('.kitopt[data-kit=none]')?.classList.add('on');
+  const dbrow=document.getElementById('dbrow');
+  if(dbrow) dbrow.classList.toggle('hidden', !document.querySelector('.kitopt[data-kit=db].on'));
+}
+function readKit(){
+  const on=[...document.querySelectorAll('.kitopt.on')].map(b=>b.dataset.kit).filter(k=>k!=='none');
+  return on.length?on:['none'];
+}
 function finishSetup(){
-  S.db=parseFloat(document.getElementById('s_db').value)||10;
+  S.kit=readKit();
+  S.dbAdjustable=!!document.getElementById('s_adj')?.checked;
+  S.db=parseFloat(document.getElementById('s_db')?.value)||10;
   S.unit=document.getElementById('s_unit').value;
   S.target=parseInt(document.getElementById('s_tgt').value);
   EX.forEach(e=>{ if(S.weights[e.id]===undefined) S.weights[e.id]=S.db; });
@@ -778,7 +946,7 @@ function finishSetup(){
 }
 
 function viewToday(){
-  const st=streak(), ds=dayStreak(), done=thisWeekCount(), key=nextSession(), sess=SESSIONS[key];
+  const st=streak(), ds=dayStreak(), done=thisWeekCount(), key=nextSession(), sess=sessionFor(key);
   const d=new Date(), rest=isRestDay(), trainedToday=trainedOn(dayKey(d)), ci=checkedInToday();
   const rungs=Array.from({length:S.target},(_,i)=>`<div class="rung ${i<done?'done':''}"></div>`).join('');
   const readyList=sess.ex.filter(id=>S.ready[id]);
@@ -804,7 +972,7 @@ function viewToday(){
 
   ${ci||trainedToday ? '' : `<div class="card checkin" style="margin-top:14px">
     <h2 style="font-size:17px">${rest?'Rest day check-in':'Check in'}</h2>
-    <p class="small muted" style="margin:6px 0 0">Thirty seconds. Two minutes of loosening off, three questions, and today's idea. This is what keeps the day streak alive — no lifting required.</p>
+    <p class="small muted" style="margin:6px 0 0">${S.logs.length||Object.keys(S.checkins).length?'Three moves, three questions, today\u2019s idea.':'Thirty seconds. Three mobility moves, three questions and today\u2019s idea \u2014 no lifting required.'}</p>
     <button class="btn" style="background:var(--brass);color:var(--surface)" onclick="startCheckin()">${rest?'Start rest-day check-in':'Check in for today'}</button>
   </div>`}
 
@@ -843,8 +1011,8 @@ function viewToday(){
     <button class="btn ghost sm" onclick="startSession('${key}',true)">Short on time — one exercise</button>
   </div>`}
 
-  ${S.logs.length===0?`<div class="card"><h3 style="font-size:15px">Before your first session</h3><p class="small muted" style="margin:8px 0 0">Three minutes of warm-up, a bit of floor space, and your dumbbells within reach. Pick a weight that lets you finish every set with one or two reps left in you — if you finish easily, that set didn't count for much.</p></div>`:
-  `<div class="card"><h3 style="font-size:15px">Last session</h3><p class="small muted" style="margin:8px 0 0">${lastSummary()}</p></div>`}`;
+  ${S.logs.length===0?`<div class="card"><h3 style="font-size:15px">Before your first session</h3><p class="small muted" style="margin:8px 0 0">Three minutes of warming up and a bit of floor space. Stop each set with one or two reps left in you — if a set feels easy, it did not count for much.</p></div>`:
+  `<p class="tiny muted" style="margin:16px 0 0;text-align:center">${lastSummary()}</p>`}`;
 }
 function last7(){
   let o='';
@@ -854,7 +1022,7 @@ function last7(){
   return o;
 }
 function showSession(key){
-  const sess=SESSIONS[key];
+  const sess=sessionFor(key);
   document.getElementById('peek').innerHTML=`<ul class="exlist" style="margin-top:14px">
     ${sess.ex.map(id=>{const e=byId(id),lv=e.ladder[S.levels[id]];
       return `<li><span>${lv.n}</span><span class="meta">${e.sets} × ${e.reps[0]}–${e.reps[1]}${e.unit==='sec'?'s':''}</span></li>`}).join('')}</ul>
@@ -882,7 +1050,7 @@ function viewLearn(){
     <div class="acbody"></div></div>`).join('')}</div>
 
   <h2 style="font-size:15px;margin:28px 0 4px">Every movement</h2>
-  <div>${EX.map(e=>`<div class="accordion">
+  <div>${EX.filter(e=>hasKit(e.kit||'db')).map(e=>`<div class="accordion">
     <button class="achead" onclick="acc(this,'${e.id}')">${e.name}<svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>
     <div class="acbody" id="ac_${e.id}"></div></div>`).join('')}</div>`;
 }
@@ -1083,83 +1251,159 @@ function viewCrew(){
     ${Signer.canWrite?`<button class="btn sm" style="background:var(--pine);color:var(--surface)" onclick="chCreate()">Set one up</button>`:''}
   </div>`}
 
-  <div class="card" style="margin-top:22px"><h3 style="font-size:15px">Why there are no weights here</h3>
-    <p class="small muted" style="margin:8px 0 0">This screen only ever shows how often people train. If it showed what everyone was lifting, anyone starting out would come off worst against people who have been at it for years, and the beginners are exactly the people who most need to keep going. Turning up three times a week looks the same whoever you are.</p></div>
-  <p class="tiny muted" style="margin:14px 0 0;text-align:center">Numbers come from what people publish to nostr. Anyone with publishing switched off will look quiet even if they are training.</p>`;
+  <p class="tiny muted" style="margin:20px 0 0;text-align:center">Only frequency is ever shown here, never weights. Anyone with publishing switched off looks quiet even if they are training.</p>`;
   socialSync();
 }
 
+/* Settings live behind a menu rather than one long scroll: each screen holds
+   one concern, and the menu shows what each is currently set to. */
+let sub=null;
+function openSub(k){ sub=k; render(); window.scrollTo(0,0); }
+function closeSub(){ sub=null; render(); window.scrollTo(0,0); }
+
+function subhead(title){
+  return `<div class="subbar">
+    <button onclick="closeSub()" aria-label="Back">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+    </button><h1>${title}</h1></div>`;
+}
+function kitSummary(){
+  const names=kitList().map(k=>(KIT.find(x=>x.id===k)||{}).n||k);
+  if(kitList()[0]==='none') return 'Bodyweight only';
+  return names.join(', ')+(hasKit('db')?` · ${S.db}${S.unit}${S.dbAdjustable?', adjustable':''}`:'');
+}
+const MENU=[
+  {k:'kit',   n:'Equipment',        sum:()=>kitSummary()},
+  {k:'train', n:'Training',         sum:()=>`${S.target} sessions a week · ${S.restSec}s rest`},
+  {k:'ladder',n:'Exercise levels',  sum:()=>`${EX.filter(e=>hasKit(e.kit||'db')).length} movements`},
+  {k:'remind',n:'Daily reminder',   sum:()=>!Native.on?'Not available on this platform':(S.notify?`On at ${S.notifyAt||'19:00'}`:'Off')},
+  {k:'look',  n:'Appearance',       sum:()=>({auto:'Match device',light:'Light',dark:'Dark'})[S.theme||'auto']},
+  {k:'acct',  n:'Nostr account',    sum:()=>S.nostr?shortNpub(S.nostr.pk):'Not signed in'},
+  {k:'data',  n:'Your data',        sum:()=>`${S.logs.length} session${S.logs.length===1?'':'s'} on this device`}
+];
+
 function viewYou(){
+  if(sub) return ({kit:subKit,train:subTrain,ladder:subLadder,remind:subRemind,
+                   look:subLook,acct:subAcct,data:subData})[sub]();
   $v.innerHTML=`<div class="topbar"><h1>You</h1></div>
+  <div class="menu">${MENU.map(m=>`<button class="menurow" onclick="openSub('${m.k}')">
+    <span class="ml"><span class="mn">${m.n}</span><span class="ms">${m.sum()}</span></span>
+    <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+  </button>`).join('')}</div>
+  <p class="tiny muted" style="margin:20px 0 0;text-align:center">Everything stays on this device unless you sign in.</p>`;
+}
+
+function subKit(){
+  $v.innerHTML=subhead('Equipment')+`
+  <p class="small muted" style="margin:0 0 14px">Pick everything you have. Sessions rebuild themselves from this, so nothing you own goes unused and nothing you lack gets suggested.</p>
+  <div id="kitpick">${KIT.map(k=>`<button type="button" class="kitopt${(k.id==='none'?kitList()[0]==='none':kitList().indexOf(k.id)>=0)?' on':''}" data-kit="${k.id}" onclick="toggleKit(this);S.kit=readKit();save();render()">
+    <span class="kn">${k.n}</span><span class="kd">${k.d}</span></button>`).join('')}</div>
+  ${hasKit('db')?`<div class="card" style="margin-top:16px"><h3 style="font-size:15px">Your dumbbells</h3>
+    <label class="row"><span>They weigh</span><span class="rowctl">
+      <input type="number" class="qty" value="${S.db}" min="0.5" step="0.5" onchange="S.db=parseFloat(this.value)||S.db;save()">
+      <select class="unit" onchange="S.unit=this.value;save();render()"><option value="kg" ${S.unit==='kg'?'selected':''}>kg</option><option value="lb" ${S.unit==='lb'?'selected':''}>lb</option></select></span></label>
+    <label class="row"><span>I can change the weight<br><span class="tiny muted">Adjustable, or several pairs</span></span>
+      <input type="checkbox" ${S.dbAdjustable?'checked':''} style="width:20px;height:20px;flex:0 0 auto;accent-color:var(--pine)" onchange="S.dbAdjustable=this.checked;save();render()"></label>
+    <p class="tiny muted" style="margin:12px 0 0">${S.dbAdjustable?'Because you can add weight, that will be offered first when an exercise gets easy.':'Because the weight is fixed, you will progress by moving to harder versions instead.'}</p>
+  </div>`:''}`;
+}
+
+function subTrain(){
+  $v.innerHTML=subhead('Training')+`
   <div class="card">
-    <h3 style="font-size:15px">Setup</h3>
-    <label class="row"><span>Dumbbell weight</span><span class="rowctl">
-      <input type="number" class="qty" id="y_db" value="${S.db}" min="0.5" step="0.5" onchange="S.db=parseFloat(this.value)||S.db;save()">
-      <select class="unit" id="y_unit" onchange="S.unit=this.value;save();render()"><option value="kg" ${S.unit==='kg'?'selected':''}>kg</option><option value="lb" ${S.unit==='lb'?'selected':''}>lb</option></select></span></label>
-    <label class="row"><span>Sessions per week</span>
+    <label class="row" style="border-top:none"><span>Sessions per week</span>
       <select onchange="S.target=parseInt(this.value);save();render()">${[2,3,4].map(n=>`<option value="${n}" ${S.target===n?'selected':''}>${n}</option>`).join('')}</select></label>
     <label class="row"><span>Rest between sets</span>
-      <select onchange="S.restSec=parseInt(this.value);save()">${[45,60,75,90,120].map(n=>`<option value="${n}" ${S.restSec===n?'selected':''}>${n} sec</option>`).join('')}</select></label>
-    <label class="row"><span>Appearance</span>
-      <select onchange="setTheme(this.value)">${[['auto','Match device'],['light','Light'],['dark','Dark']].map(([v,n])=>`<option value="${v}" ${(S.theme||'auto')===v?'selected':''}>${n}</option>`).join('')}</select></label>
-  </div>
+      <select onchange="S.restSec=parseInt(this.value);save();render()">${[45,60,75,90,120].map(n=>`<option value="${n}" ${S.restSec===n?'selected':''}>${n} sec</option>`).join('')}</select></label>
+    <p class="tiny muted" style="margin:14px 0 0">Three sessions a week is the sweet spot for most people. Two still works if life is busy — it just takes longer.</p>
+  </div>`;
+}
 
-  <div class="card"><h3 style="font-size:15px">Adjust your ladders</h3>
-    <p class="small muted" style="margin:6px 0 0">The app moves you up automatically, but if a version feels wrong today, move it yourself.</p>
-    ${EX.map(e=>`<label class="stack"><span style="font-size:14.5px">${e.name}</span>
+function subLadder(){
+  $v.innerHTML=subhead('Exercise levels')+`
+  <p class="small muted" style="margin:0 0 14px">The app moves you up on its own when you earn it. Change one here if a version feels wrong today.</p>
+  <div class="card">
+    ${EX.filter(e=>hasKit(e.kit||'db')).map((e,i)=>`<label class="stack" ${i===0?'style="border-top:none"':''}><span style="font-size:14.5px">${e.name}</span>
       <select onchange="S.levels['${e.id}']=parseInt(this.value);S.ready['${e.id}']=false;save()">
-      ${e.ladder.map((l,i)=>`<option value="${i}" ${S.levels[e.id]===i?'selected':''}>${l.n}</option>`).join('')}</select></label>`).join('')}
-  </div>
+      ${e.ladder.map((l,j)=>`<option value="${j}" ${S.levels[e.id]===j?'selected':''}>${l.n}</option>`).join('')}</select></label>`).join('')}
+  </div>`;
+}
 
-  <div class="card"><h3 style="font-size:15px">Daily reminder</h3>
-    <p class="small muted" style="margin:6px 0 0">One nudge a day for the check-in. It skips days you've already logged, and never nags you to train on a rest day.</p>
-    <label class="row"><span>Remind me</span>
-      <span class="rowctl">
-        <input type="time" value="${S.notifyAt||'19:00'}" onchange="S.notifyAt=this.value;save();notifSchedule();toast('Reminder set for '+this.value)">
-      </span></label>
-    ${S.notify
-      ? `<button class="btn ghost sm" onclick="notifOff()">Turn reminders off</button>`
-      : `<button class="btn sm" style="background:var(--brass);color:var(--surface)" onclick="notifAsk()">Turn reminders on</button>`}
-    <p class="tiny muted" style="margin:12px 0 0">Reminders need the installed app — they do nothing in a browser tab.</p>
-  </div>
+function subRemind(){
+  $v.innerHTML=subhead('Daily reminder')+`
+  <div class="card">
+    <p class="small muted" style="margin:0">One nudge a day for the check-in. It skips days you have already logged, and never nags you to train on a rest day.</p>
+    <label class="row"><span>Remind me at</span><span class="rowctl">
+      <input type="time" value="${S.notifyAt||'19:00'}" onchange="S.notifyAt=this.value;save();notifSchedule();toast('Set for '+this.value)"></span></label>
+    ${Native.on
+      ? (S.notify?`<button class="btn ghost sm" onclick="notifOff()">Turn reminders off</button>`
+        :`<button class="btn sm" style="background:var(--brass);color:var(--surface)" onclick="notifAsk()">Turn reminders on</button>`)
+      : `<div class="flag" style="margin-top:14px"><b>Not available here.</b> ${IOS
+          ? 'iPhone home-screen apps cannot schedule their own reminders — that is an Apple restriction, not something the app can work around. Set a repeating alarm on your phone for the same time instead; it does the same job.'
+          : 'Reminders need the installed app. In a browser tab there is nothing to schedule against.'}</div>`}
+  </div>`;
+}
 
-  ${S.nostr ? `<div class="card"><h3 style="font-size:15px">Nostr account</h3>
-    <div style="display:flex;align-items:center;gap:11px;margin-top:11px">
-      <div style="width:36px;height:36px;border-radius:50%;background:var(--pine-soft);display:grid;place-items:center;color:var(--pine);font-weight:700;font-family:'Familjen Grotesk',sans-serif">${npubEncode(S.nostr.pk)[5].toUpperCase()}</div>
+function subLook(){
+  $v.innerHTML=subhead('Appearance')+`
+  <div class="card">
+    ${[['auto','Match device'],['light','Light'],['dark','Dark']].map(([v,n],i)=>
+      `<button class="pickrow${(S.theme||'auto')===v?' on':''}" onclick="setTheme('${v}');render()" ${i===0?'style="border-top:none"':''}>
+        <span>${n}</span>${(S.theme||'auto')===v?'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>':''}
+      </button>`).join('')}
+  </div>`;
+}
+
+function subAcct(){
+  $v.innerHTML=subhead('Nostr account')+(S.nostr?`
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:11px">
+      <div class="av" style="background:var(--pine);color:var(--surface)">${initialOf(S.nostr.pk)}</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:14px;font-family:'Familjen Grotesk',sans-serif;word-break:break-all">${shortNpub(S.nostr.pk)}</div>
         <div class="tiny muted">${{amber:'Signed with Amber',nip07:'Signed with a browser extension',npub:'Read-only'}[S.nostr.mode]}</div>
       </div>
       <button class="tiny muted" onclick="nostrLogout()" style="text-decoration:underline">Sign out</button>
     </div>
-    ${Signer.canWrite?`<label class="row"><span>Back up after every session</span>
-      <input type="checkbox" ${S.nostr.autoBackup?'checked':''} style="width:20px;height:20px;flex:0 0 auto;accent-color:var(--pine)"
-        onchange="S.nostr.autoBackup=this.checked;save()"></label>
-    <label class="row"><span>Publish workouts publicly<br><span class="tiny muted">Unencrypted, visible to anyone</span></span>
-      <input type="checkbox" ${S.nostr.publishWorkouts?'checked':''} style="width:20px;height:20px;flex:0 0 auto;accent-color:var(--brass)"
-        onchange="S.nostr.publishWorkouts=this.checked;save()"></label>`:''}
-    <label class="row"><span>Relays</span>
-      <button onclick="relayEdit()" style="text-decoration:underline;font-size:14px">${(S.nostr.relays||[]).length} connected</button></label>
+  </div>
+  ${Signer.canWrite?`<div class="card"><h3 style="font-size:15px">Backup</h3>
+    <label class="row"><span>Back up after every session</span>
+      <input type="checkbox" ${S.nostr.autoBackup?'checked':''} style="width:20px;height:20px;flex:0 0 auto;accent-color:var(--pine)" onchange="S.nostr.autoBackup=this.checked;save()"></label>
     <p class="tiny muted" style="margin:12px 0 4px">${S.nostr.lastBackup?'Last backed up '+new Date(S.nostr.lastBackup).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'Not backed up yet'}</p>
-    ${Signer.canWrite?`<button class="btn pine sm" onclick="nostrBackup()">Back up now</button>`:''}
-    <button class="btn ghost sm" onclick="nostrRestore()">Restore from backup</button>
-  </div>`
-  : `<div class="card"><h3 style="font-size:15px">Nostr account</h3>
-    <p class="small muted" style="margin:6px 0 0">Optional. Signing in gives you an encrypted backup of your whole history, so a lost or wiped phone doesn't take your streak with it. Only you can read it — it's encrypted to your own key before it leaves the device.</p>
+    <button class="btn pine sm" onclick="nostrBackup()">Back up now</button>
+    <button class="btn ghost sm" onclick="nostrRestore()">Restore from backup</button></div>`
+  :`<div class="card"><button class="btn ghost sm" style="margin-top:0" onclick="nostrRestore()">Restore from backup</button></div>`}
+  ${Signer.canWrite?`<div class="card"><h3 style="font-size:15px">Sharing</h3>
+    <label class="row"><span>Publish workouts publicly<br><span class="tiny muted">Unencrypted. Lets your crew see you trained, never what you lifted.</span></span>
+      <input type="checkbox" ${S.nostr.publishWorkouts?'checked':''} style="width:20px;height:20px;flex:0 0 auto;accent-color:var(--brass)" onchange="S.nostr.publishWorkouts=this.checked;save()"></label>
+    <label class="row"><span>Relays</span>
+      <button onclick="relayEdit()" style="text-decoration:underline;font-size:14px">${(S.nostr.relays||[]).length} connected</button></label></div>`:''}`
+  :`<div class="card">
+    <p class="small muted" style="margin:0">Optional. Signing in gives you an encrypted backup of your whole history, so a lost phone doesn't take your streak with it. Only you can read it.</p>
     <button class="btn sm" style="background:var(--pine);color:var(--surface)" onclick="nostrLogin('amber')">Sign in with Amber</button>
     ${window.nostr?`<button class="btn ghost sm" onclick="nostrLogin('nip07')">Use browser extension</button>`:''}
     <button class="btn ghost sm" onclick="nostrLoginNpub()">Paste an npub (read-only)</button>
-    <p class="tiny muted" style="margin:12px 0 0">Your private key stays in Amber. This app asks it to sign things and never sees the key itself. Amber needs to be installed — it's a free signer app for Android.</p>
-  </div>`}
+    <p class="tiny muted" style="margin:12px 0 0">Your private key stays in Amber. This app asks it to sign things and never sees the key.</p>
+  </div>`);
+}
 
-  <div class="card"><h3 style="font-size:15px">Your data</h3>
-    <p class="small muted" style="margin:6px 0 0">Everything lives on this device. Nothing is uploaded.</p>
+function subData(){
+  const reps=totalReps();
+  $v.innerHTML=subhead('Your data')+`
+  <div class="card">
+    <p class="small muted" style="margin:0">${S.logs.length} sessions and ${reps.toLocaleString()} reps, stored on this device only. Nothing is uploaded unless you sign in.</p>
     <button class="btn ghost sm" onclick="exportData()">Export as a file</button>
     <button class="btn ghost sm" onclick="document.getElementById('impf').click()">Import a file</button>
     <input type="file" id="impf" accept="application/json,.json" class="hidden" onchange="importData(this)">
+    <p class="tiny muted" style="margin:12px 0 0">Import merges rather than replaces, so nothing already here is lost.</p>
+  </div>
+  <div class="card">
+    <h3 style="font-size:15px">Start over</h3>
+    <p class="small muted" style="margin:6px 0 0">Erases every session, streak and setting. There is no undo, so export first if you might want it back.</p>
     <button class="btn ghost sm" style="color:#b4442e;border-color:#b4442e" onclick="wipe()">Erase everything</button>
   </div>`;
 }
+
 function setTheme(v){ S.theme=v; save();
   if(v==='auto') document.documentElement.removeAttribute('data-theme');
   else document.documentElement.setAttribute('data-theme',v); }
@@ -1174,7 +1418,7 @@ function wipe(){ if(confirm('Erase all sessions, streaks and settings? This cann
 /* ============================== SESSION PLAYER ============================== */
 let run=null;
 function startSession(key,short){
-  const sess=SESSIONS[key];
+  const sess=sessionFor(key);
   const list = short ? [sess.ex[0]] : sess.ex;
   run={ key, i:0, short:!!short, startedAt:Date.now(), entries: list.map(id=>{
     const e=byId(id);
@@ -1199,8 +1443,9 @@ function drawStep(){
 
   ${stepUp?`<div class="card" style="margin-top:14px;border-color:var(--brass);background:var(--brass-soft)">
     <h3 style="font-size:15px;color:var(--brass)">Ready to step up</h3>
-    <p class="small" style="margin:6px 0 0">You hit ${e.reps[1]} reps on every set last time. Move up to <b>${e.ladder[en.level+1].n}</b> and start again near the bottom of the range.</p>
-    <button class="btn sm" style="background:var(--brass);color:var(--surface)" onclick="stepUp('${en.exId}')">Move up a rung</button>
+    <p class="small" style="margin:6px 0 0">You hit ${e.reps[1]} reps on every set last time.${canAddWeight()&&e.load?` Add a little weight and drop back to ${e.reps[0]} reps, or move up to <b>${e.ladder[en.level+1].n}</b>.`:` Move up to <b>${e.ladder[en.level+1].n}</b> and start again near the bottom of the range.`}</p>
+    ${canAddWeight()&&e.load?`<button class="btn sm" style="background:var(--brass);color:var(--surface)" onclick="addWeight('${en.exId}')">Add weight, keep this version</button><button class="btn ghost sm" onclick="stepUp('${en.exId}')">Move up a rung instead</button>`
+      :`<button class="btn sm" style="background:var(--brass);color:var(--surface)" onclick="stepUp('${en.exId}')">Move up a rung</button>`}
     <button class="btn ghost sm" onclick="S.ready['${en.exId}']=false;save();drawStep()">Stay here for now</button>
   </div>`:''}
 
@@ -1290,6 +1535,14 @@ function markSet(i){
   if(s.done && i<en.sets.length-1) startRest();
   if(s.done && i===en.sets.length-1 && navigator.vibrate) navigator.vibrate(18);
 }
+function addWeight(id){
+  const e=byId(id), step=S.unit==='kg'?1:2.5;
+  const w=Math.round(((S.weights[id]??S.db)+step)*2)/2;
+  S.weights[id]=w; S.ready[id]=false;
+  run.entries[run.i].sets.forEach(s=>{ if(!s.done){ s.weight=w; s.reps=e.reps[0]; } });
+  save(); stopAll(); drawStep();
+  toast('Now '+w+S.unit+' \u2014 back to '+e.reps[0]+' reps');
+}
 function stepUp(id){
   S.levels[id]=Math.min(S.levels[id]+1, byId(id).ladder.length-1);
   S.ready[id]=false;
@@ -1313,7 +1566,7 @@ function nextStep(){
 /* --- cooldown stretches --- */
 let st_t=null;
 function drawCool(){
-  const list=SESSIONS[run.key].cool, s=byStr(list[run.ci]);
+  const list=sessionFor(run.key).cool, s=byStr(list[run.ci]);
   const total=run.entries.length+list.length;
   document.getElementById('pfill').style.width=((run.entries.length+run.ci)/total*100)+'%';
   document.getElementById('pbody').innerHTML=`
@@ -1359,7 +1612,7 @@ function holdStart(sec,twoSides){
 }
 function coolNext(){
   clearInterval(st_t); stopAll();
-  const list=SESSIONS[run.key].cool;
+  const list=sessionFor(run.key).cool;
   if(run.ci < list.length-1){ run.ci++; drawCool(); document.getElementById('player').scrollTo(0,0); }
   else finishSession();
 }
@@ -2030,6 +2283,14 @@ function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.
   clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),2200); }
 
 /* ============================== BOOT ============================== */
+/* Platform: native shell, iOS home-screen app, or a plain browser tab */
+const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent||'') ||
+  (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+const STANDALONE = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone===true;
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+}
+
 load();
 figNormalise([...EX,...STR,...MOB]);
 if(S.theme && S.theme!=='auto') document.documentElement.setAttribute('data-theme',S.theme);
