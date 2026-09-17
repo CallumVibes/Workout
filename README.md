@@ -1,6 +1,6 @@
 # Groundwork
 
-Home strength training for people who don't like gyms. Bodyweight plus one pair of dumbbells, three sessions a week, with a daily check-in that keeps the habit alive on rest days.
+Home strength training for people who don't like gyms. Bodyweight plus a pair of weights, three sessions a week, with a daily check-in that keeps the habit alive on rest days.
 
 The whole app is one file: `www/index.html`. No build step, no framework, no bundler. Edit it in any text editor, commit, and CI produces an APK.
 
@@ -32,7 +32,7 @@ Milestones also get a **Share on nostr** button, which drafts a `kind 1` note yo
 
 ### Crew and challenges
 
-The **Crew** tab reads your friends' published workout records and shows how often they have trained. Add people by npub, or import your nostr follow list in one tap. The crew list is local to this device and does not touch your real nostr follows.
+The **Friends** tab reads your friends' published workout records and shows how often they have trained. Add people by npub, or import your nostr follow list in one tap. The friends list is local to this device and does not touch your real nostr follows.
 
 A deliberate constraint: this screen never shows weights or reps, only frequency. Beginners lose every comparison against experienced lifters, and beginners are exactly the people who most need to keep going. Turning up three times a week looks identical whoever you are.
 
@@ -62,6 +62,7 @@ www/icon-*.png                    app icons
 scripts/patch-android.py          permissions, deep link, signer visibility
 .github/workflows/android.yml     builds the APK
 .github/workflows/ios.yml         builds an unsigned .ipa on a Mac runner
+.github/workflows/pages.yml       publishes www/ to GitHub Pages
 ```
 
 The `android/` folder is deliberately **not** committed. CI generates it on every run, which means you never need Android Studio or a desktop machine.
@@ -97,11 +98,11 @@ Reminders do nothing in a browser — they need the installed app. Android will 
 
 ## Equipment
 
-Setup asks what the person owns — nothing, dumbbells, bands, a pull-up bar, or any combination — and the sessions are built from that. Each exercise declares the kit it needs, and each session slot is a *movement pattern* (squat, push, pull, hinge, core) with an ordered list of candidates. The first candidate whose kit is available wins.
+Setup asks what the person owns — nothing, weights, bands, a pull-up bar, or any combination — and the sessions are built from that. Each exercise declares the kit it needs, and each session slot is a *movement pattern* (squat, push, pull, hinge, core) with an ordered list of candidates. The first candidate whose kit is available wins.
 
 That means a bodyweight-only user still gets a pulling exercise, which matters: without one, a home programme trains the front of the body and nothing else, and round shoulders are the result. Under-table rows and doorframe rows fill that gap; pike push-ups cover overhead pressing.
 
-If the person says their dumbbells are adjustable, progression changes. Instead of only climbing the variation ladder, the app offers to add weight and drop back to the bottom of the rep range — the simpler lever when you have it.
+If the person says their weights are adjustable, progression changes. Instead of only climbing the variation ladder, the app offers to add weight and drop back to the bottom of the rep range — the simpler lever when you have it.
 
 The Learn tab and the ladder editor both filter to what the person can actually do, so nobody reads a guide for kit they do not own.
 
@@ -114,6 +115,14 @@ Fourteen days or more without a session and the Today screen offers to drop ever
 Everything is stored on the device in `localStorage`. Nothing is uploaded and there is no account.
 
 **You → Export as a file** writes a JSON backup, and **Import a file** reads one back in. Import merges rather than overwrites: existing sessions are kept, duplicates are ignored, and ladder positions take whichever is further along — the same rules as the nostr restore. Android can also clear WebView storage when space runs low, which is rare but real — if you get attached to a long streak, worth migrating to `@capacitor/preferences`, which survives that.
+
+## Web version
+
+`.github/workflows/pages.yml` publishes the `www` folder to GitHub Pages on every push to `main`, so the app is served at the repo's Pages URL directly rather than under `/www/`.
+
+This needs **Settings → Pages → Source** set to **GitHub Actions**. Left on "Deploy from a branch" it serves the repo root, where Jekyll renders this README as the homepage.
+
+A `.nojekyll` file is added during the build so nothing gets filtered on the way out.
 
 ## iOS
 
