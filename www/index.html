@@ -1364,6 +1364,7 @@ function subAcct(){
     <button class="btn sm" style="background:var(--pine);color:var(--surface)" onclick="nostrLogin('amber')">Sign in with Amber</button>
     ${window.nostr?`<button class="btn ghost sm" onclick="nostrLogin('nip07')">Use browser extension</button>`:''}
     <button class="btn ghost sm" onclick="nostrLoginNpub()">Paste an npub (read-only)</button>
+    ${!Native.on?`<div class="flag" style="margin-top:14px"><b>In a browser, Amber can only sign you in.</b> Backups and posting need signing on every action, which means leaving the page each time. Install the app for those, or use a browser extension.</div>`:''}
     <p class="tiny muted" style="margin:12px 0 0">Your key stays in Amber. This app never sees it.</p>
   </div>`);
 }
@@ -1769,37 +1770,87 @@ function npubDecode(s){
 }
 function shortNpub(hex){ if(!hex) return ''; const n=npubEncode(hex); return n.slice(0,10)+'\u2026'+n.slice(-6); }
 
-/* --- Amber, over NIP-55 deep links --- */
+/* --- Amber, over NIP-55 deep links ---
+   Two things NIP-55 is fussy about: callbackUrl has to be the last parameter,
+   because Amber appends its answer to the end of it, and the callback has to
+   be somewhere this app can actually be reached. In the installed app that is
+   the groundwork:// scheme. In a browser it is this page's own URL, and the
+   page reloads on the way back, so the request has to survive in storage. */
 const pending={};
+const PKEY='gw.pending';
+
+function cbBase(){
+  if(Native.on) return 'groundwork://nostr?';
+  return location.origin + location.pathname + '?';
+}
+function amberUrl(type, payload, extra, id){
+  const cb = encodeURIComponent(cbBase()+'gwid='+id+'&res=');
+  return 'nostrsigner:' + (payload ? encodeURIComponent(payload) : '')
+    + '?compressionType=none'
+    + '&returnType=' + (type==='sign_event' ? 'event' : 'signature')
+    + '&type=' + type
+    + '&appName=Groundwork'
+    + (extra || '')
+    + '&callbackUrl=' + cb;   // must stay last
+}
 function amberCall(type, payload, extra){
   return new Promise((resolve,reject)=>{
     const id='gw'+Date.now()+Math.floor(Math.random()*999);
-    const cb=encodeURIComponent('groundwork://nostr?id='+id+'&res=');
-    let url='nostrsigner:'+(payload?encodeURIComponent(payload):'')
-      +'?compressionType=none&returnType='+(type==='sign_event'?'event':'signature')
-      +'&type='+type+'&callbackUrl='+cb+'&id='+id;
-    if(extra) url+=extra;
-    pending[id]={resolve,reject,t:setTimeout(()=>{ delete pending[id];
-      reject(new Error('Amber did not answer. Is it installed?')); },90000)};
+    const url=amberUrl(type,payload,extra,id);
+    if(Native.on){
+      pending[id]={resolve,reject,t:setTimeout(()=>{ delete pending[id];
+        reject(new Error('Amber did not answer. Is it installed?')); },90000)};
+      window.location.href=url;
+      return;
+    }
+    // Browser: we are about to leave the page, so only a login can be resumed.
+    if(type!=='get_public_key'){
+      reject(new Error('Signing needs the installed app. In a browser, use a nostr extension or sign in read-only with your npub.'));
+      return;
+    }
+    try{ localStorage.setItem(PKEY, JSON.stringify({id,type,at:Date.now()})); }catch(e){}
     window.location.href=url;
   });
+}
+
+/* Pull the answer out of whatever shape it came back in */
+function amberValue(u){
+  return u.searchParams.get('res') || u.searchParams.get('event')
+      || u.searchParams.get('signature') || u.searchParams.get('result')
+      || (u.hash ? decodeURIComponent(u.hash.slice(1)) : '');
 }
 function amberResult(url){
   try{
     const u=new URL(url.replace('groundwork://','https://x/'));
-    const id=u.searchParams.get('id');
-    let res=u.searchParams.get('res')||u.searchParams.get('event')||u.searchParams.get('signature');
-    if(!res && u.hash) res=decodeURIComponent(u.hash.slice(1));
+    const id=u.searchParams.get('gwid')||u.searchParams.get('id');
+    const res=amberValue(u);
     const p=pending[id]; if(!p) return;
     clearTimeout(p.t); delete pending[id];
-    if(!res) p.reject(new Error('Amber returned nothing'));
-    else p.resolve(res);
+    res ? p.resolve(res) : p.reject(new Error('Amber returned nothing'));
   }catch(e){}
 }
 if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App){
   window.Capacitor.Plugins.App.addListener('appUrlOpen', d=>{
     if(d&&d.url&&d.url.indexOf('groundwork://')===0) amberResult(d.url);
   });
+}
+
+/* Coming back from Amber in a browser: the page has reloaded, so finish the
+   login from the query string and then tidy the URL. */
+function amberResume(){
+  let stash=null;
+  try{ const r=localStorage.getItem(PKEY); if(r){ stash=JSON.parse(r); localStorage.removeItem(PKEY); } }catch(e){}
+  const q=new URLSearchParams(location.search);
+  if(!q.get('gwid')) return;
+  const res=amberValue(new URL(location.href));
+  history.replaceState({},'',location.origin+location.pathname);
+  if(!stash || stash.id!==q.get('gwid')) return;
+  if(!res){ toast('Amber returned nothing'); return; }
+  const pk = res.indexOf('npub1')===0 ? npubDecode(res) : res.trim();
+  if(!pk || pk.length!==64){ toast('That key did not look right'); return; }
+  S.nostr={mode:'amber', pk, relays:(S.nostr&&S.nostr.relays)||RELAYS_DEFAULT.slice(),
+    autoBackup:false, publishWorkouts:false};
+  save(); render(); toast('Signed in as '+shortNpub(pk));
 }
 
 /* --- one interface over the three ways in --- */
@@ -1838,7 +1889,8 @@ async function nostrLogin(mode){
     toast(mode==='amber'?'Opening Amber\u2026':'Asking your extension\u2026');
     const pk=await Signer.getPublicKey(mode);
     if(!pk||pk.length!==64) throw new Error('That key did not look right');
-    S.nostr={mode, pk, relays:(S.nostr&&S.nostr.relays)||RELAYS_DEFAULT.slice(), autoBackup:true, publishWorkouts:false};
+    S.nostr={mode, pk, relays:(S.nostr&&S.nostr.relays)||RELAYS_DEFAULT.slice(),
+      autoBackup:Native.on||mode==='nip07', publishWorkouts:false};
     save(); render(); toast('Signed in as '+shortNpub(pk));
   }catch(e){ toast(e.message||'Sign-in failed'); }
 }
@@ -2270,6 +2322,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 }
 
 load();
+amberResume();
 figNormalise([...EX,...STR,...MOB]);
 if(S.theme && S.theme!=='auto') document.documentElement.setAttribute('data-theme',S.theme);
 renderTabs();
