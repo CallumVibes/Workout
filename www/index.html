@@ -249,7 +249,7 @@ const EX = [
     id:'squat', kit:'none', alt:['split','bridge'], name:'Goblet squat', trains:'Thighs, glutes, core', reps:[8,14], sets:3, load:true,
     ladder:[
       {n:'Bodyweight squat', h:'Arms straight out in front to balance.'},
-      {n:'Goblet squat', h:'Hold one dumbbell against your chest.'},
+      {n:'Goblet squat', h:'Hold one weight against your chest.'},
       {n:'Slow goblet squat', h:'Take 4 seconds to lower. Stand up normally.'},
       {n:'Paused goblet squat', h:'Hold 3 seconds at the bottom, no bouncing.'},
       {n:'Heels-raised goblet squat', h:'Heels on a book. Deeper, harder on the thighs.'}
@@ -280,15 +280,15 @@ const EX = [
     }
   },
   {
-    id:'row', kit:'db', alt:['curl','rdl'], name:'One-arm dumbbell row', trains:'Upper back, biceps', reps:[8,14], sets:3, load:true,
+    id:'row', kit:'db', alt:['curl','rdl'], name:'One-arm row', trains:'Upper back, biceps', reps:[8,14], sets:3, load:true,
     ladder:[
-      {n:'One-arm row', h:'Free hand on a chair, one dumbbell in the other.'},
-      {n:'Paused row', h:'Hold 2 seconds with the dumbbell at your ribs.'},
+      {n:'One-arm row', h:'Free hand on a chair, one weight in the other.'},
+      {n:'Paused row', h:'Hold 2 seconds with the weight at your ribs.'},
       {n:'Slow-lowering row', h:'Pull fast, take 4 seconds to lower.'},
-      {n:'Dead-stop row', h:'Rest the dumbbell on the floor between every rep.'},
-      {n:'Two-dumbbell bent-over row', h:'Both dumbbells, no support. Hard on the lower back too.'}
+      {n:'Dead-stop row', h:'Rest the weight on the floor between every rep.'},
+      {n:'Two-handed bent-over row', h:'Both weights, no support. Hard on the lower back too.'}
     ],
-    cues:['Hinge forward until your back is roughly parallel to the floor, back flat.','Let the dumbbell hang straight down from your shoulder.','Drive your elbow up past your ribs, like starting a lawnmower.','Squeeze your shoulder blade in at the top, then lower all the way.'],
+    cues:['Hinge forward until your back is roughly parallel to the floor, back flat.','Let the weight hang straight down from your shoulder.','Drive your elbow up past your ribs, like starting a lawnmower.','Squeeze your shoulder blade in at the top, then lower all the way.'],
     wrong:'Twisting your body to heave the weight up. Keep your shoulders level.',
     pose:{
       a:{h:[76,38],n:[68,45],p:[44,52],ka:[43,72],fa:[43,92],kb:[43,72],fb:[43,92],ea:[69,58],wa:[71,70],eb:[60,49],wb:[52,54],floor:93,load:[71,72]},
@@ -300,7 +300,7 @@ const EX = [
     ladder:[
       {n:'Glute bridge', h:'Both feet on the floor, arms by your sides.'},
       {n:'Paused glute bridge', h:'Squeeze hard for 3 seconds at the top of each rep.'},
-      {n:'Weighted glute bridge', h:'Rest a dumbbell across your hips, hold it with both hands.'},
+      {n:'Weighted glute bridge', h:'Rest a weight across your hips, hold it with both hands.'},
       {n:'Feet-raised bridge', h:'Heels on a sofa, hips higher.'},
       {n:'Single-leg bridge', h:'One foot on the floor, the other knee hugged to your chest.'}
     ],
@@ -332,9 +332,9 @@ const EX = [
     ladder:[
       {n:'Supported split squat', h:'Hold a chair or doorframe for balance.'},
       {n:'Split squat', h:'No hands. Feet in a long stride.'},
-      {n:'Weighted split squat', h:'A dumbbell in each hand, hanging by your sides.'},
+      {n:'Weighted split squat', h:'A weight in each hand, hanging by your sides.'},
       {n:'Rear-foot-raised split squat', h:'Back foot on a sofa. This one is brutal.'},
-      {n:'Weighted rear-foot-raised', h:'Back foot raised, dumbbells in hand.'}
+      {n:'Weighted rear-foot-raised', h:'Back foot raised, weights in hand.'}
     ],
     cues:['Step one foot forward into a long stride, back heel lifted.','Lower straight down — your back knee drops towards the floor.','Stop an inch above the floor, then drive up through the front heel.','Finish all the reps on one leg, then swap. Both legs is one set.'],
     wrong:'Stepping forward into a lunge each rep. Stay in the same stance the whole set — it is easier to balance and easier to track.',
@@ -344,15 +344,15 @@ const EX = [
     }
   },
   {
-    id:'press', kit:'db', alt:['pushup','ohp'], name:'Dumbbell floor press', trains:'Chest, triceps, shoulders', reps:[8,14], sets:3, load:true,
+    id:'press', kit:'db', alt:['pushup','ohp'], name:'Floor press', trains:'Chest, triceps, shoulders', reps:[8,14], sets:3, load:true,
     ladder:[
-      {n:'Floor press', h:'Lie on your back, knees bent, press both dumbbells up.'},
+      {n:'Floor press', h:'Lie on your back, knees bent, press both weights up.'},
       {n:'Slow floor press', h:'4 seconds lowering, press up normally.'},
       {n:'Paused floor press', h:'Elbows rest on the floor for 2 seconds each rep.'},
-      {n:'One-arm floor press', h:'One dumbbell at a time. Your core has to stop you twisting.'},
+      {n:'One-arm floor press', h:'One weight at a time. Your core has to stop you twisting.'},
       {n:'Feet-up floor press', h:'Feet off the floor, knees over hips. No leg drive to help.'}
     ],
-    cues:['Lie on your back with the dumbbells resting on your chest, knees bent.','Press straight up until your arms are long, dumbbells over your chest.','Lower until the backs of your upper arms touch the floor.','Keep your wrists stacked over your elbows the whole way.'],
+    cues:['Lie on your back with the weights resting on your chest, knees bent.','Press straight up until your arms are long, weights over your chest.','Lower until the backs of your upper arms touch the floor.','Keep your wrists stacked over your elbows the whole way.'],
     wrong:'Flaring your elbows straight out to the sides — hard on the shoulders. Keep them at about 45°.',
     pose:{
       a:{h:[22,64],n:[31,69],p:[60,70],ka:[76,58],fa:[84,72],kb:[76,58],fb:[84,72],ea:[33,58],wa:[34,47],eb:[33,58],wb:[34,47],floor:74,load:[34,44]},
@@ -363,12 +363,12 @@ const EX = [
     id:'rdl', kit:'db', alt:['bridge','split'], name:'Romanian deadlift', trains:'Hamstrings, glutes, lower back', reps:[8,14], sets:3, load:true,
     ladder:[
       {n:'Hip hinge, hands on hips', h:'Learn the movement with no weight first.'},
-      {n:'Dumbbell RDL', h:'A dumbbell in each hand, sliding down your thighs.'},
+      {n:'Weighted RDL', h:'A weight in each hand, sliding down your thighs.'},
       {n:'Slow RDL', h:'4 seconds down. This is where hamstrings grow.'},
-      {n:'Deficit RDL', h:'Stand on a book so the dumbbells travel further.'},
+      {n:'Deficit RDL', h:'Stand on a book so the weights travel further.'},
       {n:'Single-leg RDL', h:'One leg, other leg straight behind you as a counterweight.'}
     ],
-    cues:['Stand tall, dumbbells in front of your thighs, knees softly bent.','Push your hips backwards — the movement starts at the hips, not the knees.','Slide the dumbbells down your legs, back flat, until you feel a strong stretch behind your thighs.','Drive your hips forward to stand up. Squeeze the glutes at the top.'],
+    cues:['Stand tall, weights in front of your thighs, knees softly bent.','Push your hips backwards — the movement starts at the hips, not the knees.','Slide the weights down your legs, back flat, until you feel a strong stretch behind your thighs.','Drive your hips forward to stand up. Squeeze the glutes at the top.'],
     wrong:'Rounding your back to reach lower. Stop where the stretch is — depth is not the point.',
     pose:{
       a:{h:[50,17],n:[50,29],p:[50,57],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[44,43],wa:[45,56],eb:[56,43],wb:[55,56],floor:95,load:[50,58]},
@@ -378,13 +378,13 @@ const EX = [
   {
     id:'ohp', kit:'db', alt:['press','pushup'], name:'Overhead press', trains:'Shoulders, triceps', reps:[6,12], sets:3, load:true,
     ladder:[
-      {n:'Seated overhead press', h:'Sit upright on a chair, press both dumbbells overhead.'},
+      {n:'Seated overhead press', h:'Sit upright on a chair, press both weights overhead.'},
       {n:'Standing overhead press', h:'Stand tall, no leg help.'},
       {n:'Slow overhead press', h:'4 seconds lowering.'},
       {n:'One-arm overhead press', h:'One side at a time, other hand on your hip.'},
       {n:'Half-kneeling press', h:'One knee down. Your core has to hold you upright.'}
     ],
-    cues:['Start with the dumbbells at shoulder height, palms facing forward.','Squeeze your glutes so you do not lean back.','Press up and very slightly in, until your arms are long overhead.','Lower under control back to your shoulders.'],
+    cues:['Start with the weights at shoulder height, palms facing forward.','Squeeze your glutes so you do not lean back.','Press up and very slightly in, until your arms are long overhead.','Lower under control back to your shoulders.'],
     wrong:'Leaning back and turning it into a standing chest press. If you have to lean, the weight is too heavy.',
     pose:{
       a:{h:[50,19],n:[50,31],p:[50,58],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[38,42],wa:[42,33],eb:[62,42],wb:[58,33],floor:95,load:[50,34]},
@@ -392,15 +392,15 @@ const EX = [
     }
   },
   {
-    id:'curl', kit:'db', alt:['row','pushup'], name:'Dumbbell curl', trains:'Biceps, forearms', reps:[8,15], sets:3, load:true,
+    id:'curl', kit:'db', alt:['row','pushup'], name:'Curl', trains:'Biceps, forearms', reps:[8,15], sets:3, load:true,
     ladder:[
-      {n:'Standing curl', h:'Both dumbbells, palms facing forward.'},
+      {n:'Standing curl', h:'Both weights, palms facing forward.'},
       {n:'Slow-lowering curl', h:'Curl up in 1 second, lower over 4.'},
       {n:'Paused curl', h:'Squeeze hard for 2 seconds at the top.'},
       {n:'One-arm curl', h:'One side at a time, no swinging.'},
       {n:'Half-rep finisher', h:'Full reps to failure, then half reps from the bottom until you cannot.'}
     ],
-    cues:['Stand tall, dumbbells hanging by your sides, palms forward.','Keep your elbows pinned to your ribs.','Curl up without moving your upper arms.','Lower all the way down — the bottom half is where the size comes from.'],
+    cues:['Stand tall, weights hanging by your sides, palms forward.','Keep your elbows pinned to your ribs.','Curl up without moving your upper arms.','Lower all the way down — the bottom half is where the size comes from.'],
     wrong:'Swinging the weight with your back. If your torso moves, the biceps stopped doing the work.',
     pose:{
       a:{h:[50,17],n:[50,29],p:[50,57],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[45,44],wa:[45,58],eb:[55,44],wb:[55,58],floor:95,load:[50,60]},
@@ -430,7 +430,7 @@ const SESSIONS = {
   B:{name:'Session B', ex:['split','press','rdl','ohp','curl'], cool:['hipflex','ham','tri']}
 };
 
-/* Five exercises that fill the gaps for people without a pair of dumbbells.
+/* Five exercises that fill the gaps for people without a pair of weights.
    The pulling ones matter most: without them a bodyweight-only programme has
    nothing for the back at all, which is how people end up round-shouldered. */
 EX.push(
@@ -513,7 +513,7 @@ EX.push(
 /* What the person actually owns */
 const KIT=[
   {id:'none', n:'Just me and the floor', d:'Plus a chair, a table and a doorway'},
-  {id:'db',   n:'Dumbbells', d:'One pair, or a fixed set'},
+  {id:'db',   n:'Weights', d:'Dumbbells, kettlebells, anything you can hold'},
   {id:'band', n:'Resistance bands', d:'Any loop or tube band'},
   {id:'bar',  n:'Pull-up bar', d:'Doorway or wall mounted'}
 ];
@@ -540,11 +540,11 @@ function sessionFor(key){
 function canAddWeight(){ return hasKit('db') && S.dbAdjustable; }
 
 const GUIDES = [
-  {t:'Why the Crew screen hides weights',b:`It only ever shows how <b>often</b> people train, never what they lifted.<br><br>If it showed the numbers, anyone starting out would come off worst against people who have been at it for years — and beginners are exactly the people who most need to keep going. Comparison is the fastest way to talk yourself out of something you have only just started.<br><br>Turning up three times a week looks identical whoever you are, and turning up is the thing worth copying.`},
+  {t:'Why the Friends screen hides weights',b:`It only ever shows how <b>often</b> people train, never what they lifted.<br><br>If it showed the numbers, anyone starting out would come off worst against people who have been at it for years — and beginners are exactly the people who most need to keep going. Comparison is the fastest way to talk yourself out of something you have only just started.<br><br>Turning up three times a week looks identical whoever you are, and turning up is the thing worth copying.`},
   {t:'When to stretch, and when not to',b:`Two different things get called stretching, and mixing them up is why stretching has a mixed reputation.<br><br><b>Before training: moving stretches.</b> Arm circles, bodyweight squats, hip hinges. These warm the joint and rehearse the movement. Good.<br><br><b>Before training: long static holds.</b> Sitting in a hamstring stretch for a minute measurably weakens the muscle for the next twenty minutes or so. Skip it.<br><br><b>After training: long static holds.</b> Now they are useful. The muscle is warm, you are done lifting, and you are giving back the range the session just took.<br><br>That is exactly how the app is built: dynamic moves on the rest-day check-in, static holds at the end of a session. Stretch to mild tension and no further. If it is sharp, or you cannot breathe normally, back off.`},
   {t:'What actually makes a muscle grow', b:`Three things, in order of how much they matter.<br><br><b>1. Hard sets.</b> A set only counts if the last two or three reps are genuinely difficult. Stopping when it starts to burn is the single commonest reason people train for months and look the same.<br><br><b>2. Doing a bit more over time.</b> One more rep, a slower lowering, a harder version of the movement. That is progressive overload, and it is the whole game.<br><br><b>3. Food and sleep.</b> Muscle is built out of protein while you sleep. Aim for a decent protein source at every meal and seven-plus hours in bed. You cannot out-train four hours of sleep.<br><br>Notice that "which exercise" is not on the list. The exercises here are fine. What you do with them is what matters.`},
   {t:'How hard is hard enough?', b:`Use this scale on the last set of each exercise:<br><br><b>Too easy</b> — you finish and could have done six more. The set did almost nothing.<br><b>About right</b> — you finish with one or two reps left in you. Reps are slowing down, form still good.<br><b>Too far</b> — form falls apart, you are jerking the weight. Not more effective, just riskier.<br><br>Aim for "about right" on every set. It should feel uncomfortable and completely achievable at the same time. That feeling is the target, and you will get better at finding it after about three weeks.`},
-  {t:'Making an exercise harder without more weight', b:`If you have a fixed pair of dumbbells, bands, or nothing at all, you cannot just add 2kg when things get easy. Instead you make the movement harder. Use these levers roughly in this order:<br><br><b>More reps</b> — work up to the top of the rep range.<br><b>Slower lowering</b> — take four seconds to lower. This alone can double how hard a set feels.<br><b>Bigger range</b> — stand on a book, elevate your feet, go deeper.<br><b>Pause at the hard point</b> — three seconds at the bottom, no bounce.<br><b>One limb at a time</b> — instantly doubles the load on that side.<br><b>Shorter rests</b> — drop from 90 seconds to 60.<br><br>The app tracks where you are on each exercise's ladder and tells you when to step up. If your dumbbells are adjustable, it will offer you the weight instead, since that is the simpler lever when you have it. You will get a long way before equipment is what holds you back.`},
+  {t:'Making an exercise harder without more weight', b:`If you have a fixed pair of weights, bands, or nothing at all, you cannot just add 2kg when things get easy. Instead you make the movement harder. Use these levers roughly in this order:<br><br><b>More reps</b> — work up to the top of the rep range.<br><b>Slower lowering</b> — take four seconds to lower. This alone can double how hard a set feels.<br><b>Bigger range</b> — stand on a book, elevate your feet, go deeper.<br><b>Pause at the hard point</b> — three seconds at the bottom, no bounce.<br><b>One limb at a time</b> — instantly doubles the load on that side.<br><b>Shorter rests</b> — drop from 90 seconds to 60.<br><br>The app tracks where you are on each exercise's ladder and tells you when to step up. If your weights are adjustable, it will offer the weight instead, since that is the simpler lever when you have it. You will get a long way before equipment is what holds you back.`},
   {t:'How often, and why rest days matter', b:`Three sessions a week, with a day off between them. Something like Monday, Wednesday, Friday — but any three days work, and the app does not care which ones you pick.<br><br>Training breaks muscle down. The building happens afterwards, while you rest and sleep. Train the same muscles two days running and you interrupt the repair you are trying to cause.<br><br>This is why the streak here counts <b>weeks, not days</b>. Three sessions in a week is a full week, whether you do them Monday-Wednesday-Friday or all at the weekend. A daily streak would push you to train when you should be recovering, which is the opposite of what you want.`},
   {t:'Soreness is not a scorecard', b:`Aching for two days after a session feels like proof it worked. It is not. Soreness mostly tells you that you did something <b>new</b>, not something <b>effective</b>. It fades after a few weeks of the same movements even as you keep getting stronger.<br><br>Judge a session by the numbers instead: did you beat last time, by a rep or by a harder version? That is the only honest measure, and it is the one the app keeps for you.<br><br>Mild stiffness for a day or two is normal, especially at the start. Sharp pain in a joint is not — stop, drop a rung on the ladder, and rebuild from there.`},
   {t:'What to expect, and when', b:`<b>Weeks 1–3.</b> You get noticeably better at the movements and your numbers jump. Almost all of that is your nervous system learning, not new muscle. It still counts — it is the foundation.<br><br><b>Weeks 4–10.</b> Real muscle starts to show up. Clothes fit differently before the mirror shows much. Progress becomes slower and steadier, which is the point at which most people quit.<br><br><b>Month 3 onwards.</b> Visible change, if you have kept the sessions honest and eaten enough. Beginners build faster than they ever will again, so the work you do now pays the most.<br><br>Three sessions a week for twelve weeks is thirty-six sessions. That is the whole ask.`},
@@ -587,7 +587,7 @@ const MOB=[
 /* --- one short idea a day, cycling --- */
 const LESSONS=[
   ['Reps in reserve','Finish each set with one or two reps left in you. Not five, not zero. That narrow band is where nearly all the muscle gets built.'],
-  ['The lowering half','Muscles are strongest while lengthening. Taking four seconds to lower a weight makes a set far harder without touching the dumbbells.'],
+  ['The lowering half','Muscles are strongest while lengthening. Taking four seconds to lower a weight makes a set far harder without adding any.'],
   ['Protein at every meal','Muscle is made of protein and you cannot store much of it. A decent source at each meal beats one big hit at dinner.'],
   ['Sleep is the other half','Growth hormone peaks in deep sleep. A week of six-hour nights will flatten your progress more than skipping a session.'],
   ['Soreness proves novelty, not progress','It tells you the movement was new. It fades while you keep getting stronger. Judge sessions by your numbers instead.'],
@@ -857,9 +857,9 @@ function stopAll(){ Object.keys(anims).forEach(k=>{ cancelAnimationFrame(anims[k
 let tab='today';
 const TABS=[
   {id:'today',n:'Today',ic:'<path d="M4 7h16M4 12h16M4 17h10"/>'},
-  {id:'learn',n:'Learn',ic:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 5.5v15"/>'},
   {id:'progress',n:'Progress',ic:'<path d="M4 19V9M10 19V5M16 19v-7M4 19h17"/>'},
-  {id:'crew',n:'Crew',ic:'<circle cx="9" cy="8" r="3"/><path d="M3 19a6 6 0 0 1 12 0"/><path d="M16 5.5a3 3 0 0 1 0 5.4M17.5 19a6 6 0 0 0-2-4.4"/>'},
+  {id:'learn',n:'Learn',ic:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 5.5v15"/>'},
+  {id:'crew',n:'Friends',ic:'<circle cx="9" cy="8" r="3"/><path d="M3 19a6 6 0 0 1 12 0"/><path d="M16 5.5a3 3 0 0 1 0 5.4M17.5 19a6 6 0 0 0-2-4.4"/>'},
   {id:'you',n:'You',ic:'<circle cx="12" cy="8" r="3.4"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/>'}
 ];
 function renderTabs(){
@@ -880,7 +880,7 @@ function viewSetup(){
   $v.innerHTML=`
   <div style="padding-top:28px">
     <h1 style="font-size:32px;line-height:1.12">Three sessions a week,<br>at home, from zero.</h1>
-    <p class="muted" style="margin-top:14px;max-width:44ch">Full-body strength training built around a pair of dumbbells and whatever furniture you already own. Every movement has a guide. The app decides when you're ready for a harder version.</p>
+    <p class="muted" style="margin-top:14px;max-width:44ch">Full-body strength training built around a pair of weights and whatever furniture you already own. Every movement has a guide. The app decides when you're ready for a harder version.</p>
     <div class="card" style="margin-top:24px">
       <h2 style="font-size:16px">Set up</h2>
       <div style="padding:4px 0 2px"><span style="font-size:15px">What have you got?</span>
@@ -888,7 +888,7 @@ function viewSetup(){
         <div id="kitpick">${KIT.map(k=>`<button type="button" class="kitopt${k.id==='none'?' on':''}" data-kit="${k.id}" onclick="toggleKit(this)">
           <span class="kn">${k.n}</span><span class="kd">${k.d}</span></button>`).join('')}</div></div>
       <div id="dbrow" class="hidden">
-        <label class="row"><span>Your dumbbells weigh</span>
+        <label class="row"><span>Each weight is</span>
           <span class="rowctl">
             <input type="number" class="qty" id="s_db" value="10" min="0.5" step="0.5">
             <select class="unit" id="s_unit"><option value="kg">kg</option><option value="lb">lb</option></select>
@@ -1141,7 +1141,7 @@ function deleteLog(i){
 function viewCrew(){
   socialInit();
   if(!S.nostr){
-    $v.innerHTML=`<div class="topbar"><h1>Crew</h1></div>
+    $v.innerHTML=`<div class="topbar"><h1>Friends</h1></div>
     <div class="card"><h3 style="font-size:16px">Training with other people</h3>
       <p class="small muted" style="margin:8px 0 0">People who train alongside someone else stick at it far longer than people who train alone. This screen shows who has turned up lately, and lets you set challenges together.</p>
       <p class="small muted" style="margin:10px 0 0">It runs on nostr, so there is no account to make and no server holding your data. Sign in and you can add anyone by their npub.</p>
@@ -1160,7 +1160,7 @@ function viewCrew(){
     .sort((a,b)=>b.at-a.at);
 
   $v.innerHTML=`
-  <div class="topbar"><h1>Crew</h1>
+  <div class="topbar"><h1>Friends</h1>
     <button class="date" onclick="socialSync(true)" style="text-decoration:underline">
       Refresh <span id="syncdot" style="opacity:0;color:var(--pine)">\u2022</span></button></div>
 
@@ -1173,12 +1173,12 @@ function viewCrew(){
       </div>
       <div class="dotline">${mine.dots.map(d=>`<i class="${d?'trained':''}"></i>`).join('')}</div>
     </div>
-    ${S.nostr.publishWorkouts?'':`<p class="tiny muted" style="margin:12px 0 0">Your crew cannot see you yet. Turn on publishing under You to appear on their screens.</p>`}
+    ${S.nostr.publishWorkouts?'':`<p class="tiny muted" style="margin:12px 0 0">Your friends cannot see you yet. Turn on publishing under You to appear on their screens.</p>`}
   </div>
 
   ${crew.length?`
   <div style="display:flex;justify-content:space-between;align-items:baseline;margin:22px 0 8px">
-    <h2 style="font-size:15px">Your crew</h2>
+    <h2 style="font-size:15px">Your friends</h2>
     <span class="tiny muted">${active} of ${crew.length} active this week</span></div>
   ${rows.map(r=>`<div class="card" style="padding:14px;margin-top:10px">
     <div style="display:flex;align-items:center;gap:12px">
@@ -1279,7 +1279,7 @@ function subKit(){
   <p class="small muted" style="margin:0 0 14px">Sessions are built from whatever you pick.</p>
   <div id="kitpick">${KIT.map(k=>`<button type="button" class="kitopt${(k.id==='none'?kitList()[0]==='none':kitList().indexOf(k.id)>=0)?' on':''}" data-kit="${k.id}" onclick="toggleKit(this);S.kit=readKit();save();render()">
     <span class="kn">${k.n}</span><span class="kd">${k.d}</span></button>`).join('')}</div>
-  ${hasKit('db')?`<div class="card" style="margin-top:16px"><h3 style="font-size:15px">Your dumbbells</h3>
+  ${hasKit('db')?`<div class="card" style="margin-top:16px"><h3 style="font-size:15px">Your weights</h3>
     <label class="row"><span>They weigh</span><span class="rowctl">
       <input type="number" class="qty" value="${S.db}" min="0.5" step="0.5" onchange="S.db=parseFloat(this.value)||S.db;save()">
       <select class="unit" onchange="S.unit=this.value;save();render()"><option value="kg" ${S.unit==='kg'?'selected':''}>kg</option><option value="lb" ${S.unit==='lb'?'selected':''}>lb</option></select></span></label>
@@ -1355,7 +1355,7 @@ function subAcct(){
     <button class="btn ghost sm" onclick="nostrRestore()">Restore from backup</button></div>`
   :`<div class="card"><button class="btn ghost sm" style="margin-top:0" onclick="nostrRestore()">Restore from backup</button></div>`}
   ${Signer.canWrite?`<div class="card"><h3 style="font-size:15px">Sharing</h3>
-    <label class="row"><span>Publish workouts publicly<br><span class="tiny muted">Unencrypted. Lets your crew see you trained, never what you lifted.</span></span>
+    <label class="row"><span>Publish workouts publicly<br><span class="tiny muted">Unencrypted. Lets your friends see you trained, never what you lifted.</span></span>
       <input type="checkbox" ${S.nostr.publishWorkouts?'checked':''} style="width:20px;height:20px;flex:0 0 auto;accent-color:var(--brass)" onchange="S.nostr.publishWorkouts=this.checked;save()"></label>
     <label class="row"><span>Relays</span>
       <button onclick="relayEdit()" style="text-decoration:underline;font-size:14px">${(S.nostr.relays||[]).length} connected</button></label></div>`:''}`
@@ -2092,7 +2092,7 @@ function nameOf(pk){ const p=profOf(pk);
   return esc(String(raw).slice(0,40)); }
 function initialOf(pk){ const n=nameOf(pk).replace(/&[a-z#0-9]+;/gi,''); return (n[0]||'?').toUpperCase(); }
 
-/* --- who is in your crew --- */
+/* --- who is in your friends list --- */
 async function crewImportFollows(){
   if(!S.nostr){ toast('Sign in first'); return; }
   toast('Reading your follows\u2026');
@@ -2114,11 +2114,11 @@ function crewAdd(){
   const pk=npubDecode(v);
   if(!pk){ toast('That is not a valid npub'); return; }
   socialInit();
-  if(S.social.crew.indexOf(pk)>=0){ toast('Already in your crew'); return; }
+  if(S.social.crew.indexOf(pk)>=0){ toast('Already added'); return; }
   S.social.crew.push(pk); save(); toast('Added'); socialSync(true);
 }
 function crewRemove(pk){
-  if(!confirm('Remove '+nameOf(pk)+' from your crew?')) return;
+  if(!confirm('Remove '+nameOf(pk)+' from your friends?')) return;
   S.social.crew=S.social.crew.filter(x=>x!==pk); save(); render();
 }
 
