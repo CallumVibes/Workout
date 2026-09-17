@@ -1,0 +1,15 @@
+{
+  "appId": "uk.groundwork.app",
+  "appName": "Groundwork",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#E9EBE6"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon",
+      "iconColor": "#8F6B18"
+    }
+  }
+}

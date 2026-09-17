@@ -1,0 +1,6 @@
+# Generated fresh by CI on every build — no need to commit it
+android/
+node_modules/
+package-lock.json
+out/
+.DS_Store
