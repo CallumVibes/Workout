@@ -1365,7 +1365,7 @@ function subAcct(){
     ${window.nostr?`<button class="btn ghost sm" onclick="nostrLogin('nip07')">Use browser extension</button>`:''}
     <button class="btn ghost sm" onclick="nostrLoginNpub()">Paste an npub (read-only)</button>
     ${!Native.on?`<div class="flag" style="margin-top:14px"><b>In a browser, Amber can only sign you in.</b> Backups and posting need signing on every action, which means leaving the page each time. Install the app for those, or use a browser extension.</div>`:''}
-    <p class="tiny muted" style="margin:12px 0 0">Your key stays in Amber. This app never sees it.</p>
+    <p class="tiny muted" style="margin:12px 0 0">Your key stays in Amber. It returns each answer through the clipboard, so your phone may ask you to allow a paste.</p>
   </div>`);
 }
 
@@ -1770,87 +1770,95 @@ function npubDecode(s){
 }
 function shortNpub(hex){ if(!hex) return ''; const n=npubEncode(hex); return n.slice(0,10)+'\u2026'+n.slice(-6); }
 
-/* --- Amber, over NIP-55 deep links ---
-   Two things NIP-55 is fussy about: callbackUrl has to be the last parameter,
-   because Amber appends its answer to the end of it, and the callback has to
-   be somewhere this app can actually be reached. In the installed app that is
-   the groundwork:// scheme. In a browser it is this page's own URL, and the
-   page reloads on the way back, so the request has to survive in storage. */
-const pending={};
-const PKEY='gw.pending';
+/* --- Amber, over NIP-55 ---
+   Amber decides how to read a request by whether the browser stamped
+   Browser.EXTRA_APPLICATION_ID on the intent: present, it parses the
+   nostrsigner: URL; absent, it reads the parameters from intent extras.
+   Chromium stopped setting that extra (Brave included), so a plain
+   nostrsigner: URL reaches the extras branch with no type and is rejected
+   as malformed. The request therefore goes out as an intent: URL, where
+   Android's Intent.parseUri turns each S.<name> field into a String extra.
 
-function cbBase(){
-  if(Native.on) return 'groundwork://nostr?';
-  return location.origin + location.pathname + '?';
+   No callbackUrl. A web page has no scheme Amber can return to, and asking
+   for one is the second half of the malformed-request problem. Amber puts
+   the answer on the clipboard instead and the page reads it when it regains
+   focus — the approach noStrudel uses, which works in the wild. Clipboard
+   reads can be refused, so there is a paste fallback.
+
+   Amber also URL-decodes the whole URI and splits on "?" before parsing any
+   JSON, so a literal ? in a payload would truncate the request.
+   encodeURIComponent escapes it to %3F, which survives that split. */
+
+const SIGNER_SCHEME='nostrsigner';
+
+function amberIntentUrl(type, payload, extraFields){
+  const fields = Object.assign({
+    type: type,
+    compressionType: 'none',
+    returnType: 'signature',
+    appName: 'Groundwork'
+  }, extraFields||{});
+  const S = Object.keys(fields)
+    .map(k => 'S.' + k + '=' + encodeURIComponent(fields[k]))
+    .join(';');
+  return 'intent:' + (payload ? encodeURIComponent(payload) : '')
+    + '#Intent;scheme=' + SIGNER_SCHEME + ';' + S + ';end';
 }
-function amberUrl(type, payload, extra, id){
-  const cb = encodeURIComponent(cbBase()+'gwid='+id+'&res=');
-  return 'nostrsigner:' + (payload ? encodeURIComponent(payload) : '')
-    + '?compressionType=none'
-    + '&returnType=' + (type==='sign_event' ? 'event' : 'signature')
-    + '&type=' + type
-    + '&appName=Groundwork'
-    + (extra || '')
-    + '&callbackUrl=' + cb;   // must stay last
+
+let waiting=null;
+function amberSettle(v){ const w=waiting; if(!w) return; waiting=null; w.resolve(String(v).trim()); }
+function amberFail(m){ const w=waiting; if(!w) return; waiting=null; w.reject(new Error(m)); }
+function askPaste(){
+  const v=prompt('Amber has copied the result. Paste it here:');
+  if(v && v.trim()) amberSettle(v); else amberFail('Nothing pasted');
 }
-function amberCall(type, payload, extra){
+
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState!=='visible' || !waiting) return;
+  setTimeout(()=>{
+    if(!waiting) return;
+    if(!navigator.clipboard || !navigator.clipboard.readText){ askPaste(); return; }
+    navigator.clipboard.readText()
+      .then(t=>{ if(t && t.trim()) amberSettle(t); else askPaste(); })
+      .catch(()=>askPaste());
+  },250);
+});
+
+function amberCall(type, payload, extraFields){
   return new Promise((resolve,reject)=>{
-    const id='gw'+Date.now()+Math.floor(Math.random()*999);
-    const url=amberUrl(type,payload,extra,id);
-    if(Native.on){
-      pending[id]={resolve,reject,t:setTimeout(()=>{ delete pending[id];
-        reject(new Error('Amber did not answer. Is it installed?')); },90000)};
-      window.location.href=url;
-      return;
-    }
-    // Browser: we are about to leave the page, so only a login can be resumed.
-    if(type!=='get_public_key'){
-      reject(new Error('Signing needs the installed app. In a browser, use a nostr extension or sign in read-only with your npub.'));
-      return;
-    }
-    try{ localStorage.setItem(PKEY, JSON.stringify({id,type,at:Date.now()})); }catch(e){}
-    window.location.href=url;
+    if(waiting) amberFail('Replaced by a newer request');
+    const url=amberIntentUrl(type,payload,extraFields);
+    // an anchor click, because some browsers ignore location.href for intent:
+    try{
+      const a=document.createElement('a');
+      a.href=url; a.target='_blank'; a.rel='noopener'; a.style.display='none';
+      document.body.appendChild(a); a.click();
+      setTimeout(()=>{ try{ a.remove(); }catch(e){} },1000);
+    }catch(e){ return reject(new Error('Could not open Amber')); }
+    // visibilitychange fires the moment Amber opens, so arm after it
+    setTimeout(()=>{
+      waiting={resolve,reject};
+      setTimeout(()=>{ if(waiting&&waiting.resolve===resolve) amberFail('Amber did not answer. Is it installed?'); },120000);
+    },500);
   });
 }
 
-/* Pull the answer out of whatever shape it came back in */
-function amberValue(u){
-  return u.searchParams.get('res') || u.searchParams.get('event')
-      || u.searchParams.get('signature') || u.searchParams.get('result')
-      || (u.hash ? decodeURIComponent(u.hash.slice(1)) : '');
+/* returnType=signature means the event id is ours to compute */
+async function eventId(ev){
+  const ser=JSON.stringify([0,ev.pubkey,ev.created_at,ev.kind,ev.tags,ev.content]);
+  const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ser));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-function amberResult(url){
-  try{
-    const u=new URL(url.replace('groundwork://','https://x/'));
-    const id=u.searchParams.get('gwid')||u.searchParams.get('id');
-    const res=amberValue(u);
-    const p=pending[id]; if(!p) return;
-    clearTimeout(p.t); delete pending[id];
-    res ? p.resolve(res) : p.reject(new Error('Amber returned nothing'));
-  }catch(e){}
-}
-if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App){
-  window.Capacitor.Plugins.App.addListener('appUrlOpen', d=>{
-    if(d&&d.url&&d.url.indexOf('groundwork://')===0) amberResult(d.url);
-  });
-}
-
-/* Coming back from Amber in a browser: the page has reloaded, so finish the
-   login from the query string and then tidy the URL. */
-function amberResume(){
-  let stash=null;
-  try{ const r=localStorage.getItem(PKEY); if(r){ stash=JSON.parse(r); localStorage.removeItem(PKEY); } }catch(e){}
-  const q=new URLSearchParams(location.search);
-  if(!q.get('gwid')) return;
-  const res=amberValue(new URL(location.href));
-  history.replaceState({},'',location.origin+location.pathname);
-  if(!stash || stash.id!==q.get('gwid')) return;
-  if(!res){ toast('Amber returned nothing'); return; }
-  const pk = res.indexOf('npub1')===0 ? npubDecode(res) : res.trim();
-  if(!pk || pk.length!==64){ toast('That key did not look right'); return; }
-  S.nostr={mode:'amber', pk, relays:(S.nostr&&S.nostr.relays)||RELAYS_DEFAULT.slice(),
-    autoBackup:false, publishWorkouts:false};
-  save(); render(); toast('Signed in as '+shortNpub(pk));
+async function amberSign(ev){
+  const draft=Object.assign({}, ev);
+  draft.id=await eventId(draft);
+  const r=await amberCall('sign_event', JSON.stringify(draft));
+  if(r.charAt(0)==='{'){                      // some versions return the whole event
+    try{ const full=JSON.parse(r); if(full&&full.sig) return full; }catch(e){}
+  }
+  if(!/^[0-9a-f]{128}$/i.test(r)) throw new Error('Amber did not return a signature');
+  draft.sig=r;
+  return draft;
 }
 
 /* --- one interface over the three ways in --- */
@@ -1865,22 +1873,21 @@ const Signer={
   },
   async signEvent(ev){
     if(this.mode==='nip07') return await window.nostr.signEvent(ev);
-    const r=await amberCall('sign_event', JSON.stringify(ev));
-    try{ return JSON.parse(r); }catch(e){ throw new Error("Could not read Amber's reply"); }
+    return await amberSign(ev);
   },
   async encrypt(plain){
     if(this.mode==='nip07'){
       if(window.nostr.nip44&&window.nostr.nip44.encrypt) return await window.nostr.nip44.encrypt(this.pk, plain);
       return await window.nostr.nip04.encrypt(this.pk, plain);
     }
-    return await amberCall('nip44_encrypt', plain, '&pubkey='+this.pk+'&current_user='+this.pk);
+    return await amberCall('nip44_encrypt', plain, {pubKey:this.pk, current_user:this.pk});
   },
   async decrypt(ct){
     if(this.mode==='nip07'){
       if(window.nostr.nip44&&window.nostr.nip44.decrypt) return await window.nostr.nip44.decrypt(this.pk, ct);
       return await window.nostr.nip04.decrypt(this.pk, ct);
     }
-    return await amberCall('nip44_decrypt', ct, '&pubkey='+this.pk+'&current_user='+this.pk);
+    return await amberCall('nip44_decrypt', ct, {pubKey:this.pk, current_user:this.pk});
   }
 };
 
@@ -2322,7 +2329,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 }
 
 load();
-amberResume();
 figNormalise([...EX,...STR,...MOB]);
 if(S.theme && S.theme!=='auto') document.documentElement.setAttribute('data-theme',S.theme);
 renderTabs();
