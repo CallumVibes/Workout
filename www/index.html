@@ -1364,7 +1364,7 @@ function subAcct(){
     <button class="btn sm" style="background:var(--pine);color:var(--surface)" onclick="nostrLogin('amber')">Sign in with Amber</button>
     ${window.nostr?`<button class="btn ghost sm" onclick="nostrLogin('nip07')">Use browser extension</button>`:''}
     <button class="btn ghost sm" onclick="nostrLoginNpub()">Paste an npub (read-only)</button>
-    ${!Native.on?`<div class="flag" style="margin-top:14px"><b>In a browser, Amber can only sign you in.</b> Backups and posting need signing on every action, which means leaving the page each time. Install the app for those, or use a browser extension.</div>`:''}
+
     <p class="tiny muted" style="margin:12px 0 0">Your key stays in Amber. It returns each answer through the clipboard, so your phone may ask you to allow a paste.</p>
   </div>`);
 }
@@ -1806,8 +1806,10 @@ function amberIntentUrl(type, payload, extraFields){
 }
 
 let waiting=null;
-function amberSettle(v){ const w=waiting; if(!w) return; waiting=null; w.resolve(String(v).trim()); }
-function amberFail(m){ const w=waiting; if(!w) return; waiting=null; w.reject(new Error(m)); }
+function amberSettle(v){ try{ sessionStorage.removeItem(AMB_KEY); }catch(e){}
+  const w=waiting; if(!w) return; waiting=null; w.resolve(String(v).trim()); }
+function amberFail(m){ try{ sessionStorage.removeItem(AMB_KEY); }catch(e){}
+  const w=waiting; if(!w) return; waiting=null; w.reject(new Error(m)); }
 function askPaste(){
   const v=prompt('Amber has copied the result. Paste it here:');
   if(v && v.trim()) amberSettle(v); else amberFail('Nothing pasted');
@@ -1824,14 +1826,18 @@ document.addEventListener('visibilitychange',()=>{
   },250);
 });
 
+const AMB_KEY='gw.amber';
 function amberCall(type, payload, extraFields){
   return new Promise((resolve,reject)=>{
     if(waiting) amberFail('Replaced by a newer request');
+    // Some browsers reload the page on the way back from an external app, which
+    // would lose the promise. Leave a note so the next load can finish the job.
+    try{ sessionStorage.setItem(AMB_KEY, JSON.stringify({type, at:Date.now()})); }catch(e){}
     const url=amberIntentUrl(type,payload,extraFields);
     // an anchor click, because some browsers ignore location.href for intent:
     try{
       const a=document.createElement('a');
-      a.href=url; a.target='_blank'; a.rel='noopener'; a.style.display='none';
+      a.href=url; a.style.display='none';
       document.body.appendChild(a); a.click();
       setTimeout(()=>{ try{ a.remove(); }catch(e){} },1000);
     }catch(e){ return reject(new Error('Could not open Amber')); }
@@ -1841,6 +1847,31 @@ function amberCall(type, payload, extraFields){
       setTimeout(()=>{ if(waiting&&waiting.resolve===resolve) amberFail('Amber did not answer. Is it installed?'); },120000);
     },500);
   });
+}
+
+/* If the page reloaded while Amber had the request, finish the login here.
+   Only a login is worth resuming — anything else was mid-flow and is better
+   retried than guessed at. */
+function amberResume(){
+  let note=null;
+  try{ const r=sessionStorage.getItem(AMB_KEY); if(r) note=JSON.parse(r); sessionStorage.removeItem(AMB_KEY); }catch(e){}
+  if(!note || note.type!=='get_public_key' || Date.now()-note.at > 300000) return;
+  const finish=v=>{
+    const t=String(v||'').trim(); if(!t) return;
+    const pk = t.indexOf('npub1')===0 ? npubDecode(t) : t;
+    if(!pk || pk.length!==64) return;
+    S.nostr={mode:'amber', pk, relays:(S.nostr&&S.nostr.relays)||RELAYS_DEFAULT.slice(),
+      autoBackup:true, publishWorkouts:false};
+    save(); render(); toast('Signed in as '+shortNpub(pk));
+  };
+  setTimeout(()=>{
+    if(navigator.clipboard && navigator.clipboard.readText){
+      navigator.clipboard.readText().then(t=>{
+        if(t&&t.trim()) finish(t);
+        else { const v=prompt('Paste what Amber copied:'); if(v) finish(v); }
+      }).catch(()=>{ const v=prompt('Paste what Amber copied:'); if(v) finish(v); });
+    }else{ const v=prompt('Paste what Amber copied:'); if(v) finish(v); }
+  },400);
 }
 
 /* returnType=signature means the event id is ours to compute */
@@ -2329,6 +2360,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 }
 
 load();
+amberResume();
 figNormalise([...EX,...STR,...MOB]);
 if(S.theme && S.theme!=='auto') document.documentElement.setAttribute('data-theme',S.theme);
 renderTabs();
