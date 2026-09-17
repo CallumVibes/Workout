@@ -20,6 +20,15 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Check the web app is where it should be
+        run: |
+          if [ ! -f www/index.html ]; then
+            echo "::error::www/index.html is missing. Capacitor needs it as the entry point."
+            find . -maxdepth 2 -not -path './.git*' | sort
+            exit 1
+          fi
+          echo "Found www/index.html ($(wc -c < www/index.html) bytes)"
+
       - name: Install dependencies
         run: |
           npm install

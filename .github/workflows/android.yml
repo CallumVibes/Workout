@@ -26,6 +26,26 @@ jobs:
         with:
           node-version: '20'
 
+      # Fail here with a clear message rather than three steps later with an
+      # ENOENT about capacitor.plugins.json.
+      - name: Check the web app is where it should be
+        run: |
+          if [ ! -f www/index.html ]; then
+            echo "::error::www/index.html is missing. Capacitor needs it as the entry point."
+            echo ""
+            echo "What the repo actually contains:"
+            find . -maxdepth 2 -not -path './.git*' | sort
+            echo ""
+            if [ -f index.html ]; then
+              echo "index.html is at the repo root. It needs to be at www/index.html."
+            fi
+            exit 1
+          fi
+          echo "Found www/index.html ($(wc -c < www/index.html) bytes)"
+          for f in manifest.webmanifest sw.js icon-192.png icon-512.png; do
+            [ -f "www/$f" ] && echo "  www/$f" || echo "::warning::www/$f is missing (the app runs, but it will not install to a home screen)"
+          done
+
       - name: Install dependencies
         run: npm install
 
