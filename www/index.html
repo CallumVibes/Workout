@@ -169,9 +169,26 @@ button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
 .tabs svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 
 /* ---- learn ---- */
+.lsearch{width:100%;font:inherit;background:var(--surface);color:var(--ink);border:1px solid var(--edge);
+  border-radius:11px;padding:12px 14px;margin:0 0 20px;-webkit-appearance:none}
+.lsearch::placeholder{color:var(--muted)}
+.lsec{margin-bottom:26px}
+.lsec h2{font-size:15px;margin-bottom:3px}
+.lsec > .tiny{margin:0 0 6px}
+.lrow{display:flex;align-items:center;gap:11px;flex:1;min-width:0}
+.lnum{width:21px;height:21px;border-radius:50%;background:var(--pine-soft);color:var(--pine);
+  font-size:11.5px;font-weight:700;display:grid;place-items:center;flex:0 0 auto;
+  font-family:"Familjen Grotesk",sans-serif}
+.lt{flex:1;min-width:0}
+.lt > span{display:block}
+.lsub{font-size:12.5px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tick{color:var(--edge);flex:0 0 auto}
+.tick.on{color:var(--pine)}
+.nextwrap{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.nextwrap .chip{color:var(--ink)}
 .accordion{border-top:1px solid var(--edge)}
 .accordion:last-of-type{border-bottom:1px solid var(--edge)}
-.achead{display:flex;width:100%;justify-content:space-between;align-items:center;gap:12px;padding:15px 2px;text-align:left;font-size:15.5px;font-weight:500}
+.achead{display:flex;width:100%;justify-content:space-between;align-items:center;gap:10px;padding:14px 2px;text-align:left;font-size:15.5px;font-weight:500}
 .achead .chev{color:var(--muted);transition:transform .25s ease;flex:0 0 auto}
 .achead.on .chev{transform:rotate(90deg)}
 .acbody{display:none;padding:2px 2px 20px}
@@ -180,7 +197,45 @@ button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
 .cues li{margin-bottom:7px;font-size:14.5px}
 .flag{border-left:3px solid var(--brass);padding:8px 0 8px 12px;margin-top:14px;font-size:14px}
 .flag b{color:var(--brass);font-weight:600}
+.levelcard{border-color:var(--brass)}
+.lvbar{height:7px;border-radius:4px;background:var(--edge);overflow:hidden;margin-top:14px}
+.lvbar i{display:block;height:100%;background:var(--brass);border-radius:4px;transition:width .6s ease}
+.levelup{border-color:var(--brass);background:var(--brass-soft);text-align:left}
+.medalrow{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+.medal{width:52px;border:1px solid var(--edge);border-radius:11px;padding:8px 4px;text-align:center;color:var(--edge)}
+.medal svg{width:20px;height:20px;display:block;margin:0 auto}
+.medal span{display:block;font-size:10.5px;margin-top:3px;color:var(--muted);
+  font-family:"Familjen Grotesk",sans-serif;font-weight:600}
+.medal.got{border-color:var(--brass);background:var(--brass-soft);color:var(--brass)}
+.medal.got span{color:var(--brass)}
+.medalbig{width:34px;height:34px;color:var(--brass);flex:0 0 auto}
+.cardiobtn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;font-size:13.5px;color:var(--ink)}
+.cardiobtn svg{width:17px;height:17px;flex:0 0 auto;color:var(--pine)}
+.profilecard{border-color:var(--pine)}
+.bigav{width:54px;height:54px;border-radius:50%;background:var(--pine);color:var(--surface);
+  display:grid;place-items:center;font-family:"Familjen Grotesk",sans-serif;font-weight:700;
+  font-size:23px;flex:0 0 auto}
+.pstats{display:flex;justify-content:space-between;gap:8px;margin-top:20px;
+  border-top:1px solid var(--edge);padding-top:16px;text-align:center}
+.pstats .num{font-size:20px;line-height:1.1}
+.prow{display:flex;justify-content:space-between;align-items:center;gap:14px;
+  padding:11px 0;border-top:1px solid var(--edge);font-size:14.5px}
+.prow > span:last-child{color:var(--muted);text-align:right;white-space:nowrap}
+.medalsm{width:20px;height:20px;color:var(--brass);flex:0 0 auto}
+.spark{margin-top:14px;height:34px}
+.spark svg{width:100%;height:34px;display:block}
+.quote{text-align:center;color:var(--muted);font-family:"Familjen Grotesk",sans-serif;
+  font-size:15px;font-style:italic;letter-spacing:-.01em;margin:22px auto 0;max-width:30ch;line-height:1.4}
+.quote.small{font-size:13.5px}
 .pill{display:inline-block;font-size:12px;color:var(--muted);border:1px solid var(--edge);border-radius:999px;padding:2px 9px;margin:0 6px 6px 0}
+/* Deliberately not a flex row: flex items shrink below their text and the
+   labels collapse into unreadable columns. Inline-block wraps without that. */
+.ladder{margin:12px 0 16px;display:block}
+.pill.rung{display:inline-block;font-size:12.5px;padding:8px 13px;margin:0 7px 7px 0;
+  background:var(--bg);cursor:pointer;white-space:nowrap;max-width:100%;
+  overflow:hidden;text-overflow:ellipsis;vertical-align:top;line-height:1.25}
+.pill.rung:active{background:var(--edge)}
+.pill.rung.on{border-color:var(--pine);background:var(--pine-soft);color:var(--pine);font-weight:600}
 
 /* ---- progress ---- */
 .statgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -248,7 +303,7 @@ const EX = [
   {
     id:'squat', kit:'none', alt:['split','bridge'], name:'Goblet squat', trains:'Thighs, glutes, core', reps:[8,14], sets:3, load:true,
     ladder:[
-      {n:'Bodyweight squat', h:'Arms straight out in front to balance.'},
+      {n:'Bodyweight squat', nw:1, h:'Arms straight out in front to balance.'},
       {n:'Goblet squat', h:'Hold one weight against your chest.'},
       {n:'Slow goblet squat', h:'Take 4 seconds to lower. Stand up normally.'},
       {n:'Paused goblet squat', h:'Hold 3 seconds at the bottom, no bouncing.'},
@@ -298,11 +353,11 @@ const EX = [
   {
     id:'bridge', kit:'none', alt:['rdl','squat'], name:'Glute bridge', trains:'Glutes, hamstrings', reps:[10,20], sets:3, load:true,
     ladder:[
-      {n:'Glute bridge', h:'Both feet on the floor, arms by your sides.'},
-      {n:'Paused glute bridge', h:'Squeeze hard for 3 seconds at the top of each rep.'},
+      {n:'Glute bridge', nw:1, h:'Both feet on the floor, arms by your sides.'},
+      {n:'Paused glute bridge', nw:1, h:'Squeeze hard for 3 seconds at the top of each rep.'},
       {n:'Weighted glute bridge', h:'Rest a weight across your hips, hold it with both hands.'},
-      {n:'Feet-raised bridge', h:'Heels on a sofa, hips higher.'},
-      {n:'Single-leg bridge', h:'One foot on the floor, the other knee hugged to your chest.'}
+      {n:'Feet-raised bridge', nw:1, h:'Heels on a sofa, hips higher.'},
+      {n:'Single-leg bridge', nw:1, h:'One foot on the floor, the other knee hugged to your chest.'}
     ],
     cues:['Lie on your back, knees bent, heels close enough to brush with your fingertips.','Push through your heels and lift your hips.','Stop when your body is a straight ramp from knees to shoulders.','Squeeze your glutes hard at the top for a beat, then lower slowly.'],
     wrong:'Arching your lower back to go higher. Tuck your ribs down and let the glutes do it.',
@@ -330,8 +385,8 @@ const EX = [
   {
     id:'split', kit:'none', alt:['squat','bridge'], name:'Split squat', trains:'One leg at a time — thighs, glutes', reps:[6,12], sets:3, load:true,
     ladder:[
-      {n:'Supported split squat', h:'Hold a chair or doorframe for balance.'},
-      {n:'Split squat', h:'No hands. Feet in a long stride.'},
+      {n:'Supported split squat', nw:1, h:'Hold a chair or doorframe for balance.'},
+      {n:'Split squat', nw:1, h:'No hands. Feet in a long stride.'},
       {n:'Weighted split squat', h:'A weight in each hand, hanging by your sides.'},
       {n:'Rear-foot-raised split squat', h:'Back foot on a sofa. This one is brutal.'},
       {n:'Weighted rear-foot-raised', h:'Back foot raised, weights in hand.'}
@@ -362,7 +417,7 @@ const EX = [
   {
     id:'rdl', kit:'db', alt:['bridge','split'], name:'Romanian deadlift', trains:'Hamstrings, glutes, lower back', reps:[8,14], sets:3, load:true,
     ladder:[
-      {n:'Hip hinge, hands on hips', h:'Learn the movement with no weight first.'},
+      {n:'Hip hinge, hands on hips', nw:1, h:'Learn the movement with no weight first.'},
       {n:'Weighted RDL', h:'A weight in each hand, sliding down your thighs.'},
       {n:'Slow RDL', h:'4 seconds down. This is where hamstrings grow.'},
       {n:'Deficit RDL', h:'Stand on a book so the weights travel further.'},
@@ -551,19 +606,299 @@ const GUIDES = [
   {t:'Warming up in three minutes', b:`You do not need a routine. You need to be warm and move the joints you are about to use.<br><br>Thirty seconds of marching on the spot or jogging up and down the stairs. Then ten slow arm circles each way, ten bodyweight squats, and ten hip hinges with your hands on your hips.<br><br>Then do your first set of the first exercise deliberately light and slow. That set is your real warm-up. Log it anyway — it counts.`}
 ];
 
-const BADGES = [
-  {id:'first', n:'First session', d:'The hardest one', test:s=>s.logs.length>=1},
-  {id:'d7', n:'Seven days running', d:'Showed up every day for a week', test:s=>s.bestDay>=7},
-  {id:'w1', n:'Full week', d:'Three sessions in one week', test:s=>s.bestStreak>=1},
-  {id:'d30', n:'Thirty days running', d:'A month without dropping the thread', test:s=>s.bestDay>=30},
-  {id:'s10', n:'Ten sessions', d:'Past the novelty stage', test:s=>s.logs.length>=10},
-  {id:'w4', n:'One month', d:'4 full weeks in a row', test:s=>s.bestStreak>=4},
-  {id:'s25', n:'Twenty-five sessions', d:'This is a habit now', test:s=>s.logs.length>=25},
-  {id:'v10k', n:'10,000 reps', d:'Total reps lifted', test:s=>s.totalReps>=10000},
-  {id:'w12', n:'Twelve weeks', d:'Long enough to see it', test:s=>s.bestStreak>=12},
-  {id:'s50', n:'Fifty sessions', d:'Genuinely strong now', test:s=>s.logs.length>=50},
-  {id:'s100', n:'One hundred sessions', d:'A different body', test:s=>s.logs.length>=100}
+/* Reference first, but a beginner still needs to know which four to read.
+   Everything else is there when a question comes up. */
+const ESSENTIALS=[
+  'What actually makes a muscle grow',
+  'How hard is hard enough?',
+  'How often, and why rest days matter',
+  'What to expect, and when'
 ];
+const APP_NOTES=['Why the Friends screen hides weights'];
+function guideTier(t){
+  if(ESSENTIALS.indexOf(t)>=0) return 'essential';
+  if(APP_NOTES.indexOf(t)>=0) return 'app';
+  return 'more';
+}
+function guidesIn(tier){
+  const list=GUIDES.map((g,i)=>({g,i})).filter(x=>guideTier(x.g.t)===tier);
+  if(tier!=='essential') return list;
+  return ESSENTIALS.map(t=>list.find(x=>x.g.t===t)).filter(Boolean);
+}
+function readCount(){ return GUIDES.filter(g=>(S.read||{})[g.t]).length; }
+function markRead(i){
+  const g=GUIDES[i]; if(!g) return;
+  if(!S.read) S.read={};
+  if(S.read[g.t]) return;
+  S.read[g.t]=true; save();
+  const el=document.getElementById('readcount');
+  if(el) el.textContent=readCount()+' of '+GUIDES.length+' read';
+  const tick=document.getElementById('tick'+i);
+  if(tick) tick.classList.add('on');
+}
+
+/* Short lines shown after a session or a check-in. Half training, half the
+   bitcoin habit of thinking in decades rather than days — which is the same
+   argument this app makes about training. Switchable off under Appearance. */
+const QUOTES=[
+  'Proof of exercise.',
+  'Stay humble, stack reps.',
+  'Low time preference. That goes for your body too.',
+  'No shortcuts. Nothing to print.',
+  'Time under the bar, not timing the bar.',
+  'Difficulty adjusts. So do you.',
+  'Sovereign body, sovereign mind.',
+  'Twenty-one million. Three sessions a week.',
+  'Everything worth having compounds.',
+  'Verify your own numbers.',
+  'Freedom starts with discipline.',
+  'Be the best version of yourself.',
+  'For a better tomorrow.',
+  'Consistency is the only cheat code.',
+  'Stack sats. Stack sets.',
+  'Hard work is the only thing nobody can debase.',
+  'You cannot fake a rep.',
+  'Slow is smooth. Smooth is strong.',
+  'Sound money. Sound body.',
+  'Build something that outlasts the noise.',
+  'The best time to start was ten years ago. The second best is today.',
+  'Discipline equals freedom.',
+  'One block at a time.',
+  'Zoom out.',
+  'Nobody gets strong in a bull run of one week.',
+  'Self-custody your health.',
+  'Small deposits, every week, forever.',
+  'The work is the reward.',
+  'Do the boring thing for long enough and it stops being boring.',
+  'Nothing stops this session.'
+];
+/* Deterministic, so it does not flicker on a re-render but still moves on */
+function quoteFor(seed){
+  if(S.quotes===false) return '';
+  const n=Math.abs(Math.floor(seed))%QUOTES.length;
+  return QUOTES[n];
+}
+function quoteToday(){ return quoteFor(Math.floor(new Date().setHours(0,0,0,0)/864e5)); }
+
+/* Jogging and cycling.
+
+   Logged separately from the strength sessions and deliberately kept out of
+   the weekly three: cardio is good for you but it is not what builds muscle,
+   and letting a run fill a training slot would quietly gut the programme.
+   It does count as showing up, so it holds the day streak. */
+const CARDIO=[
+  {k:'jog',  n:'Jog',  dist:true,  def:30, icon:'M13 4.5a1.6 1.6 0 1 0 0-.1M7 20l3-5 3 2 1 3M10 15l-1-5 4-2 3 3 2 .5'},
+  {k:'bike', n:'Ride', dist:true,  def:30, icon:'M6 18a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 18a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM9 15l3-6 3 3h3M12 9l-1-3h3'},
+  {k:'yoga', n:'Yoga', dist:false, def:20, icon:'M12 5a1.6 1.6 0 1 0 0-.1M12 8.5v5M12 13.5c-1.8 0-3.2 1.1-4 3.5M12 13.5c1.8 0 3.2 1.1 4 3.5M5 11h14'},
+  {k:'sit',  n:'Meditation', dist:false, def:10, icon:'M12 5a1.6 1.6 0 1 0 0-.1M12 8.5v4.5M9 19h6M8.5 13l-2.5 6M15.5 13l2.5 6'}
+];
+function cardioOf(k){ return CARDIO.find(c=>c.k===k); }
+function cardioLog(){ return S.cardio||[]; }
+function cardioOn(day){ return cardioLog().some(c=>c.d===day); }
+function cardioAdd(k,mins,dist){
+  mins=parseInt(mins)||0; if(mins<=0) return false;
+  S.cardio=cardioLog().concat([{d:dayKey(new Date()), k, m:mins, km:parseFloat(dist)||null, at:Date.now()}]);
+  save(); return true;
+}
+function cardioRemove(at){ S.cardio=cardioLog().filter(c=>c.at!==at); save(); render(); }
+function cardioToday(){ return cardioLog().filter(c=>c.d===dayKey(new Date())); }
+function cardioSince(days){
+  const cut=Date.now()-days*864e5;
+  return cardioLog().filter(c=>new Date(c.d).getTime()>=cut);
+}
+function cardioMinutes(days){ return cardioSince(days).reduce((a,c)=>a+c.m,0); }
+
+/* the little logging form, opened from Today */
+let cardioDraft=null;
+function cardioOpen(k){
+  const c=cardioOf(k);
+  cardioDraft={k, m:(c&&c.def)||20, km:''};
+  cardioPaint();
+}
+function cardioClose(){ cardioDraft=null; cardioPaint(); }
+function cardioBump(d){
+  if(!cardioDraft) return;
+  cardioDraft.m=Math.max(5,Math.min(300,cardioDraft.m+d));
+  const el=document.getElementById('cdmins'); if(el) el.textContent=cardioDraft.m;
+}
+function cardioSave(){
+  if(!cardioDraft) return;
+  const km=document.getElementById('cdkm');
+  if(cardioAdd(cardioDraft.k, cardioDraft.m, km?km.value:'')){
+    const c=cardioOf(cardioDraft.k);
+    cardioDraft=null; render();
+    toast(c.n+' logged');
+  }
+}
+function cardioPaint(){
+  const box=document.getElementById('cardiobox'); if(!box) return;
+  if(!cardioDraft){ box.innerHTML=''; return; }
+  const c=cardioOf(cardioDraft.k);
+  box.innerHTML=`<div style="border-top:1px solid var(--edge);margin-top:14px;padding-top:14px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <h3 style="font-size:15px">${c.n}</h3>
+      <button class="tiny muted" onclick="cardioClose()" style="text-decoration:underline">Cancel</button></div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:12px">
+      <div class="stepper">
+        <button onclick="cardioBump(-5)" aria-label="less">−</button>
+        <div class="val" id="cdmins">${cardioDraft.m}</div>
+        <button onclick="cardioBump(5)" aria-label="more">+</button>
+      </div><span class="unit">minutes</span>
+      ${c.dist?`<input type="number" id="cdkm" class="qty" step="0.1" placeholder="km" style="width:72px">`:''}
+    </div>
+    <button class="btn pine sm" onclick="cardioSave()">Log it</button>
+    <p class="tiny muted" style="margin:10px 0 0">${c.dist?'Distance is optional. ':''}This does not count towards your ${S.target} strength sessions, but it holds your day streak.</p>
+  </div>`;
+}
+
+/* About you.
+
+   Height and weight go in for tracking, not for setting difficulty — they
+   predict very little about how hard a push-up will be. What does predict it
+   is what you can already do, so the starting levels come from a short
+   self-assessment instead. No BMI, no targets, no judgement about any number
+   you put in here. */
+
+const ACTIVITY=[
+  {k:'sedentary', n:'Mostly sitting',       d:'Desk work, little walking', band:0},
+  {k:'light',     n:'On my feet a bit',     d:'Some walking most days',    band:1},
+  {k:'active',    n:'On my feet all day',   d:'Physical job, or regular walking', band:2},
+  {k:'sporty',    n:'I already train',      d:'Sport or exercise most weeks', band:3}
+];
+
+const ASSESS=[
+  {k:'push', q:'Can you do a full push-up on your toes?',
+   o:[{n:'Not yet',b:0},{n:'A few',b:1},{n:'Ten or so',b:2},{n:'Twenty plus',b:3}]},
+  {k:'legs', q:'Can you squat down until your thighs are level?',
+   o:[{n:'Not comfortably',b:0},{n:'Just about',b:1},{n:'Easily',b:2},{n:'Easily, and back up fast',b:3}]},
+  {k:'core', q:'How long can you hold a plank?',
+   o:[{n:'Not tried',b:0},{n:'Under 20 seconds',b:1},{n:'About a minute',b:2},{n:'Over two minutes',b:3}]}
+];
+
+/* Which answer governs which movement */
+const BAND_OF={
+  pushup:'push', press:'push', ohp:'push', pikepush:'push', curl:'push',
+  squat:'legs', split:'legs', rdl:'legs', bridge:'legs',
+  plank:'core', deadbug:'core',
+  row:'push', tablerow:'push', bandrow:'push', bandcurl:'push', pullup:'push'
+};
+
+/* band 0-3 plus activity, mapped onto each ladder's length */
+function rungFor(ex, bands, activityBand){
+  const b=bands[BAND_OF[ex.id]||'legs'];
+  const mix=(b*3 + activityBand)/4;           // the answer matters more than the job
+  const top=ex.ladder.length-1;
+  return Math.max(0, Math.min(top, Math.round(mix/3 * top * 0.75)));
+}
+function applyAssessment(bands, activityBand){
+  let n=0;
+  EX.forEach(e=>{ S.levels[e.id]=rungFor(e,bands,activityBand); n++; });
+  Object.keys(S.ready).forEach(k=>S.ready[k]=false);
+  save();
+  return n;
+}
+
+/* --- weigh-ins --- */
+function weighDue(){
+  const w=S.weighins||[]; if(!w.length) return true;
+  const last=new Date(w[w.length-1].d).getTime();
+  return (Date.now()-last) > 6*864e5;
+}
+function lastWeight(){ const w=S.weighins||[]; return w.length?w[w.length-1]:null; }
+function weightChange(days){
+  const w=S.weighins||[]; if(w.length<2) return null;
+  const cut=Date.now()-days*864e5;
+  const old=w.filter(x=>new Date(x.d).getTime()<=cut).pop() || w[0];
+  const now=w[w.length-1];
+  if(old===now) return null;
+  return {from:old.v, to:now.v, diff:+(now.v-old.v).toFixed(1),
+          days:Math.round((new Date(now.d)-new Date(old.d))/864e5)};
+}
+function logWeight(v){
+  v=parseFloat(v); if(!v||v<=0) return false;
+  S.weighins=S.weighins||[];
+  const today=dayKey(new Date());
+  const i=S.weighins.findIndex(x=>x.d===today);
+  const row={d:today, v:+v.toFixed(1)};
+  if(i>=0) S.weighins[i]=row; else S.weighins.push(row);
+  S.weighins.sort((a,b)=>a.d<b.d?-1:1);
+  save(); return true;
+}
+
+/* Levels and medals.
+
+   Points come from the three things the app actually wants: training,
+   showing up on rest days, and finishing a week. Training is weighted
+   heaviest, and nothing pays more for training four times in a week than
+   three, so there is no reward here for skipping recovery. */
+function points(){
+  const sessions=S.logs.length;
+  const checkins=Object.keys(S.checkins||{}).length;
+  const m=weekCounts();
+  const fullWeeks=Object.keys(m).filter(k=>m[k]>=S.target).length;
+  const cardio=(S.cardio||[]).length;
+  return sessions*10 + checkins*3 + fullWeeks*15 + cardio*4;
+}
+
+/* Named after the stages of putting up a building, which is the same idea
+   the app is selling: nothing visible for a while, then all of it. */
+const LEVELS=[
+  {at:0,    n:'Breaking ground'},
+  {at:100,  n:'Footings'},
+  {at:250,  n:'First course'},
+  {at:500,  n:'Load bearing'},
+  {at:900,  n:'Framed'},
+  {at:1500, n:'Weathertight'},
+  {at:2400, n:'Keystone'},
+  {at:3600, n:'Cornerstone'},
+  {at:5000, n:'Bedrock'}
+];
+function levelFor(p){
+  let i=0; for(let k=0;k<LEVELS.length;k++) if(p>=LEVELS[k].at) i=k;
+  const cur=LEVELS[i], next=LEVELS[i+1]||null;
+  const span=next?next.at-cur.at:1;
+  return {i, n:i+1, name:cur.n, at:cur.at, next,
+    into:p-cur.at, span, pct:next?Math.min(100,Math.round((p-cur.at)/span*100)):100};
+}
+function levelNow(){ return levelFor(points()); }
+
+/* Medals in groups, so different habits get rewarded and not just volume */
+const MEDALS=[
+  {g:'Sessions', k:'s', icon:'M12 3l2.6 5.6 6.1.8-4.5 4.2 1.2 6.1L12 16.8 6.6 19.7l1.2-6.1L3.3 9.4l6.1-.8z',
+   tiers:[{n:1,t:'First session'},{n:10,t:'Ten sessions'},{n:25,t:'Twenty-five'},
+          {n:50,t:'Fifty'},{n:100,t:'One hundred'},{n:250,t:'Two hundred and fifty'}]},
+  {g:'Full weeks', k:'w', icon:'M4 5h16v15H4zM4 10h16M9 3v4M15 3v4',
+   tiers:[{n:1,t:'One week'},{n:4,t:'A month'},{n:12,t:'A quarter'},
+          {n:26,t:'Half a year'},{n:52,t:'A full year'}]},
+  {g:'Days running', k:'d', icon:'M12 3v18M5 8l7-5 7 5',
+   tiers:[{n:7,t:'A week straight'},{n:30,t:'Thirty days'},{n:100,t:'One hundred days'},{n:365,t:'Every day for a year'}]},
+  {g:'Reps lifted', k:'r', icon:'M3 12h4l3-7 4 14 3-7h4',
+   tiers:[{n:1000,t:'A thousand'},{n:10000,t:'Ten thousand'},{n:50000,t:'Fifty thousand'},{n:100000,t:'One hundred thousand'}]},
+  {g:'Minutes logged', k:'c', icon:'M12 21s-7-4.7-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.3-7 10-7 10z',
+   tiers:[{n:60,t:'An hour'},{n:600,t:'Ten hours'},{n:3000,t:'Fifty hours'},{n:6000,t:'A hundred hours'}]},
+  {g:'Top of the ladder', k:'l', icon:'M7 3v18M17 3v18M7 8h10M7 13h10M7 18h10',
+   tiers:[{n:1,t:'Topped one movement'},{n:3,t:'Topped three'},{n:6,t:'Topped six'},{n:10,t:'Topped ten'}]}
+];
+function medalScore(k,st){
+  if(k==='s') return st.logs.length;
+  if(k==='w') { const m=weekCounts(); return Object.keys(m).filter(x=>m[x]>=S.target).length; }
+  if(k==='d') return st.bestDay||0;
+  if(k==='r') return st.totalReps;
+  if(k==='c') return (S.cardio||[]).reduce((a,c)=>a+c.m,0);
+  if(k==='l') return EX.filter(e=>(S.levels[e.id]||0)>=e.ladder.length-1 && hasKit(e.kit||'db')).length;
+  return 0;
+}
+function medalsEarned(st){
+  const out=[];
+  MEDALS.forEach(g=>{ const v=medalScore(g.k,st);
+    g.tiers.forEach(t=>{ if(v>=t.n) out.push(g.k+t.n); }); });
+  return out;
+}
+function medalById(id){
+  for(const g of MEDALS) for(const t of g.tiers) if(g.k+t.n===id) return {g,t};
+  return null;
+}
+
 
 /* --- rest-day mobility: three moves, about two minutes --- */
 const MOB=[
@@ -636,9 +971,10 @@ const STR=[
    pose:{a:{h:[50,19],n:[50,31],p:[50,58],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[47,19],wa:[57,28],eb:[60,33],wb:[51,20],floor:95},
          b:{h:[50,19],n:[50,31],p:[50,58],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[46,17],wa:[60,37],eb:[59,30],wb:[49,18],floor:95}}}
 ];
-const byStr = id => STR.find(s=>s.id===id);
+const byStr = id => STR.find(s=>s.id===id) || MOB.find(m=>m.id===id);
 
 /* ============================== STATE ============================== */
+const BUILD='2026-09-18 11:55';
 const KEY='groundwork.v1';
 let S = {
   setup:false,
@@ -703,6 +1039,45 @@ function applyDeload(){
   S.deloadedAt=Date.now(); save();
   return moved;
 }
+/* A session already done today cannot be repeated — it is logged, and doing
+   it again the same day is not what builds muscle. Anything beyond the
+   schedule is an extra, recorded as such, and enough extras is a signal that
+   the schedule itself is too easy. */
+function trainedToday(){ return trainedOn(dayKey(new Date())); }
+function extrasCount(days){
+  const cut=Date.now()-days*864e5;
+  return S.logs.filter(l=>l.extra && new Date(l.date).getTime()>=cut).length;
+}
+/* Three extras in four weeks means the schedule is not asking enough. Two
+   honest answers to that: train more often, or make each session harder.
+   The app offers both rather than picking one silently — and rung changes
+   are the sort of thing that should be a decision, not a surprise. */
+function extrasNudgeDue(){
+  if(extrasCount(28) < 3) return false;
+  if(S.extraNudgedAt && Date.now()-S.extraNudgedAt < 21*864e5) return false;
+  return true;
+}
+function bumpAllLadders(){
+  let n=0;
+  EX.forEach(e=>{ if(!hasKit(e.kit||'db')) return;
+    const cur=S.levels[e.id]||0, top=e.ladder.length-1;
+    if(cur<top){ S.levels[e.id]=cur+1; n++; } });
+  Object.keys(S.ready).forEach(k=>S.ready[k]=false);
+  S.extraNudgedAt=Date.now(); save(); render();
+  toast(n+' movements stepped up');
+}
+function raiseTarget(){
+  S.target=Math.min(4,(S.target||3)+1);
+  S.extraNudgedAt=Date.now(); save(); render();
+  toast('Now '+S.target+' sessions a week');
+}
+function dismissExtraNudge(){ S.extraNudgedAt=Date.now(); save(); render(); }
+
+function extraKey(){
+  const last=S.logs[S.logs.length-1];
+  return (last && last.session==='A') ? 'B' : 'A';
+}
+
 function nextSession(){ const last=S.logs[S.logs.length-1]; return (last&&last.session==='A')?'B':'A'; }
 function thisWeekCount(){ return weekCounts()[weekKey(new Date())]||0; }
 function stats(){ const st=streak(); const d=dayStreak(); return {bestStreak:st.best, curStreak:st.cur, logs:S.logs, totalReps:totalReps(), dayStreak:d.cur, bestDay:d.best}; }
@@ -712,7 +1087,7 @@ function stats(){ const st=streak(); const d=dayStreak(); return {bestStreak:st.
 function dayKey(d){ const x=new Date(d); x.setHours(0,0,0,0);
   return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); }
 function trainedOn(k){ return S.logs.some(l=>dayKey(new Date(l.date))===k); }
-function metOn(k){ return !!S.checkins[k] || trainedOn(k); }
+function metOn(k){ return !!S.checkins[k] || trainedOn(k) || cardioOn(k); }
 function checkedInToday(){ return !!S.checkins[dayKey(new Date())]; }
 function dayStreak(){
   const today=new Date(); let cur=0, gaps=0;
@@ -783,10 +1158,15 @@ function figFit(ex){
   return ex._fit;
 }
 
+function rungLoads(ex){
+  if(!ex.load) return false;
+  const r=ex.ladder&&ex.ladder[S.levels[ex.id]||0];
+  return !(r&&r.nw);
+}
 function figure(ex, id){
   const f=figFit(ex), sw=(STROKE/f.s).toFixed(2), a=ex.pose.a;
   const floorY=(f.ty+f.s*a.floor).toFixed(1);
-  const load=ex.load?`<circle class="load" r="5"/>`:'';
+  const load=rungLoads(ex)?`<circle class="load" r="5"/>`:'';
   return `<div class="figwrap"><svg class="fig" id="${id}" viewBox="0 0 ${FIG_W} ${FIG_H}" aria-hidden="true">
     <line class="floor" x1="8" y1="${floorY}" x2="${FIG_W-8}" y2="${floorY}"/>
     <g transform="translate(${f.tx.toFixed(2)},${f.ty.toFixed(2)}) scale(${f.s.toFixed(4)})" stroke-width="${sw}">
@@ -829,7 +1209,7 @@ const anims={};
 
 function figLabel(id,txt){ const el=document.getElementById('lb_'+id); if(el) el.textContent=txt; }
 
-function animate(ex, id){
+function figPlay(ex, id){
   const svg=document.getElementById(id); if(!svg) return;
   if(anims[id]){ cancelAnimationFrame(anims[id].raf); delete anims[id];
     setPoseT(svg,ex,0); figLabel(id,'tap to play'); return; }
@@ -866,7 +1246,7 @@ function renderTabs(){
   document.getElementById('tabs').innerHTML = '<div class="tabrow">' + TABS.map(t=>
     `<button class="${t.id===tab?'on':''}" onclick="go('${t.id}')" aria-label="${t.n}"><svg viewBox="0 0 24 24">${t.ic}</svg><span>${t.n}</span></button>`).join('') + '</div>';
 }
-function go(t){ stopAll(); sub=null; tab=t; renderTabs(); render(); window.scrollTo(0,0); }
+function go(t){ stopAll(); sub=null; asq=null; tab=t; renderTabs(); render(); window.scrollTo(0,0); }
 
 function render(){
   if(!S.setup){ return viewSetup(); }
@@ -945,6 +1325,7 @@ function viewToday(){
       <div class="mk">week streak</div>
       <div class="rungs" style="margin-top:9px">${rungs}</div>
       <div class="tiny muted" style="margin-top:7px">${done} of ${S.target} sessions</div>
+      <div class="tiny" style="margin-top:6px;color:var(--brass)">Level ${levelNow().n} · ${levelNow().name}</div>
     </div>
     <div class="meter">
       <div class="num mv" style="color:var(--brass)">${ds.cur}</div>
@@ -959,6 +1340,14 @@ function viewToday(){
     <p class="small muted" style="margin:6px 0 0">${S.logs.length||Object.keys(S.checkins).length?'Three moves, three questions, today\u2019s idea.':'Thirty seconds. Three moves, three questions, today\u2019s idea. No lifting.'}</p>
     <button class="btn" style="background:var(--brass);color:var(--surface)" onclick="startCheckin()">${rest?'Start rest-day check-in':'Check in for today'}</button>
   </div>`}
+
+  ${extrasNudgeDue()?`<div class="card" style="margin-top:14px;border-color:var(--pine)">
+    <h3 style="font-size:16px">You keep adding extra sessions</h3>
+    <p class="small muted" style="margin:8px 0 0">${extrasCount(28)} extras in the last month. That usually means the schedule is too easy rather than that you need more days — and doing more of something easy builds less than doing something harder.</p>
+    <button class="btn pine sm" onclick="bumpAllLadders()">Step every movement up a rung</button>
+    ${(S.target||3)<4?`<button class="btn ghost sm" onclick="raiseTarget()">Train ${(S.target||3)+1} times a week instead</button>`:''}
+    <button class="btn ghost sm" onclick="dismissExtraNudge()">Leave it as it is</button>
+  </div>`:''}
 
   ${(breakLength()>=14 && !(S.deloadedAt&&Date.now()-S.deloadedAt<864e5*3))?`<div class="card" style="margin-top:14px;border-color:var(--brass)">
     <h3 style="font-size:16px">Been a while</h3>
@@ -976,7 +1365,9 @@ function viewToday(){
       ? 'You trained today. Everything from here is repair — eat properly and get to bed at a sensible hour.'
       : 'You trained yesterday. The muscle is being built today. Training the same movements again would interrupt it.'}</p>
     <div class="flag" style="border-color:var(--brass)"><b>Today's idea.</b> ${lb} <span class="muted">— ${lt.toLowerCase()}</span></div>
-    <button class="btn ghost sm" onclick="showSession('${key}')">Look at ${sess.name.toLowerCase()} anyway</button>
+    ${trainedToday
+      ? `<button class="btn ghost sm" onclick="showExtra()">Add an extra session</button>`
+      : `<button class="btn ghost sm" onclick="showSession('${key}')">Look at ${sess.name.toLowerCase()} anyway</button>`}
     <div id="peek"></div>
   </div>`
   : `<div class="card" style="margin-top:14px">
@@ -991,11 +1382,29 @@ function viewToday(){
       <li style="color:var(--muted)"><span>Cooldown — ${sess.cool.map(id=>byStr(id).target.toLowerCase()).join(', ')}</span><span class="meta">3 stretches</span></li>
     </ul>
     <button class="btn pine" onclick="startSession('${key}')">Start ${sess.name.toLowerCase()}</button>
-    <button class="btn ghost sm" onclick="startSession('${key}',true)">Short on time — one exercise</button>
   </div>`}
 
+  <div class="card" style="margin-top:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+      <h3 style="font-size:15px">Anything else today?</h3>
+      <span class="tiny muted">${cardioMinutes(7)?cardioMinutes(7)+' min this week':''}</span>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:11px;flex-wrap:wrap">
+      ${CARDIO.map(c=>`<button class="chip cardiobtn" onclick="cardioOpen('${c.k}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="${c.icon}"/></svg>
+        ${c.n}</button>`).join('')}
+    </div>
+    <div id="cardiobox"></div>
+    ${cardioToday().length?`<div style="margin-top:14px">${cardioToday().map(c=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--edge)">
+        <span style="font-size:14px;flex:1">${cardioOf(c.k)?cardioOf(c.k).n:c.k} · ${c.m} min${c.km?' · '+c.km+' km':''}</span>
+        <button class="tiny muted" onclick="cardioRemove(${c.at})" style="text-decoration:underline">Remove</button>
+      </div>`).join('')}</div>`:''}
+  </div>
+
   ${S.logs.length===0?`<div class="card"><h3 style="font-size:15px">Before your first session</h3><p class="small muted" style="margin:8px 0 0">Three minutes of warming up and a bit of floor space. Stop each set with one or two reps left in you — if a set feels easy, it did not count for much.</p></div>`:
-  `<p class="tiny muted" style="margin:16px 0 0;text-align:center">${lastSummary()}</p>`}`;
+  `<p class="tiny muted" style="margin:16px 0 0;text-align:center">${lastSummary()}</p>`}
+  ${quoteToday()?`<p class="quote small" style="margin-top:22px">${quoteToday()}</p>`:''}`;
 }
 function last7(){
   let o='';
@@ -1003,6 +1412,16 @@ function last7(){
     const t=trainedOn(k), c=!!S.checkins[k];
     o+=`<i class="${t?'trained':c?'checked':''}"></i>`; }
   return o;
+}
+function showExtra(){
+  const key=extraKey(), sess=sessionFor(key);
+  document.getElementById('peek').innerHTML=`
+    <p class="small muted" style="margin:14px 0 0">Today's session is logged and cannot be repeated. If you want more, this is ${sess.name.toLowerCase()} — different movements, so nothing you trained today gets worked twice.</p>
+    <ul class="exlist" style="margin-top:12px">
+      ${sess.ex.map(id=>{const e=byId(id),lv=e.ladder[S.levels[id]||0];
+        return `<li><span>${lv.n}</span><span class="meta">${e.sets} × ${e.reps[0]}–${e.reps[1]}${e.unit==='sec'?'s':''}</span></li>`}).join('')}</ul>
+    <p class="tiny muted" style="margin:12px 0 0">Logged as an extra. If extras become a habit, the app will offer to make the scheduled sessions harder instead.</p>
+    <button class="btn pine sm" onclick="startSession('${key}',true)">Start the extra session</button>`;
 }
 function showSession(key){
   const sess=sessionFor(key);
@@ -1020,23 +1439,168 @@ function lastSummary(){
   return `${when} — ${SESSIONS[l.session].name}, ${l.entries.length} exercises, ${reps} reps. ${days>=4?'Worth getting the next one in.':'Rest day is doing its job.'}`;
 }
 
-function viewLearn(){
-  $v.innerHTML=`<div class="topbar"><h1>Learn</h1></div>
-  <h2 style="font-size:15px;margin-bottom:4px">Start here</h2>
-  <div>${GUIDES.map((g,i)=>`<div class="accordion">
-    <button class="achead" onclick="acc(this)">${g.t}<svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>
-    <div class="acbody"><p class="small" style="margin:0;line-height:1.62">${g.b}</p></div></div>`).join('')}</div>
-  <h2 style="font-size:15px;margin:28px 0 4px">Stretches</h2>
-  <p class="tiny muted" style="margin:0 0 4px">Done at the end of a session, while you are still warm. Never before — stretching cold muscles just makes you weaker for the sets that follow.</p>
-  <div>${STR.map(s=>`<div class="accordion">
-    <button class="achead" onclick="acc(this,null,'${s.id}')">${s.name}<svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>
-    <div class="acbody"></div></div>`).join('')}</div>
-
-  <h2 style="font-size:15px;margin:28px 0 4px">Every movement</h2>
-  <div>${EX.filter(e=>hasKit(e.kit||'db')).map(e=>`<div class="accordion">
-    <button class="achead" onclick="acc(this,'${e.id}')">${e.name}<svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>
-    <div class="acbody" id="ac_${e.id}"></div></div>`).join('')}</div>`;
+function learnRow(title, sub, onclick, searchText, tickId, num){
+  return `<div class="accordion" data-find="${esc((title+' '+(sub||'')+' '+(searchText||'')).toLowerCase())}">
+    <button class="achead" onclick="${onclick}">
+      <span class="lrow">
+        ${num?`<span class="lnum">${num}</span>`:''}
+        <span class="lt">
+          <span>${title}</span>
+          ${sub?`<span class="lsub">${sub}</span>`:''}
+        </span>
+        ${tickId!=null?`<svg id="tick${tickId}" class="tick${(S.read||{})[title]?' on':''}" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>`:''}
+      </span>
+      <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+    </button>
+    <div class="acbody">${searchText===null?'':''}</div></div>`;
 }
+function guideRow(x, num){
+  const plain=x.g.b.replace(/<[^>]+>/g,' ');
+  return `<div class="accordion" data-find="${esc((x.g.t+' '+plain).toLowerCase())}">
+    <button class="achead" onclick="acc(this);markRead(${x.i})">
+      <span class="lrow">
+        ${num?`<span class="lnum">${num}</span>`:''}
+        <span class="lt"><span>${x.g.t}</span></span>
+        <svg id="tick${x.i}" class="tick${(S.read||{})[x.g.t]?' on':''}" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>
+      </span>
+      <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+    </button>
+    <div class="acbody"><p class="small" style="margin:0;line-height:1.62">${x.g.b}</p></div></div>`;
+}
+
+function viewLearn(){
+  const key=nextSession(), sess=sessionFor(key);
+  const moves=EX.filter(e=>hasKit(e.kit||'db'));
+
+  $v.innerHTML=`<div class="topbar"><h1>Learn</h1>
+    <span class="date" id="readcount">${readCount()} of ${GUIDES.length} read</span></div>
+
+  <input type="search" id="lsearch" class="lsearch" placeholder="Search" autocomplete="off"
+    oninput="learnFilter(this.value)">
+
+  <div id="lnext" class="card" style="margin-bottom:22px">
+    <h3 style="font-size:15px">For your next session</h3>
+    <p class="tiny muted" style="margin:5px 0 0">${sess.name} — tap any of these to read it through first.</p>
+    <div class="nextwrap">${sess.ex.map(id=>{const e=byId(id);
+      return `<button class="chip" onclick="learnJump('${id}')">${e.ladder[S.levels[id]||0].n}</button>`}).join('')}</div>
+  </div>
+
+  <div class="lsec"><h2>Start here</h2>
+    <p class="tiny muted">Four things worth knowing before your first session. Ten minutes in total.</p>
+    ${guidesIn('essential').map((x,i)=>guideRow(x,i+1)).join('')}</div>
+
+  <div class="lsec"><h2>When you need it</h2>
+    ${guidesIn('more').map(x=>guideRow(x)).join('')}</div>
+
+  <div class="lsec"><h2>Every movement</h2>
+    <p class="tiny muted">Where you are on each ladder. Tap for the setup and the commonest mistake.</p>
+    ${moves.map(e=>{const lv=e.ladder[S.levels[e.id]||0];
+      const find=(e.name+' '+e.trains+' '+e.cues.join(' ')+' '+e.wrong+' '+e.ladder.map(l=>l.n).join(' ')).toLowerCase();
+      return `<div class="accordion" id="lx_${e.id}" data-find="${esc(find)}">
+        <button class="achead" onclick="acc(this,'${e.id}')">
+          <span class="lrow"><span class="lt"><span>${e.name}</span><span class="lsub">${lv.n}</span></span></span>
+          <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+        <div class="acbody" id="ac_${e.id}"></div></div>`}).join('')}</div>
+
+  <div class="lsec"><h2>Stretches and mobility</h2>
+    <p class="tiny muted">Static holds after a session, while you are warm. The moving ones are for rest days, before anything else.</p>
+    ${STR.concat(MOB).map(x=>{
+      const find=(x.name+' '+(x.target||'')+' '+x.how).toLowerCase();
+      const sub=x.target||'rest-day mobility';
+      return `<div class="accordion" data-find="${esc(find)}">
+        <button class="achead" onclick="acc(this,null,'${x.id}')">
+          <span class="lrow"><span class="lt"><span>${x.name}</span><span class="lsub">${sub}</span></span></span>
+          <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+        <div class="acbody"></div></div>`}).join('')}</div>
+
+  <div class="lsec"><h2>Short ideas</h2>
+    <p class="tiny muted">One of these turns up in each check-in. All ${LESSONS.length} are here.</p>
+    ${LESSONS.map(([t,b])=>`<div class="accordion" data-find="${esc((t+' '+b).toLowerCase())}">
+      <button class="achead" onclick="acc(this)"><span class="lrow"><span class="lt"><span>${t}</span></span></span>
+        <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>
+      <div class="acbody"><p class="small" style="margin:0;line-height:1.62">${b}</p></div></div>`).join('')}</div>
+
+  <div class="lsec"><h2>About this app</h2>
+    ${guidesIn('app').map(x=>guideRow(x)).join('')}</div>
+
+  <p class="tiny muted hidden" id="lempty" style="text-align:center;margin:30px 0">Nothing matches that.</p>`;
+}
+
+/* Filter in place rather than re-rendering, so the keyboard keeps focus
+   and anything already open stays open. */
+function learnFilter(q){
+  q=(q||'').trim().toLowerCase();
+  const rows=$v.querySelectorAll('.accordion');
+  let hits=0;
+  rows.forEach(r=>{
+    const on = !q || (r.dataset.find||'').indexOf(q)>=0;
+    r.classList.toggle('hidden', !on);
+    if(on) hits++;
+  });
+  $v.querySelectorAll('.lsec').forEach(sec=>{
+    const any=[...sec.querySelectorAll('.accordion')].some(r=>!r.classList.contains('hidden'));
+    sec.classList.toggle('hidden', !any);
+  });
+  const next=document.getElementById('lnext');
+  if(next) next.classList.toggle('hidden', !!q);
+  const empty=document.getElementById('lempty');
+  if(empty) empty.classList.toggle('hidden', hits>0);
+}
+
+/* Straight from a movement chip to its open entry */
+function learnJump(id){
+  const row=document.getElementById('lx_'+id); if(!row) return;
+  const btn=row.querySelector('.achead');
+  if(!row.querySelector('.acbody').classList.contains('on')) btn.click();
+  // scroll by hand rather than smooth scrollIntoView: some host pages wrap
+  // that in their own animation, and we have no control over what they pass it
+  setTimeout(()=>{
+    try{
+      const top=row.getBoundingClientRect().top+window.scrollY-12;
+      if(typeof window.scrollTo==='function') window.scrollTo(0,Math.max(0,top));
+    }catch(e){ try{ row.scrollIntoView(); }catch(e2){} }
+  },60);
+}
+
+/* The ladder was drawn as plain labels, which read as tappable and were not.
+   They set your level now — the same thing the settings page does, but here,
+   where you are actually reading about the movement. */
+function ladderPills(exId){
+  const e=byId(exId), cur=S.levels[exId]||0;
+  /* Inline, not just a class: a stale or overriding stylesheet cannot shrink
+     these below their text if the rules live on the element itself. */
+  const base='display:inline-block;width:auto;flex:0 0 auto;white-space:nowrap;'
+    +'font-size:12.5px;line-height:1.25;padding:8px 13px;margin:0 7px 7px 0;'
+    +'border-radius:999px;vertical-align:top;';
+  return e.ladder.map((l,i)=>{
+    const on=i===cur;
+    const style=base+(on
+      ? 'border:1px solid var(--pine);background:var(--pine-soft);color:var(--pine);font-weight:600;'
+      : 'border:1px solid var(--edge);background:var(--bg);color:var(--muted);');
+    return `<button class="pill rung${on?' on':''}" style="${style}"
+      onclick="setLevel('${exId}',${i})">${l.n}</button>`;
+  }).join('');
+}
+function ladderHint(exId){
+  const e=byId(exId), cur=S.levels[exId]||0;
+  return `Trains ${e.trains.toLowerCase()}. You're on <b style="color:var(--pine)">${e.ladder[cur].n}</b> — ${e.ladder[cur].h}`;
+}
+function setLevel(exId,i){
+  const e=byId(exId); if(!e) return;
+  i=Math.max(0,Math.min(i,e.ladder.length-1));
+  if((S.levels[exId]||0)===i) return;
+  S.levels[exId]=i; S.ready[exId]=false; save();
+  const ld=document.getElementById('ld_'+exId); if(ld) ld.innerHTML=ladderPills(exId);
+  const fig=document.getElementById('fw_'+exId);
+  if(fig){ stopAll(); fig.innerHTML=figure(e,'fg_'+exId); setTimeout(()=>figPlay(e,'fg_'+exId),80); }
+  const lh=document.getElementById('lh_'+exId); if(lh) lh.innerHTML=ladderHint(exId);
+  const row=document.getElementById('lx_'+exId);   // the list subtitle, if we are in Learn
+  if(row){ const sub=row.querySelector('.lsub'); if(sub) sub.textContent=e.ladder[i].n; }
+  toast('Now on '+e.ladder[i].n);
+}
+
 function acc(btn, exId, strId, logIdx){
   const body=btn.nextElementSibling, open=body.classList.contains('on');
   btn.classList.toggle('on',!open); body.classList.toggle('on',!open);
@@ -1054,18 +1618,18 @@ function acc(btn, exId, strId, logIdx){
     + `<button class="btn ghost sm" style="color:#b4442e;border-color:#b4442e" onclick="deleteLog(${logIdx})">Delete this session</button>`;
   }
   if(!open && strId){ const s=byStr(strId);
-    body.innerHTML = `<div onclick="animate(byStr('${strId}'),'sg_${strId}')" style="cursor:pointer">${figure(s,'sg_'+strId)}</div>
+    body.innerHTML = `<div onclick="figPlay(byStr('${strId}'),'sg_${strId}')" style="cursor:pointer">${figure(s,'sg_'+strId)}</div>
       <p class="small muted" style="margin:12px 0 0">${s.target} · hold ${s.sec} seconds${s.side?' each side':''}</p>
       <p class="small" style="margin:10px 0 0;line-height:1.6">${s.how}</p>`;
-    setTimeout(()=>animate(s,'sg_'+strId),150);
+    setTimeout(()=>figPlay(s,'sg_'+strId),150);
   }
   if(!open && exId){ const e=byId(exId);
-    body.innerHTML = `<div onclick="animate(byId('${exId}'),'fg_${exId}')" style="cursor:pointer">${figure(e,'fg_'+exId)}</div>
-      <div style="margin-top:12px">${e.ladder.map((l,i)=>`<span class="pill" style="${i===S.levels[exId]?'border-color:var(--pine);color:var(--pine)':''}">${l.n}</span>`).join('')}</div>
-      <p class="small muted" style="margin:10px 0 0">Trains ${e.trains.toLowerCase()}. You're on <b style="color:var(--pine)">${e.ladder[S.levels[exId]].n}</b> — ${e.ladder[S.levels[exId]].h}</p>
+    body.innerHTML = `<div id="fw_${exId}" onclick="figPlay(byId('${exId}'),'fg_${exId}')" style="cursor:pointer">${figure(e,'fg_'+exId)}</div>
+      <div class="ladder" id="ld_${exId}" style="display:block;margin:12px 0 16px">${ladderPills(exId)}</div>
+      <p class="small muted" style="margin:10px 0 0" id="lh_${exId}">${ladderHint(exId)}</p>
       <ol class="cues">${e.cues.map(c=>`<li>${c}</li>`).join('')}</ol>
       <div class="flag"><b>Commonest mistake.</b> ${e.wrong}</div>`;
-    setTimeout(()=>animate(e,'fg_'+exId),150);
+    setTimeout(()=>figPlay(e,'fg_'+exId),150);
   }
   if(open && exId){ stopAll(); }
 }
@@ -1080,8 +1644,25 @@ function viewProgress(){
     cells.push('<i style="background:transparent;width:6px"></i>');
     w=new Date(w.getTime()+7*864e5); }
   const s=stats();
+  const L=levelNow(), P=points();
   $v.innerHTML=`<div class="topbar"><h1>Progress</h1></div>
-  <div class="statgrid">
+
+  <div class="card levelcard">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+      <div>
+        <div class="tiny muted">Level ${L.n}</div>
+        <h2 style="font-size:21px;margin-top:2px">${L.name}</h2>
+      </div>
+      <div class="num" style="font-size:26px;color:var(--brass)">${P.toLocaleString()}</div>
+    </div>
+    <div class="lvbar"><i style="width:${L.pct}%"></i></div>
+    <div class="tiny muted" style="margin-top:7px">${L.next
+      ? `${(L.next.at-P).toLocaleString()} to go until ${L.next.n}`
+      : 'Top level. Everything from here is just doing the work.'}</div>
+    <div class="tiny muted" style="margin-top:9px">10 a session · 3 a check-in · 15 for finishing a week</div>
+  </div>
+
+  <div class="statgrid" style="margin-top:14px">
     <div class="stat"><div class="v num">${S.logs.length}</div><div class="k">sessions done</div></div>
     <div class="stat"><div class="v num">${s.totalReps.toLocaleString()}</div><div class="k">reps lifted, all time</div></div>
     <div class="stat"><div class="v num" style="color:var(--pine)">${st.cur}</div><div class="k">week streak</div></div>
@@ -1094,6 +1675,27 @@ function viewProgress(){
       <span><b style="color:var(--brass)">●</b> checked in</span>
       <span><b style="color:var(--muted)">●</b> missed</span></div>
     <p class="tiny muted" style="margin:10px 0 0">One missed day is forgiven. Two in a row resets the day streak — never the week streak.</p></div>
+  ${cardioLog().length?`<div class="card" style="margin-top:14px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <h3 style="font-size:15px">Everything else</h3>
+      <span class="num" style="font-size:20px">${cardioMinutes(30)}<span class="tiny muted" style="font-weight:400"> min</span></span>
+    </div>
+    <p class="tiny muted" style="margin:5px 0 0">${cardioSince(30).length} in the last month · ${cardioLog().length} all time</p>
+    <div style="margin-top:12px">${CARDIO.map(c=>{
+      const mins=cardioSince(30).filter(x=>x.k===c.k).reduce((a,x)=>a+x.m,0);
+      return mins?`<div style="display:flex;justify-content:space-between;padding:7px 0;border-top:1px solid var(--edge);font-size:14px">
+        <span>${c.n}</span><span class="tiny muted">${mins} min</span></div>`:''}).join('')}</div>
+  </div>`:''}
+
+  ${lastWeight()?`<div class="card" style="margin-top:14px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <h3 style="font-size:15px">Bodyweight</h3>
+      <span class="num" style="font-size:20px">${lastWeight().v}<span class="tiny muted" style="font-weight:400"> ${S.unit}</span></span>
+    </div>
+    ${(()=>{const c=weightChange(28); return c?`<p class="tiny muted" style="margin:5px 0 0">${c.diff>0?'+':''}${c.diff}${S.unit} over ${c.days} days</p>`:''})()}
+    ${(S.weighins||[]).length>1?`<div class="spark">${sparkline()}</div>`:''}
+  </div>`:''}
+
   <div class="card" style="margin-top:14px"><h3 style="font-size:15px">Every week since you started</h3>
     <div class="hist">${cells.join('')||'<span class="tiny muted">Nothing yet.</span>'}</div>
     <p class="tiny muted" style="margin:12px 0 0">Each block is one session.</p></div>
@@ -1113,16 +1715,31 @@ function viewProgress(){
       return `<div class="accordion">
         <button class="achead" onclick="acc(this,null,null,${idx})" style="padding:13px 2px">
           <span><span style="font-size:14.5px">${dt.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</span>
-          <span class="tiny muted"> \u00b7 ${SESSIONS[l.session]?SESSIONS[l.session].name:l.session} \u00b7 ${reps} reps</span></span>
+          <span class="tiny muted"> \u00b7 ${SESSIONS[l.session]?SESSIONS[l.session].name:l.session}${l.extra?' (extra)':''} \u00b7 ${reps} reps</span></span>
           <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>
         <div class="acbody"></div></div>`}).join('')}</div>
       ${S.logs.length>40?`<p class="tiny muted" style="margin:12px 0 0">Showing the last 40 of ${S.logs.length}.</p>`:''}`
     :`<p class="small muted" style="margin:8px 0 0">Nothing logged yet. Your sessions will show up here so you can check what you did last time.</p>`}
   </div>
 
-  <div class="card"><h3 style="font-size:15px">Milestones</h3>
-    ${BADGES.map(b=>{const got=b.test(s);return `<div class="badge ${got?'got':''}"><div class="dot"></div>
-      <div><div class="bn">${b.n}</div><div class="bd">${b.d}</div></div></div>`}).join('')}
+  <div class="card"><h3 style="font-size:15px">Medals</h3>
+    <p class="tiny muted" style="margin:5px 0 0">${medalsEarned(s).length} of ${MEDALS.reduce((a,g)=>a+g.tiers.length,0)}</p>
+    ${MEDALS.map(g=>{
+      const v=medalScore(g.k,s);
+      return `<div style="margin-top:16px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <div style="font-size:14px;font-weight:500">${g.g}</div>
+          <div class="tiny muted">${v.toLocaleString()}</div></div>
+        <div class="medalrow">${g.tiers.map(t=>{
+          const got=v>=t.n;
+          return `<div class="medal${got?' got':''}" title="${esc(t.t)}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${g.icon}"/></svg>
+            <span>${t.n>=1000?(t.n/1000)+'k':t.n}</span></div>`}).join('')}</div>
+        <div class="tiny muted" style="margin-top:5px">${(()=>{
+          const nextT=g.tiers.find(t=>v<t.n);
+          return nextT ? `Next: ${nextT.t.toLowerCase()}` : 'All earned.';
+        })()}</div>
+      </div>`}).join('')}
   </div>`;
 }
 
@@ -1236,11 +1853,131 @@ function viewCrew(){
   socialSync();
 }
 
+/* The profile.
+
+   Deliberately not a second Progress screen: that one is the record over
+   time, this one is the state of play now — who you are, what you are
+   currently doing, and the best you have managed at each movement. */
+
+function displayName(){
+  const p=S.profile||{};
+  if(p.name) return esc(p.name);
+  if(S.nostr) return nameOf(S.nostr.pk);
+  return 'You';
+}
+function avatarLetter(){
+  const n=displayName().replace(/&[a-z#0-9]+;/gi,'').trim();
+  return (n[0]||'Y').toUpperCase();
+}
+function trainingSince(){
+  if(!S.logs.length) return null;
+  const first=S.logs.reduce((a,l)=>{const t=new Date(l.date).getTime(); return t<a?t:a;},Infinity);
+  return new Date(first);
+}
+function setName(){
+  const v=prompt('What should the app call you?', (S.profile||{}).name||'');
+  if(v===null) return;
+  S.profile=Object.assign({}, S.profile, {name:v.trim().slice(0,30)||null});
+  save(); render();
+}
+
+/* Best single set per movement: furthest up the ladder first, then most reps */
+function bests(){
+  const m={};
+  S.logs.forEach(l=>l.entries.forEach(en=>{
+    const e=byId(en.exId); if(!e) return;
+    en.sets.forEach(st=>{
+      const cur=m[en.exId];
+      const better = !cur || en.level>cur.level ||
+        (en.level===cur.level && (st.weight||0)>cur.weight) ||
+        (en.level===cur.level && (st.weight||0)===cur.weight && st.reps>cur.reps);
+      if(better) m[en.exId]={level:en.level, reps:st.reps, weight:st.weight||0,
+        hold:!!st.hold, name:e.name, rung:(e.ladder[en.level]||{}).n||''};
+    });
+  }));
+  return Object.keys(m).map(k=>Object.assign({id:k}, m[k]))
+    .sort((a,b)=>b.level-a.level || b.reps-a.reps);
+}
+
+function recentMedals(n){
+  const got=medalsEarned(stats()).map(medalById).filter(Boolean);
+  return got.slice(-n).reverse();
+}
+
+function profileHeader(){
+  const L=levelNow(), P=points(), since=trainingSince(), st=streak(), ds=dayStreak();
+  return `
+  <div class="card profilecard">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div class="bigav">${avatarLetter()}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px">
+          <h2 style="font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${displayName()}</h2>
+          <button class="tiny muted" onclick="setName()" style="text-decoration:underline;flex:0 0 auto">Edit</button>
+        </div>
+        <div class="tiny muted" style="margin-top:2px">${S.nostr?shortNpub(S.nostr.pk):'Not signed in'}</div>
+        ${since?`<div class="tiny muted" style="margin-top:2px">Training since ${since.toLocaleDateString('en-GB',{month:'long',year:'numeric'})}</div>`:''}
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:18px">
+      <div><div class="tiny muted">Level ${L.n}</div>
+        <div style="font-size:17px;font-family:'Familjen Grotesk',sans-serif;font-weight:600">${L.name}</div></div>
+      <div class="num" style="font-size:20px;color:var(--brass)">${P.toLocaleString()}</div>
+    </div>
+    <div class="lvbar"><i style="width:${L.pct}%"></i></div>
+    ${L.next?`<div class="tiny muted" style="margin-top:6px">${(L.next.at-P).toLocaleString()} to ${L.next.n}</div>`:''}
+
+    <div class="pstats">
+      <div><div class="num">${S.logs.length}</div><div class="tiny muted">sessions</div></div>
+      <div><div class="num" style="color:var(--pine)">${st.cur}</div><div class="tiny muted">week streak</div></div>
+      <div><div class="num" style="color:var(--brass)">${ds.cur}</div><div class="tiny muted">day streak</div></div>
+      <div><div class="num">${totalReps().toLocaleString()}</div><div class="tiny muted">reps</div></div>
+    </div>
+  </div>`;
+}
+
+function profileBody(){
+  const sess=sessionFor(nextSession());
+  const bs=bests().slice(0,6);
+  const meds=recentMedals(3);
+  return `
+  <div class="card">
+    <h3 style="font-size:15px">Right now</h3>
+    <div class="prow"><span>Training</span><span>${S.target} times a week</span></div>
+    <div class="prow"><span>Equipment</span><span>${kitSummary()}</span></div>
+    <div class="prow"><span>Next up</span><span>${sess.name}</span></div>
+    ${(S.cardio||[]).length?`<div class="prow"><span>Also logging</span><span>${
+      Array.from(new Set(cardioLog().map(c=>c.k))).map(k=>(cardioOf(k)||{}).n).filter(Boolean).join(', ').toLowerCase()
+    }</span></div>`:''}
+  </div>
+
+  ${bs.length?`<div class="card">
+    <h3 style="font-size:15px">Best sets</h3>
+    <p class="tiny muted" style="margin:5px 0 0">The hardest version you have logged, and the best set at it.</p>
+    ${bs.map(b=>`<div class="prow">
+      <span style="min-width:0"><span style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(b.rung||b.name)}</span></span>
+      <span class="num" style="font-size:15px">${b.reps}${b.hold?'s':''}${b.weight?` × ${b.weight}${S.unit}`:''}</span>
+    </div>`).join('')}
+  </div>`:''}
+
+  ${meds.length?`<div class="card">
+    <h3 style="font-size:15px">Latest medals</h3>
+    ${meds.map(m=>`<div class="prow">
+      <span style="display:flex;align-items:center;gap:10px;min-width:0">
+        <svg class="medalsm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${m.g.icon}"/></svg>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.t.t}</span></span>
+      <span class="tiny muted">${m.g.g}</span>
+    </div>`).join('')}
+    <button class="btn ghost sm" onclick="go('progress')">All medals</button>
+  </div>`:''}`;
+}
+
 /* Settings live behind a menu rather than one long scroll: each screen holds
    one concern, and the menu shows what each is currently set to. */
 let sub=null;
 function openSub(k){ sub=k; render(); window.scrollTo(0,0); }
-function closeSub(){ sub=null; render(); window.scrollTo(0,0); }
+function closeSub(){ sub=null; asq=null; render(); window.scrollTo(0,0); }
 
 function subhead(title){
   return `<div class="subbar">
@@ -1254,6 +1991,14 @@ function kitSummary(){
   return names.join(', ')+(hasKit('db')?` · ${S.db}${S.unit}${S.dbAdjustable?', adjustable':''}`:'');
 }
 const MENU=[
+  {k:'me',    n:'About you',        sum:()=>{
+    const p=S.profile||{}, lw=lastWeight();
+    const bits=[];
+    if(lw) bits.push(lw.v+S.unit);
+    if(p.height) bits.push(p.height+(p.hUnit==='in'?' in':' cm'));
+    const a=ACTIVITY.find(x=>x.k===p.activity); if(a) bits.push(a.n.toLowerCase());
+    return bits.length?bits.join(' · '):'Not set';
+  }},
   {k:'kit',   n:'Equipment',        sum:()=>kitSummary()},
   {k:'train', n:'Training',         sum:()=>`${S.target} sessions a week · ${S.restSec}s rest`},
   {k:'ladder',n:'Exercise levels',  sum:()=>`${EX.filter(e=>hasKit(e.kit||'db')).length} movements`},
@@ -1264,14 +2009,103 @@ const MENU=[
 ];
 
 function viewYou(){
-  if(sub) return ({kit:subKit,train:subTrain,ladder:subLadder,remind:subRemind,
+  if(sub==='me' && asq) return drawAssess();
+  if(sub) return ({me:subMe,kit:subKit,train:subTrain,ladder:subLadder,remind:subRemind,
                    look:subLook,acct:subAcct,data:subData})[sub]();
   $v.innerHTML=`<div class="topbar"><h1>You</h1></div>
+  ${profileHeader()}
+  ${profileBody()}
+  <h2 style="font-size:15px;margin:26px 0 8px">Settings</h2>
   <div class="menu">${MENU.map(m=>`<button class="menurow" onclick="openSub('${m.k}')">
     <span class="ml"><span class="mn">${m.n}</span><span class="ms">${m.sum()}</span></span>
     <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
   </button>`).join('')}</div>
-`;
+  <p class="tiny muted" style="margin:20px 0 0;text-align:center">Build ${BUILD}</p>`;
+}
+
+function subMe(){
+  const p=S.profile||{}, lw=lastWeight(), ch=weightChange(28);
+  const act=ACTIVITY.find(a=>a.k===p.activity);
+  $v.innerHTML=subhead('About you')+`
+  <div class="card">
+    <h3 style="font-size:15px">Measurements</h3>
+    <p class="tiny muted" style="margin:5px 0 0">Optional, and kept on this device. They are here so you can watch them change, not so the app can judge them.</p>
+    <label class="row"><span>Height</span><span class="rowctl">
+      <input type="number" class="qty" value="${p.height||''}" min="80" max="260" placeholder="—"
+        onchange="S.profile=Object.assign({},S.profile,{height:parseFloat(this.value)||null});save();render()">
+      <select class="unit" onchange="S.profile=Object.assign({},S.profile,{hUnit:this.value});save();render()">
+        <option value="cm" ${p.hUnit!=='in'?'selected':''}>cm</option>
+        <option value="in" ${p.hUnit==='in'?'selected':''}>in</option></select></span></label>
+    <label class="row"><span>Bodyweight today</span><span class="rowctl">
+      <input type="number" class="qty" id="bw" step="0.1" value="${lw?lw.v:''}" placeholder="—">
+      <button class="chip" onclick="if(logWeight(document.getElementById('bw').value)){toast('Logged');render()}else{toast('Enter a number')}">Log</button>
+    </span></label>
+    ${ch?`<p class="tiny muted" style="margin:12px 0 0">${ch.diff>0?'Up':'Down'} ${Math.abs(ch.diff)}${S.unit} over the last ${ch.days} days.</p>`:''}
+    ${(S.weighins||[]).length>1?`<div class="spark">${sparkline()}</div>
+      <p class="tiny muted" style="margin:6px 0 0">${(S.weighins||[]).length} entries. Muscle arrives slowly — judge this over months, not weeks.</p>`:''}
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:15px">How active are you normally?</h3>
+    <p class="tiny muted" style="margin:5px 0 0">Outside of training.</p>
+    <div style="margin-top:12px">${ACTIVITY.map(a=>`<button class="pickrow${p.activity===a.k?' on':''}" style="border-top:1px solid var(--edge)"
+      onclick="S.profile=Object.assign({},S.profile,{activity:'${a.k}'});save();render()">
+      <span><span style="display:block">${a.n}</span><span class="tiny muted">${a.d}</span></span>
+      ${p.activity===a.k?'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>':''}
+    </button>`).join('')}</div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:15px">Starting levels</h3>
+    <p class="small muted" style="margin:6px 0 0">Three questions about what you can do now. The answers set where you start on every ladder, which beats guessing and beats starting everyone at the bottom.</p>
+    ${p.assessedAt?`<p class="tiny muted" style="margin:10px 0 0">Last done ${new Date(p.assessedAt).toLocaleDateString('en-GB',{day:'numeric',month:'long'})}.</p>`:''}
+    <button class="btn sm" style="background:var(--pine);color:var(--surface)" onclick="startAssess()">${p.assessedAt?'Do it again':'Set my levels'}</button>
+    <p class="tiny muted" style="margin:10px 0 0">This overwrites every ladder position. Your history and streaks are untouched.</p>
+  </div>`;
+}
+
+function sparkline(){
+  const w=(S.weighins||[]).slice(-40);
+  if(w.length<2) return '';
+  const vs=w.map(x=>x.v), lo=Math.min(...vs), hi=Math.max(...vs), span=(hi-lo)||1;
+  const pts=w.map((x,i)=>{
+    const px=(i/(w.length-1))*100;
+    const py=28-((x.v-lo)/span)*24-2;
+    return px.toFixed(1)+','+py.toFixed(1);
+  }).join(' ');
+  return `<svg viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true">
+    <polyline points="${pts}" fill="none" stroke="var(--pine)" stroke-width="1.4"
+      vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+}
+
+/* --- the assessment --- */
+let asq=null;
+function startAssess(){ asq={i:0, ans:{}}; drawAssess(); }
+function drawAssess(){
+  const total=ASSESS.length;
+  if(asq.i>=total){
+    const bands={}; ASSESS.forEach(q=>bands[q.k]=asq.ans[q.k]??0);
+    const a=ACTIVITY.find(x=>x.k===(S.profile||{}).activity);
+    const n=applyAssessment(bands, a?a.band:1);
+    S.profile=Object.assign({},S.profile,{assessedAt:Date.now()});
+    save(); asq=null; render();
+    toast(n+' movements set to match');
+    return;
+  }
+  const q=ASSESS[asq.i];
+  $v.innerHTML=subhead('Starting levels')+`
+  <div class="tiny muted" style="margin:-8px 0 14px">Question ${asq.i+1} of ${total}</div>
+  <div class="card">
+    <h3 style="font-size:17px">${q.q}</h3>
+    <p class="tiny muted" style="margin:6px 0 0">Answer for how you are today, not how you were.</p>
+    <div style="margin-top:14px">${q.o.map(o=>`<button class="pickrow" style="border-top:1px solid var(--edge)"
+      onclick="asq.ans['${q.k}']=${o.b};asq.i++;drawAssess();window.scrollTo(0,0)">
+      <span>${o.n}</span>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+    </button>`).join('')}</div>
+  </div>
+  <button class="btn ghost sm" onclick="asq=null;render()">Cancel</button>`;
 }
 
 function subKit(){
@@ -1327,6 +2161,12 @@ function subRemind(){
 
 function subLook(){
   $v.innerHTML=subhead('Appearance')+`
+  <div class="card">
+    <h3 style="font-size:15px">Motivational lines</h3>
+    <label class="row"><span>Show them<br><span class="tiny muted">${esc(QUOTES[0])} ${esc(QUOTES[1])}</span></span>
+      <input type="checkbox" ${S.quotes===false?'':'checked'} style="width:20px;height:20px;flex:0 0 auto;accent-color:var(--pine)"
+        onchange="S.quotes=this.checked;save();render()"></label>
+  </div>
   <div class="card">
     ${[['auto','Match device'],['light','Light'],['dark','Dark']].map(([v,n],i)=>
       `<button class="pickrow${(S.theme||'auto')===v?' on':''}" onclick="setTheme('${v}');render()" ${i===0?'style="border-top:none"':''}>
@@ -1399,10 +2239,9 @@ function wipe(){ if(confirm('Erase all sessions, streaks and settings? This cann
 
 /* ============================== SESSION PLAYER ============================== */
 let run=null;
-function startSession(key,short){
+function startSession(key, extra){
   const sess=sessionFor(key);
-  const list = short ? [sess.ex[0]] : sess.ex;
-  run={ key, i:0, short:!!short, startedAt:Date.now(), entries: list.map(id=>{
+  run={ key, i:0, extra:!!extra, startedAt:Date.now(), entries: sess.ex.map(id=>{
     const e=byId(id);
     return { exId:id, level:S.levels[id], sets:Array.from({length:e.sets},()=>({reps:e.hold?30:e.reps[0], weight:S.weights[id]??S.db, done:false, hold:!!e.hold})) };
   })};
@@ -1420,7 +2259,7 @@ function drawStep(){
     <div><div class="tiny muted">${SESSIONS[run.key].name} · ${run.i+1} of ${total}</div><h1 style="font-size:21px;margin-top:2px">${lv.n}</h1></div>
     <button class="tiny muted" onclick="quitSession()" style="text-decoration:underline">Quit</button>
   </div>
-  <div onclick="animate(byId('${en.exId}'),'pf')" style="cursor:pointer">${figure(e,'pf')}</div>
+  <div onclick="figPlay(byId('${en.exId}'),'pf')" style="cursor:pointer">${figure(e,'pf')}</div>
   <p class="small muted" style="margin:12px 0 0">${lv.h}</p>
 
   ${stepUp?`<div class="card" style="margin-top:14px;border-color:var(--brass);background:var(--brass-soft)">
@@ -1465,7 +2304,7 @@ function drawStep(){
   <button class="btn ghost sm" onclick="skipEx()">Skip this one today</button>
 
   <div style="height:20px"></div>`;
-  setTimeout(()=>animate(e,'pf'),120);
+  setTimeout(()=>figPlay(e,'pf'),120);
 }
 function swapEx(id){
   const e=byId(id); if(!e) return;
@@ -1479,7 +2318,7 @@ function skipEx(){
   if(hs_t){ clearInterval(hs_t.t); hs_t=null; }
   run.entries[run.i].sets.forEach(s=>s.done=false);
   if(run.i<run.entries.length-1){ run.i++; stopAll(); drawStep(); document.getElementById('player').scrollTo(0,0); }
-  else if(!run.short && run.phase!=='cool'){ run.phase='cool'; run.ci=0; stopAll(); drawCool(); }
+  else if(run.phase!=='cool'){ run.phase='cool'; run.ci=0; stopAll(); drawCool(); }
   else finishSession();
 }
 function bump(i,f,d){
@@ -1490,19 +2329,44 @@ function bump(i,f,d){
   if(el) el.textContent=s[f];
 }
 let hs_t=null;
+const HOLD_LEAD=5;   // seconds to get into position before either hold clock starts
+
 function holdSet(i){
   const en=run.entries[run.i], s=en.sets[i];
   const btn=document.getElementById('hb'+i);
-  const val=document.querySelectorAll('.setrow')[i].querySelector('.val');
-  if(hs_t&&hs_t.i===i){ clearInterval(hs_t.t); hs_t=null; if(val)val.textContent=s.reps; if(btn)btn.textContent='Start'; return; }
+  const row=document.querySelectorAll('.setrow')[i];
+  const val=row?row.querySelector('.val'):null;
+  const reset=()=>{ if(val){ val.textContent=s.reps; val.style.color=''; } if(btn) btn.textContent='Start'; };
+
+  if(hs_t&&hs_t.i===i){ clearInterval(hs_t.t); hs_t=null; reset(); return; }
   if(hs_t){ clearInterval(hs_t.t); hs_t=null; }
+
+  // same five seconds to get set as the cooldown holds
+  let lead=HOLD_LEAD;
+  if(val){ val.textContent=lead; val.style.color='var(--brass)'; }
+  if(btn) btn.textContent='Get set';
+  hs_t={i, t:setInterval(()=>{
+    lead--;
+    if(lead>0){ if(val) val.textContent=lead; if(navigator.vibrate) navigator.vibrate(12); return; }
+    clearInterval(hs_t.t);
+    if(navigator.vibrate) navigator.vibrate(30);
+    if(val) val.style.color='var(--pine)';
+    holdSetRun(i);
+  },1000)};
+}
+function holdSetRun(i){
+  const en=run.entries[run.i], s=en.sets[i];
+  const btn=document.getElementById('hb'+i);
+  const row=document.querySelectorAll('.setrow')[i];
+  const val=row?row.querySelector('.val'):null;
   let left=s.reps;
+  if(val) val.textContent=left;
   if(btn) btn.textContent='Stop';
   hs_t={i, t:setInterval(()=>{
     left--; if(val) val.textContent=Math.max(left,0);
     if(left<=0){
       clearInterval(hs_t.t); hs_t=null;
-      if(val) val.textContent=s.reps;
+      if(val){ val.textContent=s.reps; val.style.color=''; }
       if(btn) btn.textContent='Done';
       if(navigator.vibrate) navigator.vibrate(40);
       if(!s.done) markSet(i);
@@ -1540,7 +2404,7 @@ function nextStep(){
   } else if(logged.length===en.sets.length){ S.ready[en.exId]=false; }
   save(); stopAll();
   if(run.i < run.entries.length-1){ run.i++; drawStep(); document.getElementById('player').scrollTo(0,0); }
-  else if(!run.short && run.phase!=='cool'){ run.phase='cool'; run.ci=0; drawCool(); document.getElementById('player').scrollTo(0,0); }
+  else if(run.phase!=='cool'){ run.phase='cool'; run.ci=0; drawCool(); document.getElementById('player').scrollTo(0,0); }
   else finishSession();
 }
 
@@ -1555,12 +2419,13 @@ function drawCool(){
     <div><div class="tiny muted">Cooldown · ${run.ci+1} of ${list.length}</div><h1 style="font-size:21px;margin-top:2px">${s.name}</h1></div>
     <button class="tiny muted" onclick="finishSession()" style="text-decoration:underline">Skip to end</button>
   </div>
-  <div onclick="animate(byStr('${s.id}'),'sf')" style="cursor:pointer">${figure(s,'sf')}</div>
+  <div onclick="figPlay(byStr('${s.id}'),'sf')" style="cursor:pointer">${figure(s,'sf')}</div>
 
   <div class="card" style="margin-top:14px;text-align:center">
     <div class="num" id="holdT" style="font-size:52px;line-height:1;color:var(--pine)">${s.sec}</div>
     <div class="tiny muted">${s.side?`seconds each side`:`seconds`}</div>
     <button class="btn pine" id="holdBtn" onclick="holdStart(${s.sec},${s.side?1:0})">Start the hold</button>
+    <p class="tiny muted" style="margin:10px 0 0">Five seconds to get set, then the clock starts.</p>
   </div>
 
   <div class="card">
@@ -1573,20 +2438,41 @@ function drawCool(){
   <button class="btn" onclick="coolNext()">${run.ci===list.length-1?'Finish session':'Next stretch'}</button>
   <button class="btn ghost sm" onclick="coolNext()">Skip this one</button>
   <div style="height:20px"></div>`;
-  setTimeout(()=>animate(s,'sf'),120);
+  setTimeout(()=>figPlay(s,'sf'),120);
 }
 function holdStart(sec,twoSides){
   clearInterval(st_t);
+  const t=document.getElementById('holdT'), b=document.getElementById('holdBtn');
+  if(b){ b.disabled=true; b.style.opacity=.55; }
+  let lead=HOLD_LEAD;
+  const paint=(v,cls)=>{ if(t){ t.textContent=v; t.style.color=cls; } };
+  paint(lead,'var(--brass)');
+  if(b) b.textContent='Get into position';
+  st_t=setInterval(()=>{
+    lead--;
+    if(lead>0){ paint(lead,'var(--brass)'); if(navigator.vibrate) navigator.vibrate(12); return; }
+    clearInterval(st_t);
+    if(navigator.vibrate) navigator.vibrate(30);
+    paint(sec,'var(--pine)');
+    holdRun(sec,twoSides);
+  },1000);
+}
+function holdRun(sec,twoSides){
   let left=sec, side=1;
   const t=document.getElementById('holdT'), b=document.getElementById('holdBtn');
-  b.textContent = twoSides?'Holding — side 1':'Holding';
-  b.disabled=true; b.style.opacity=.55;
+  if(b) b.textContent = twoSides?'Holding — side 1':'Holding';
   st_t=setInterval(()=>{
     left--; if(t) t.textContent=Math.max(left,0);
     if(left<=0){
       if(navigator.vibrate) navigator.vibrate(40);
-      if(twoSides && side===1){ side=2; left=sec; if(b) b.textContent='Swap sides — side 2'; toast('Other side'); }
-      else{ clearInterval(st_t); if(b){ b.textContent='Held'; b.disabled=false; b.style.opacity=1; } toast('Done'); }
+      if(twoSides && side===1){
+        side=2; left=sec;
+        if(b) b.textContent='Swap sides — side 2';
+        if(t) t.textContent=sec;
+        toast('Other side');
+      }
+      else{ clearInterval(st_t); if(b){ b.textContent='Held'; b.disabled=false; b.style.opacity=1; }
+        if(t) t.style.color='var(--pine)'; toast('Done'); }
     }
   },1000);
 }
@@ -1606,14 +2492,17 @@ function finishSession(){
   clearInterval(st_t); if(hs_t){clearInterval(hs_t.t);hs_t=null;} stopAll();
   const entries=run.entries.map(en=>({exId:en.exId,level:en.level,sets:en.sets.filter(s=>s.done)})).filter(en=>en.sets.length);
   if(!entries.length){ quitSession(); return; }
-  const before=stats(), beforeBadges=BADGES.filter(b=>b.test(before)).map(b=>b.id);
+  const before=stats(), beforeMedals=medalsEarned(before), beforeLevel=levelNow().n;
   const newLog={date:new Date().toISOString(), session:run.key, entries,
+    extra: !!run.extra,
     mins: run.startedAt?Math.max(1,Math.round((Date.now()-run.startedAt)/60000)):null};
   S.logs.push(newLog);
   save();
   if(S.nostr&&S.nostr.autoBackup) nostrBackup(true);
   nostrPublishWorkout(newLog);
-  const after=stats(), newBadges=BADGES.filter(b=>b.test(after)&&!beforeBadges.includes(b.id));
+  const after=stats();
+  const newMedals=medalsEarned(after).filter(id=>beforeMedals.indexOf(id)<0).map(medalById).filter(Boolean);
+  const L=levelNow(), levelledUp=L.n>beforeLevel;
   const reps=entries.reduce((a,e)=>a+e.sets.reduce((b,s)=>b+(s.hold?0:s.reps),0),0);
   const done=thisWeekCount(), st=streak();
   const weekDone = done>=S.target;
@@ -1629,10 +2518,19 @@ function finishSession(){
         : `${done} of ${S.target} this week. Take tomorrow off — the growing happens on rest days.`}</p>
       <div class="rungs" style="justify-content:center;margin:24px 0;display:flex">
         ${Array.from({length:S.target},(_,i)=>`<div class="rung ${i<done?'done':''}"></div>`).join('')}</div>
-      ${newBadges.map(b=>`<div class="card" style="border-color:var(--brass);background:var(--brass-soft);text-align:left">
-        <div class="tiny" style="color:var(--brass);font-weight:600">Milestone unlocked</div>
-        <h3 style="font-size:17px;margin-top:3px">${b.n}</h3><p class="small muted" style="margin:3px 0 0">${b.d}</p>
-        ${Signer.canWrite?`<button class="btn ghost sm" onclick="nostrShareMilestone('${b.n}')">Share on nostr</button>`:''}</div>`).join('')}
+      ${quoteFor(S.logs.length)?`<p class="quote">${quoteFor(S.logs.length)}</p>`:''}
+      ${levelledUp?`<div class="card levelup">
+        <div class="tiny" style="color:var(--brass);font-weight:600">Level ${L.n}</div>
+        <h3 style="font-size:22px;margin-top:3px">${L.name}</h3>
+        <div class="lvbar" style="margin-top:12px"><i style="width:${L.pct}%"></i></div></div>`:''}
+      ${newMedals.map(m=>`<div class="card" style="border-color:var(--brass);background:var(--brass-soft);text-align:left">
+        <div style="display:flex;align-items:center;gap:12px">
+          <svg class="medalbig" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${m.g.icon}"/></svg>
+          <div style="flex:1">
+            <div class="tiny" style="color:var(--brass);font-weight:600">Medal earned</div>
+            <h3 style="font-size:17px;margin-top:2px">${m.t.t}</h3>
+            <p class="tiny muted" style="margin:2px 0 0">${m.g.g}</p></div></div>
+        ${Signer.canWrite?`<button class="btn ghost sm" onclick="nostrShareMilestone('${esc(m.t.t)}')">Share on nostr</button>`:''}</div>`).join('')}
       ${Object.keys(S.ready).filter(k=>S.ready[k]).length?`<div class="card" style="text-align:left"><h3 style="font-size:15px">Next time, harder</h3>
         <p class="small muted" style="margin:6px 0 0">You maxed out the rep range on ${Object.keys(S.ready).filter(k=>S.ready[k]).map(k=>byId(k).name.toLowerCase()).join(', ')}. The app will offer the next version when you get there.</p></div>`:''}
       <button class="btn" onclick="closeSession()">Done</button>
@@ -1665,7 +2563,7 @@ function drawCheckin(){
       <div><div class="tiny muted">Loosening off · ${ck.step+1} of ${MOB.length}</div><h1 style="font-size:21px;margin-top:2px">${m.name}</h1></div>
       <button class="tiny muted" onclick="quitCheckin()" style="text-decoration:underline">Quit</button>
     </div>
-    <div onclick="animate(MOB[${ck.step}],'cf')" style="cursor:pointer">${figure(m,'cf')}</div>
+    <div onclick="figPlay(MOB[${ck.step}],'cf')" style="cursor:pointer">${figure(m,'cf')}</div>
     <div class="card" style="margin-top:14px">
       <div style="display:flex;justify-content:space-between;align-items:baseline">
         <h3 style="font-size:15px">${m.hold}</h3><span class="tiny muted">about 40 seconds</span></div>
@@ -1674,7 +2572,7 @@ function drawCheckin(){
     <button class="btn pine" onclick="ck.mob['${m.id}']=true;ck.step++;stopAll();drawCheckin();document.getElementById('player').scrollTo(0,0)">Done</button>
     <button class="btn ghost sm" onclick="ck.step++;stopAll();drawCheckin()">Skip this one</button>
     <div style="height:20px"></div>`;
-    setTimeout(()=>animate(m,'cf'),120);
+    setTimeout(()=>figPlay(m,'cf'),120);
     return;
   }
 
@@ -1688,6 +2586,13 @@ function drawCheckin(){
     <div class="topbar" style="margin-bottom:16px"><h1 style="font-size:21px">Three questions</h1>
       <button class="tiny muted" onclick="quitCheckin()" style="text-decoration:underline">Quit</button></div>
     <p class="small muted" style="margin:0 0 16px">No right answers. It is so you can look back and see what a good week looked like.</p>
+    ${weighDue()?`<div class="card" style="margin-top:12px"><h3 style="font-size:15px">Bodyweight, if you want to track it</h3>
+      <p class="tiny muted" style="margin:5px 0 0">Once a week is plenty. Skip it if you would rather not.</p>
+      <div class="rowctl" style="margin-top:10px">
+        <input type="number" class="qty" id="ckbw" step="0.1" placeholder="${lastWeight()?lastWeight().v:'—'}">
+        <span class="tiny muted">${S.unit}</span>
+        <button class="chip" onclick="if(logWeight(document.getElementById('ckbw').value)){toast('Logged')}">Log</button>
+      </div></div>`:''}
     ${q.map(item=>`<div class="card" style="margin-top:12px"><h3 style="font-size:15px">${item.q}</h3>
       <div class="choices">${item.o.map((o,i)=>`<button class="choice ${ck.ans[item.k]===i?'on':''}" onclick="ck.ans['${item.k}']=${i};drawCheckin()">${o}</button>`).join('')}</div></div>`).join('')}
     <button class="btn pine" onclick="ck.step++;drawCheckin();document.getElementById('player').scrollTo(0,0)">Continue</button>
@@ -1698,12 +2603,14 @@ function drawCheckin(){
   // finish
   const [lt,lb]=lessonOfDay();
   const k=dayKey(new Date());
-  const before=stats(), beforeBadges=BADGES.filter(b=>b.test(before)).map(b=>b.id);
+  const before=stats(), beforeMedals=medalsEarned(before), beforeLevel=levelNow().n;
   S.checkins[k]={mob:Object.keys(ck.mob).length, ...ck.ans};
   save();
   notifSchedule();
   if(S.nostr&&S.nostr.autoBackup) nostrBackup(true);
-  const after=stats(), newBadges=BADGES.filter(b=>b.test(after)&&!beforeBadges.includes(b.id));
+  const after=stats();
+  const newMedals=medalsEarned(after).filter(id=>beforeMedals.indexOf(id)<0).map(medalById).filter(Boolean);
+  const L=levelNow(), levelledUp=L.n>beforeLevel;
   const ds=dayStreak();
   document.getElementById('pfill').style.width='100%';
   body.innerHTML=`
@@ -1711,13 +2618,18 @@ function drawCheckin(){
       <div class="num" style="font-size:66px;line-height:1;color:var(--brass)">${ds.cur}</div>
       <div class="muted small">day${ds.cur===1?'':'s'} in a row</div>
       <h1 style="font-size:23px;margin-top:24px">${advice()}</h1>
+      ${quoteToday()?`<p class="quote">${quoteToday()}</p>`:''}
       <div class="card" style="text-align:left;margin-top:20px">
         <div class="tiny" style="color:var(--brass);font-weight:600">Today's idea</div>
         <h3 style="font-size:17px;margin-top:4px">${lt}</h3>
         <p class="small muted" style="margin:6px 0 0;line-height:1.6">${lb}</p></div>
-      ${newBadges.map(b=>`<div class="card" style="border-color:var(--brass);background:var(--brass-soft);text-align:left">
-        <div class="tiny" style="color:var(--brass);font-weight:600">Milestone unlocked</div>
-        <h3 style="font-size:17px;margin-top:3px">${b.n}</h3><p class="small muted" style="margin:3px 0 0">${b.d}</p></div>`).join('')}
+      ${levelledUp?`<div class="card levelup">
+        <div class="tiny" style="color:var(--brass);font-weight:600">Level ${L.n}</div>
+        <h3 style="font-size:22px;margin-top:3px">${L.name}</h3></div>`:''}
+      ${newMedals.map(m=>`<div class="card" style="border-color:var(--brass);background:var(--brass-soft);text-align:left">
+        <div class="tiny" style="color:var(--brass);font-weight:600">Medal earned</div>
+        <h3 style="font-size:17px;margin-top:3px">${m.t.t}</h3>
+        <p class="tiny muted" style="margin:2px 0 0">${m.g.g}</p></div>`).join('')}
       <button class="btn" onclick="closeCheckin()">Done</button>
       <div style="height:26px"></div>
     </div>`;
@@ -1982,7 +2894,8 @@ async function nostrBackup(silent){
   try{
     if(!silent) toast('Encrypting\u2026');
     const payload={v:1, at:Date.now(), levels:S.levels, weights:S.weights, ready:S.ready,
-      logs:S.logs, checkins:S.checkins, unit:S.unit, db:S.db, target:S.target, bestDay:S.bestDay};
+      logs:S.logs, checkins:S.checkins, unit:S.unit, db:S.db, target:S.target, bestDay:S.bestDay,
+      profile:S.profile, weighins:S.weighins, cardio:S.cardio};
     const ct=await Signer.encrypt(JSON.stringify(payload));
     const ev=await Signer.signEvent({kind:30078, created_at:Math.floor(Date.now()/1000),
       tags:[['d',BACKUP_D],['client','groundwork']], content:ct, pubkey:Signer.pk});
@@ -2005,6 +2918,17 @@ function mergeData(d){
   Object.keys(d.levels||{}).forEach(k=>{ if(byId(k)) S.levels[k]=Math.max(S.levels[k]||0, d.levels[k]|0); });
   S.weights=Object.assign({}, d.weights||{}, S.weights);
   S.bestDay=Math.max(S.bestDay||0, d.bestDay||0);
+  if(d.profile) S.profile=Object.assign({}, d.profile, S.profile||{});
+  if(d.cardio&&d.cardio.length){
+    const seen=new Set(cardioLog().map(x=>x.at));
+    S.cardio=cardioLog().concat(d.cardio.filter(x=>x&&x.at&&!seen.has(x.at)));
+    S.cardio.sort((a,b)=>a.at-b.at);
+  }
+  if(d.weighins&&d.weighins.length){
+    const seen=new Set((S.weighins||[]).map(x=>x.d));
+    S.weighins=(S.weighins||[]).concat(d.weighins.filter(x=>x&&x.d&&!seen.has(x.d)));
+    S.weighins.sort((a,b)=>a.d<b.d?-1:1);
+  }
   save();
   return S.logs.length-before;
 }
