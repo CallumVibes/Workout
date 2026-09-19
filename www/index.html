@@ -306,6 +306,13 @@ button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
 .feedrow .fw{font-weight:600}
 .feedrow .fm{font-size:12px;color:var(--muted);margin-top:2px}
 .feedrow .fa{flex:0 0 auto}
+/* --- leaderboard --- */
+.feedrow.brow{align-items:center}
+.brank{flex:0 0 auto;width:22px;text-align:right;font-size:13px;color:var(--muted);
+  font-variant-numeric:tabular-nums}
+.brank.top{color:var(--brass);font-weight:600}
+.boardme{background:var(--brass-soft);margin:0 -14px;padding-left:14px;padding-right:14px;
+  border-radius:10px;border-top-color:transparent}
 .feedday{font-size:11.5px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;
   margin:20px 0 2px}
 .feedday:first-child{margin-top:4px}
@@ -1840,7 +1847,7 @@ const STR=[
 const byStr = id => STR.find(s=>s.id===id) || MOB.find(m=>m.id===id);
 
 /* ============================== STATE ============================== */
-const BUILD='2026-09-19 20:10';
+const BUILD='2026-09-20 01:05';
 const KEY='groundwork.v1';
 let S = {
   setup:false,
@@ -1854,7 +1861,11 @@ let S = {
      the programme to be, tierOverride lets somebody say they have trained
      before. All of it is derived or preference — nothing here is history,
      so losing it costs a few sessions of calibration and nothing else. */
-  prog:{}, shape:{}, deload:{}, variety:'normal', tierOverride:null, assess:null
+  prog:{}, shape:{}, deload:{}, variety:'normal', tierOverride:null, assess:null,
+  /* the zapping wallet. `mnemonic` is the only thing in S that can spend
+     money: it is left out of the file export and has its own encrypted
+     backup event. See THE WALLET. */
+  spark:null
 };
 function load(){
   try{ const r=localStorage.getItem(KEY); if(r) S=Object.assign(S,JSON.parse(r)); }catch(e){}
@@ -3108,17 +3119,20 @@ function viewSocial(){
       <div class="ps">Your partner \u00b7 ${P.text}</div>
     </div>
     <button class="chip" aria-label="Cheer ${nameOf(P.pk)}" onclick="cheer('${P.pk}',null,'cheer')">\u{1F525}</button>
+    ${zapChip(P.pk, null)}
   </div>`:''}
 
   <div class="seg" role="tablist" style="margin-top:14px">
-    ${[['feed','Feed'],['people','People'],['goals','Goals']].map(([k,n])=>
+    ${[['feed','Feed'],['people','People'],['board','Board'],['goals','Goals']].map(([k,n])=>
       `<button role="tab" aria-selected="${socTab===k}" class="${socTab===k?'on':''}" onclick="socGo('${k}')">${n}</button>`).join('')}
   </div>
   ${navigator.onLine===false?`<p class="tiny muted" style="margin:12px 0 0;text-align:center">Offline — showing what was last synced.</p>`
     :syncFailed?`<p class="tiny muted" style="margin:12px 0 0;text-align:center">Could not reach the relays. <button style="color:var(--pine);text-decoration:underline" onclick="socialSync(true)">Try again</button></p>`:''}`;
 
-  $v.innerHTML = head + ({feed:socFeed, people:socPeople, goals:socGoals})[socTab]();
+  $v.innerHTML = head + ({feed:socFeed, people:socPeople, board:socBoard, goals:socGoals})[socTab]();
   socialSync();
+  /* the board's query is the expensive one — only run it on the board */
+  if(socTab==='board' && boardScope==='global') boardSync();
 }
 
 /* --- feed --- */
@@ -3144,6 +3158,7 @@ function socFeed(){
       <div class="ft">${feedText(f)}<div class="fm">${whenText(f.at)}</div></div>
       ${can?`<button class="chip fa" aria-label="Cheer ${nameOf(f.pk)}" onclick="cheer('${f.pk}','${esc(f.id)}')"${
         cheered(f.id)?' disabled':''}>${cheered(f.id)?'Sent':'\u{1F525}'}</button>`:''}
+      ${can?zapChip(f.pk, f.id):''}
     </div>`;
   }).join('');
   return `<div class="card" style="margin-top:14px;padding-top:6px">${body}</div>
@@ -3204,6 +3219,7 @@ function socPeople(){
     <div style="display:flex;align-items:center;gap:8px;margin-top:11px;flex-wrap:wrap">
       <div class="dotline" style="flex:1;min-width:70px">${r.st.dots.map(d=>`<i class="${d?'trained':''}"></i>`).join('')}</div>
       <button class="chip" aria-label="Cheer ${nameOf(r.pk)}" onclick="cheer('${r.pk}')">\u{1F525}</button>
+      ${zapChip(r.pk, null)}
       <button class="chip" onclick="setPartner('${r.pk}')"${r.pk===par?' style="color:var(--pine);border-color:var(--pine)"':''}>${r.pk===par?'Partnered':'Partner'}</button>
       <button class="chip" onclick="crewRemove('${r.pk}')">Remove</button>
     </div></div>`).join('')}
@@ -3443,6 +3459,12 @@ const MENU=[
   {k:'remind',n:'Daily reminder',   sum:()=>!Native.on?'Not available on this platform':(S.notify?`On at ${S.notifyAt||'19:00'}`:'Off')},
   {k:'look',  n:'Appearance',       sum:()=>({auto:'Match device',light:'Light',dark:'Dark'})[S.theme||'auto']},
   {k:'acct',  n:'Nostr account',    sum:()=>S.nostr?shortNpub(S.nostr.pk):'Not signed in'},
+  {k:'wallet',n:'Wallet',           sum:()=>{
+    walletInit();
+    if(!hasWallet()) return 'Not set up';
+    const b=S.spark.balance;
+    return (b!=null?b.toLocaleString()+' sats':'Set up')+(S.spark.backedUp?'':' · not backed up');
+  }},
   {k:'priv',  n:'Privacy',          sum:()=>{
     const out=[]; if(S.webfonts) out.push('web fonts'); if(S.avatars) out.push('pictures');
     if(S.nostr&&S.nostr.publishWorkouts) out.push('publishing');
@@ -3454,8 +3476,8 @@ const MENU=[
 function viewYou(){
   if(sub==='me' && asq) return drawAssess();
   if(sub) return ({me:subMe,kit:subKit,train:subTrain,coach:subCoach,ladder:subLadder,
-                   remind:subRemind,look:subLook,acct:subAcct,priv:subPrivacy,
-                   data:subData,stats:subStats})[sub]();
+                   remind:subRemind,look:subLook,acct:subAcct,wallet:subWallet,
+                   priv:subPrivacy,data:subData,stats:subStats})[sub]();
   $v.innerHTML=`<div class="topbar"><h1>You</h1></div>
   ${profileHeader()}
   ${profileBody()}
@@ -3848,15 +3870,185 @@ function subAcct(){
       <button onclick="relayEdit()" style="text-decoration:underline;font-size:14px">${(S.nostr.relays||[]).length} connected</button></label></div>`:''}`
   :`<div class="card">
     <p class="small muted" style="margin:0">Optional. Gives you an encrypted backup of your history, readable only by you.</p>
-    <button class="btn sm" style="background:var(--pine);color:var(--surface)" onclick="nostrLogin('amber')">Sign in with Amber</button>
+    ${canAmber()
+      ? `<button class="btn sm" style="background:var(--pine);color:var(--surface)" onclick="nostrLogin('amber')">Sign in with Amber</button>`
+      : ''}
+    <button class="btn ${canAmber()?'ghost':''} sm" ${canAmber()?'':'style="background:var(--pine);color:var(--surface)"'} onclick="bunkerAsk()">Connect a bunker</button>
     ${window.nostr?`<button class="btn ghost sm" onclick="nostrLogin('nip07')">Use browser extension</button>`:''}
-    <button class="btn ghost sm" onclick="pasteSignIn()">Amber opened but nothing came back? Paste it here</button>
     <button class="btn ghost sm" onclick="nostrLoginNpub()">Paste an npub (read-only)</button>
-    ${!CAN_CLIP?`<div class="flag" style="margin-top:14px"><b>This copy cannot read the clipboard.</b> That needs an https address — opened from a downloaded file the browser refuses it, so Amber's answer has to be pasted by hand. Opening the app from its web address fixes that.</div>`:''}
-    <button class="btn ghost sm" onclick="askPaste()">Amber opened but nothing happened</button>
 
-    <p class="tiny muted" style="margin:12px 0 0">Your key stays in Amber. It returns each answer through the clipboard, so your phone may ask you to allow a paste.</p>
+    ${canAmber()?'':`<p class="tiny muted" style="margin:12px 0 0">Amber is an Android app, so it is not offered here. A bunker does the same job over a relay and works anywhere.</p>`}
+
+    <div class="flag" style="margin-top:14px"><b>A bunker</b> holds your key somewhere else — nsecBunker, nsec.app, or Amber's own bunker mode — and signs when asked. You paste the <code>bunker://</code> address it gives you. Your key never reaches this app either way.</div>
+
+    ${canAmber()?`<div style="margin-top:14px">
+      <p class="tiny muted" style="margin:0 0 6px">If Amber opens but nothing comes back:</p>
+      <button class="btn ghost sm" style="margin-top:0" onclick="pasteSignIn()">Paste what it copied</button>
+    </div>
+    ${!CAN_CLIP?`<div class="flag" style="margin-top:14px"><b>This copy cannot read the clipboard.</b> That needs an https address — opened from a downloaded file the browser refuses it. The app now asks Amber to reply over a <code>groundwork://</code> link instead, but pasting by hand still works if that does not arrive.</div>`:''}
+    <p class="tiny muted" style="margin:12px 0 0">Your key stays in Amber. It replies over a link back into this app, falling back to the clipboard if that does not arrive.</p>`:''}
   </div>`);
+}
+
+/* The wallet screen. Every destructive or irreversible thing on it says what
+   it does before it does it, because this is the one screen in the app where
+   getting it wrong costs money rather than a streak. */
+function subWallet(){
+  walletInit();
+  const w=S.spark, has=hasWallet(), bal=w.balance;
+  const canSign=!!(S.nostr && Signer.canWrite);
+
+  if(!has){
+    $v.innerHTML=subhead('Wallet')+`
+    <div class="card">
+      <h3 style="font-size:16px">A wallet for zapping people</h3>
+      <p class="small muted" style="margin:8px 0 0">Zaps are a few sats sent to somebody who turned up. This sets up a <b>Spark</b> wallet on this device to pay them with.</p>
+      <div class="flag" style="margin-top:12px"><b>Pocket change only.</b> The keys live in this app's storage on this phone. That is fine for tipping and wrong for savings — keep anything you would miss in a wallet built for holding it.</div>
+      ${fragileStorage()?`<div class="flag" style="margin-top:12px;border-color:#b4442e">
+        <b>On an iPhone this storage is not durable.</b> Safari clears a web app's data after about a week without opening it, and the twelve words go with it. That is not a bug in this app and nothing here can prevent it.
+        <br><br>${canSign
+          ? 'So back the wallet up before you put anything in. It happens automatically when you create one, but check it says backed up.'
+          : 'So sign in first, or write the twelve words on paper before funding it. Right now there is nowhere to back it up to.'}</div>`:''}
+      ${canSign?`<p class="small muted" style="margin:12px 0 0">Your recovery phrase will be encrypted to your own nostr key by your signer and stored on your relays, so reinstalling restores the wallet with nothing to write down. You can still see the twelve words and copy them somewhere if you would rather.</p>`
+        :`<p class="small muted" style="margin:12px 0 0">You are not signed in, so there is nowhere to put an encrypted backup. You will need to write the twelve words down yourself.</p>`}
+      <button class="btn sm" style="background:var(--brass);color:var(--surface)" onclick="walletDoCreate()">Create a wallet</button>
+      <button class="btn ghost sm" onclick="walletDoImport()">I have a recovery phrase</button>
+      ${canSign?`<button class="btn ghost sm" onclick="walletDoRestore()">Restore from my relays</button>`:''}
+    </div>
+    <div class="card">
+      <h3 style="font-size:15px">What this adds</h3>
+      <p class="small muted" style="margin:6px 0 0;line-height:1.6">Until now the app only ever opened WebSockets to relays you chose. Zapping also fetches the lightning address out of the profile of whoever you are paying, and talks to Spark's servers. Both are listed under Privacy.</p>
+      <p class="tiny muted" style="margin:8px 0 0">The wallet itself is a separate few megabytes, downloaded the first time you use it and not before.</p>
+    </div>`;
+    return;
+  }
+
+  $v.innerHTML=subhead('Wallet')+`
+  <div class="card" style="text-align:center">
+    <div class="num" style="font-size:44px;line-height:1;color:var(--brass)">${bal!=null?bal.toLocaleString():'—'}</div>
+    <div class="tiny muted">sats${w.balanceAt?' · '+new Date(w.balanceAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):''}</div>
+    <button class="btn ghost sm" onclick="walletDoBalance()">Refresh</button>
+    <p class="tiny muted" style="margin:8px 0 0">Spark checks in with its servers to read this, so it needs a connection.</p>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:15px">Put something in</h3>
+    <p class="tiny muted" style="margin:5px 0 0">Creates a lightning invoice to pay from another wallet.</p>
+    <button class="btn pine sm" onclick="walletDoReceive()">Create an invoice</button>
+    <div id="wrecv"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:15px">Zapping</h3>
+    <label class="row" style="border-top:none"><span>Default amount</span>
+      <span class="rowctl"><input type="number" class="qty" min="1" max="1000000" value="${w.defaultZap||100}"
+        onchange="S.spark.defaultZap=Math.max(1,Math.min(1000000,parseInt(this.value,10)||100));save()"><span class="tiny muted">sats</span></span></label>
+    <p class="tiny muted" style="margin:10px 0 0">Anything over ${ZAP_CONFIRM_OVER.toLocaleString()} sats asks twice. Routing fees are capped at ${ZAP_MAX_FEE} sats.</p>
+  </div>
+
+  <div class="card" style="${w.backedUp?'':'border-color:var(--brass)'}">
+    <h3 style="font-size:15px">Backup</h3>
+    ${w.backedUp
+      ? `<p class="small muted" style="margin:6px 0 0">Encrypted to your nostr key and published to your relays${w.backedUpAt?' on '+new Date(w.backedUpAt).toLocaleDateString('en-GB',{day:'numeric',month:'long'}):''}. Reinstalling and signing back in brings it back.</p>`
+      : `<p class="small" style="margin:6px 0 0">This wallet is not backed up. If this app's storage is cleared, whatever is in it is gone.${
+          fragileStorage()?' On an iPhone that takes about a week of not opening the app — so this is a when, not an if.':''}</p>`}
+    ${canSign?`<button class="btn ${w.backedUp?'ghost':'pine'} sm" onclick="walletDoBackup()">${w.backedUp?'Back up again':'Back it up now'}</button>`:''}
+    <button class="btn ghost sm" onclick="walletShowWords()">Show my twelve words</button>
+    <p class="tiny muted" style="margin:10px 0 0">Two ways to lose this wallet: lose your nostr key, or have every relay drop the backup. Paper survives both.</p>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:15px">Remove this wallet</h3>
+    <p class="small muted" style="margin:6px 0 0">Forgets the recovery phrase on this device. Anything still in the wallet stays in it — you will need the words or a relay backup to reach it again.</p>
+    <button class="btn ghost sm" style="color:#b4442e;border-color:#b4442e" onclick="walletForget()">Forget it</button>
+  </div>`;
+}
+
+async function walletDoCreate(){
+  if(walletBusy) return; walletBusy=true;
+  toast('Setting up…');
+  try{
+    const words=await walletCreate();
+    render();
+    if(S.nostr && Signer.canWrite){
+      try{ await walletBackup(true); toast('Wallet created and backed up'); }
+      catch(e){ toast('Wallet created, but the backup failed'); }
+    }
+    render();
+    walletShowWords(words, true);
+  }catch(e){ ask(String(e && e.message || 'Could not create a wallet'), ()=>{}, 'Right'); }
+  walletBusy=false;
+}
+function walletDoImport(){
+  askText('Paste your twelve or twenty-four word recovery phrase.\n\nOnly ever type this into apps you trust.', '', async v=>{
+    if(!v) return;
+    toast('Checking it…');
+    try{ await walletImport(v); render(); toast('Wallet restored'); }
+    catch(e){ ask(String(e && e.message || 'That phrase was not accepted'), ()=>{}, 'Right'); }
+  }, {multiline:true, ok:'Restore'});
+}
+async function walletDoRestore(){
+  if(walletBusy) return; walletBusy=true;
+  toast('Looking on your relays…');
+  try{ await walletRestore(); render(); toast('Wallet restored from your backup'); }
+  catch(e){ ask(String(e && e.message || 'Could not restore'), ()=>{}, 'Right'); }
+  walletBusy=false;
+}
+async function walletDoBackup(){
+  if(walletBusy) return; walletBusy=true;
+  toast('Encrypting…');
+  try{ await walletBackup(); render(); }
+  catch(e){ ask(String(e && e.message || 'Backup failed'), ()=>{}, 'Right'); }
+  walletBusy=false;
+}
+async function walletDoBalance(){
+  if(walletBusy) return; walletBusy=true;
+  toast('Asking Spark…');
+  try{ await walletBalance(true); render(); }
+  catch(e){ ask(String(e && e.message || 'Could not reach Spark').slice(0,240), ()=>{}, 'Right'); }
+  walletBusy=false;
+}
+async function walletDoReceive(){
+  if(walletBusy) return; walletBusy=true;
+  const box=document.getElementById('wrecv');
+  if(box) box.innerHTML=`<p class="tiny muted" style="margin:10px 0 0">Asking Spark for an invoice…</p>`;
+  try{
+    const w=await walletOpen();
+    const r=await w.createLightningInvoice({amountSats:1000, memo:'Groundwork'});
+    const inv=(r && r.invoice && r.invoice.encodedInvoice) || (r && r.encodedInvoice) || '';
+    if(!inv) throw new Error('Spark did not return an invoice');
+    if(box) box.innerHTML=`
+      <p class="tiny muted" style="margin:12px 0 6px">1,000 sats. Pay it from any lightning wallet.</p>
+      <textarea class="modalinput" rows="4" readonly onclick="this.select()">${esc(inv)}</textarea>
+      <button class="btn ghost sm" onclick="walletCopy('${esc(inv)}')">Copy the invoice</button>`;
+  }catch(e){
+    if(box) box.innerHTML=`<p class="tiny muted" style="margin:10px 0 0">${esc(String(e && e.message || 'Could not create an invoice').slice(0,200))}</p>`;
+  }
+  walletBusy=false;
+}
+function walletCopy(v){
+  try{ navigator.clipboard.writeText(v); toast('Copied'); }
+  catch(e){ toast('Could not copy — select it and copy by hand'); }
+}
+function walletShowWords(words, fresh){
+  walletInit();
+  const m=words || S.spark.mnemonic;
+  if(!m){ toast('No wallet on this device'); return; }
+  S.spark.seen=true; save();
+  modalOpen(`
+    <p class="small" style="margin:0 0 10px;line-height:1.55">${fresh?'Your wallet is ready. These twelve words <b>are</b> the wallet.':'These twelve words are the wallet.'}</p>
+    <p class="tiny muted" style="margin:0 0 10px">Anyone who sees them can spend it. Do not photograph them or put them in a notes app.</p>
+    <textarea class="modalinput" rows="3" readonly onclick="this.select()">${esc(m)}</textarea>
+    <button class="btn ghost sm" onclick="walletCopy('${esc(m)}')">Copy</button>
+    <button class="btn pine sm" onclick="modalClose()">Done</button>`);
+}
+function walletForget(){
+  ask('Forget this wallet on this device?\n\nWhatever is in it stays in it, but you will need your twelve words or a relay backup to get to it again.',
+    ()=>{
+      walletInit();
+      S.spark.mnemonic=null; S.spark.balance=null; S.spark.backedUp=false; S.spark.seen=false;
+      sparkWallet=null; save(); render(); toast('Wallet forgotten');
+    }, 'Forget it', true);
 }
 
 function subPrivacy(){
@@ -3869,7 +4061,14 @@ function subPrivacy(){
     <div class="prow"><span>Analytics</span><span>None, ever</span></div>
     <div class="prow"><span>Accounts</span><span>None — no server</span></div>
     <div class="prow"><span>Relays contacted</span><span>${n?(n.relays||[]).length:'None'}</span></div>
+    <div class="prow"><span>Signing</span><span>${!n?'Not signed in'
+      :n.mode==='bunker'?'Your bunker, over '+((n.bunker&&n.bunker.relays)||[]).length+' relay'+(((n.bunker&&n.bunker.relays)||[]).length===1?'':'s')
+      :n.mode==='amber'?'Amber, on this device'
+      :n.mode==='nip07'?'A browser extension'
+      :'Read-only'}</span></div>
     <div class="prow"><span>Web fonts</span><span>${S.webfonts?'Google, each launch':'Not loaded'}</span></div>
+    <div class="prow"><span>Wallet</span><span>${hasWallet()?'Spark’s servers, when open':'Not set up'}</span></div>
+    <div class="prow"><span>Zaps</span><span>${hasWallet()?'The payee’s lightning host':'None sent'}</span></div>
     <div class="prow"><span>Other people's pictures</span><span>${S.avatars?'Loaded from their hosts':'Not loaded'}</span></div>
     <div class="prow"><span>Training partner</span><span>${partnerPk()?'Kept on this device':'Not set'}</span></div>
     <div class="prow"><span>Pledges</span><span>${myPledge()?'Published to nostr':'None published'}</span></div>
@@ -3898,6 +4097,20 @@ function subPrivacy(){
       : `You are not signed in, so no relay is contacted at all.`}</p>
     ${n?`<div style="margin-top:12px">${(n.relays||[]).map(r=>`<div class="prow"><span style="overflow:hidden;text-overflow:ellipsis">${esc(r)}</span><span></span></div>`).join('')}</div>
     <button class="btn ghost sm" onclick="relayEdit()">Change relays</button>`:''}
+  </div>
+
+  ${n&&n.mode==='bunker'?`<div class="card">
+    <h3 style="font-size:15px">Your bunker</h3>
+    <p class="small muted" style="margin:6px 0 0">Your key lives in your signer, not here. Every signature is a round trip over the relays below, which see that two keys are talking and when, but not what about — the messages are encrypted to each other.</p>
+    <div style="margin-top:12px">${((n.bunker&&n.bunker.relays)||[]).map(r=>`<div class="prow"><span style="overflow:hidden;text-overflow:ellipsis">${esc(r)}</span><span></span></div>`).join('')}</div>
+    <p class="tiny muted" style="margin:10px 0 0">This app also holds a throwaway key for talking to the bunker. It is not your identity and cannot sign anything on its own, but it does authorise this session, so it is left out of the file export.</p>
+  </div>`:''}
+
+  <div class="card">
+    <h3 style="font-size:15px">Zapping</h3>
+    <p class="small muted" style="margin:6px 0 0">Everything else in this app is a WebSocket to a relay you chose. A zap is not. It fetches the lightning address out of the profile of whoever you are paying — a web address they control, which learns your IP when you pay them — and the wallet talks to Spark's own servers whenever it is open.</p>
+    <p class="small muted" style="margin:8px 0 0">The app will only fetch an ordinary public https host: no bare IP addresses, no ports, nothing that resolves inside whatever network your phone is on. It checks the invoice is for the amount you agreed before paying, and caps routing fees at ${ZAP_MAX_FEE} sats.</p>
+    <p class="tiny muted" style="margin:8px 0 0">A zap is public by design. The receipt names you, them and the amount, and any nostr client can read it. ${hasWallet()?'':'None of this happens until you set up a wallet.'}</p>
   </div>
 
   <div class="card">
@@ -3935,7 +4148,16 @@ function setTheme(v){ S.theme=v; save();
   if(v==='auto') document.documentElement.removeAttribute('data-theme');
   else document.documentElement.setAttribute('data-theme',v); }
 function exportData(){
-  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  /* The wallet's recovery phrase is deliberately left out. This file goes to
+     the Downloads folder in plain text, and a spending key does not belong
+     there. The wallet has its own encrypted backup, on your relays. */
+  const out=Object.assign({}, S);
+  if(out.spark) out.spark=Object.assign({}, out.spark, {mnemonic:null, balance:null});
+  /* The bunker's client key authorises this signing session. Not an identity
+     key, but not something to drop into the Downloads folder either. */
+  if(out.nostr && out.nostr.bunker)
+    out.nostr=Object.assign({}, out.nostr, {bunker:Object.assign({}, out.nostr.bunker, {clientSec:null, secret:null})});
+  const blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='groundwork-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
   toast('Exported');
@@ -4620,22 +4842,67 @@ function shortNpub(hex){ if(!hex) return ''; const n=npubEncode(hex); return n.s
    encodeURIComponent escapes it to %3F, which survives that split. */
 
 const SIGNER_SCHEME='nostrsigner';
+const AMBER_CALLBACK='groundwork://amber?r=';
 
-function amberIntentUrl(type, payload, extraFields){
-  const fields = Object.assign({
-    type: type,
-    compressionType: 'none',
-    returnType: 'signature',
-    appName: 'Groundwork'
+/* The kinds this app signs, named up front so Amber can grant once at sign-in
+   rather than asking again on every backup and every zap. */
+const SIGNER_PERMS=[
+  {type:'sign_event', kind:0},
+  {type:'sign_event', kind:1},
+  {type:'sign_event', kind:7},
+  {type:'sign_event', kind:1301},
+  {type:'sign_event', kind:9734},
+  {type:'sign_event', kind:30078},
+  {type:'nip44_encrypt'},
+  {type:'nip44_decrypt'}
+];
+
+/* A plain NIP-55 URI, and deliberately *not* Chrome's `intent:…#Intent;…;end`
+   form, which is what this used to build.
+
+   That syntax works in Chrome for Android and nowhere else. Inside the APK,
+   Capacitor hands an unrecognised scheme to `new Intent(ACTION_VIEW,
+   Uri.parse(url))` — and the scheme of an `intent:` URL is literally "intent",
+   which nothing on the device claims. Android throws ActivityNotFoundException,
+   Capacitor logs it, and the button appears dead. Parsing it properly would
+   need Intent.parseUri(URI_INTENT_SCHEME), which Capacitor does not do.
+
+   `nostrsigner:` parses to the scheme Amber actually registers, so ACTION_VIEW
+   resolves. The <queries> block Android 11+ needs to see it at all is already
+   in scripts/patch-android.py. */
+function signerUrl(type, payload, extraFields){
+  const q = Object.assign({
+    compressionType:'none',
+    returnType:'signature',
+    type:type,
+    appName:'Groundwork',
+    callbackUrl:AMBER_CALLBACK
   }, extraFields||{});
-  const S = Object.keys(fields)
-    .map(k => 'S.' + k + '=' + encodeURIComponent(fields[k]))
-    .join(';');
-  return 'intent:' + (payload ? encodeURIComponent(payload) : '')
-    + '#Intent;scheme=' + SIGNER_SCHEME + ';' + S + ';end';
+  if(type==='get_public_key' && !q.permissions) q.permissions=JSON.stringify(SIGNER_PERMS);
+  const qs=Object.keys(q).map(k=>k+'='+encodeURIComponent(q[k])).join('&');
+  return SIGNER_SCHEME+':'+(payload?encodeURIComponent(payload):'')+'?'+qs;
 }
 
-let waiting=null, wasHidden=false;
+/* Whether a signer could be there at all. Amber is an Android app; offering
+   the button on a desktop is promising something that cannot happen. */
+function canAmber(){ return Native.on || /Android/i.test(navigator.userAgent||''); }
+
+/* Anything coming back from a signer is one of four shapes. Used to stop a
+   stale clipboard being mistaken for an answer now that the callback URL is
+   the real route home. */
+function looksLikeSignerResult(t){
+  const s=String(t||'').trim();
+  if(!s) return false;
+  if(s.charAt(0)==='{') return true;                 // a whole signed event
+  if(/^npub1[a-z0-9]{20,}$/i.test(s)) return true;   // a public key, bech32
+  if(/^[0-9a-f]{64}$/i.test(s)) return true;         // a public key, hex
+  if(/^[0-9a-f]{128}$/i.test(s)) return true;        // a signature
+  return /^[A-Za-z0-9+/=_-]{40,}$/.test(s);          // nip44 ciphertext
+}
+
+/* wasHidden is reset every time we come back, so it cannot answer "did we ever
+   leave?" — which is the question that tells us whether a signer exists. */
+let waiting=null, wasHidden=false, everHidden=false;
 function amberSettle(v){ try{ sessionStorage.removeItem(AMB_KEY); }catch(e){}
   const w=waiting; if(!w) return; waiting=null; w.resolve(String(v).trim()); }
 function amberFail(m){ try{ sessionStorage.removeItem(AMB_KEY); }catch(e){}
@@ -4647,9 +4914,30 @@ function askPaste(){
 }
 
 document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState!=='visible'){ if(waiting) wasHidden=true; return; }
+  if(document.visibilityState!=='visible'){ if(waiting){ wasHidden=true; everHidden=true; } return; }
   if(!waiting || !wasHidden) return;          // ignore the hop out to Amber
   wasHidden=false;
+  amberTryClipboard();
+});
+/* Belt and braces: if the browser froze the page hard enough to miss the
+   visibility event, pick it up on focus instead. */
+window.addEventListener('focus',()=>{
+  if(!waiting || !wasHidden) return;
+  wasHidden=false;
+  amberTryClipboard();
+});
+
+/* The fallback route home, for signers or Android versions where the callback
+   URL does not arrive. Two changes now that the callback is the main road:
+
+   It waits longer, so a deep link already on its way wins the race. Whichever
+   arrives first clears `waiting`, and the loser then finds nothing to do.
+
+   And it only accepts something shaped like an answer. Amber does not copy
+   anything when it has a callback URL, so whatever is on the clipboard is
+   probably a shopping list — and handing that to the caller as a public key
+   is worse than asking. */
+function amberTryClipboard(){
   setTimeout(()=>{
     if(!waiting) return;
     // The clipboard API needs a secure context. Opened from a file:// or
@@ -4657,23 +4945,41 @@ document.addEventListener('visibilitychange',()=>{
     // to asking rather than failing silently.
     if(!navigator.clipboard || !navigator.clipboard.readText){ askPaste(); return; }
     navigator.clipboard.readText()
-      .then(t=>{ if(t && t.trim()) amberSettle(t); else askPaste(); })
+      .then(t=>{ if(looksLikeSignerResult(t)) amberSettle(t); else askPaste(); })
       .catch(()=>askPaste());
-  },250);
-});
-/* Belt and braces: if the browser froze the page hard enough to miss the
-   visibility event, pick it up on focus instead. */
-window.addEventListener('focus',()=>{
-  if(!waiting || !wasHidden) return;
-  wasHidden=false;
-  setTimeout(()=>{
-    if(!waiting) return;
-    if(!navigator.clipboard || !navigator.clipboard.readText){ askPaste(); return; }
-    navigator.clipboard.readText()
-      .then(t=>{ if(t && t.trim()) amberSettle(t); else askPaste(); })
-      .catch(()=>askPaste());
-  },250);
-});
+  },700);
+}
+
+/* The way home. The manifest has registered groundwork:// since the first
+   release and nothing has ever listened for it — every answer came back by
+   reading the clipboard, which needs a secure context, a permission prompt,
+   and the page surviving the trip.
+
+   Deliberately only settles a request that is already in flight, or finishes a
+   sign-in the page was reloaded in the middle of. A groundwork:// link from
+   anywhere else finds nothing waiting and does nothing, so a web page cannot
+   use one to sign anybody in. */
+function amberReturn(url){
+  const s=String(url||'');
+  if(s.slice(0,13).toLowerCase()!=='groundwork://') return false;
+  let v='';
+  const qi=s.indexOf('?');
+  if(qi>=0){
+    try{
+      const p=new URLSearchParams(s.slice(qi+1));
+      v = p.get('r') || p.get('event') || p.get('signature') || p.get('result') || '';
+    }catch(e){}
+  }
+  /* some builds append the answer straight onto the callback with no key */
+  if(!v && qi>=0){
+    const tail=s.slice(s.lastIndexOf('=')+1);
+    if(tail && tail!==s) { try{ v=decodeURIComponent(tail); }catch(e){ v=tail; } }
+  }
+  v=String(v||'').trim();
+  if(!v) return false;
+  if(waiting){ amberSettle(v); return true; }
+  return amberResumeWith(v);
+}
 
 /* Whether the clipboard can be read at all. Needs https (or localhost) — from
    a downloaded file the API simply is not there. */
@@ -4704,7 +5010,7 @@ function amberCall(type, payload, extraFields){
     // Some browsers reload the page on the way back from an external app, which
     // would lose the promise. Leave a note so the next load can finish the job.
     try{ sessionStorage.setItem(AMB_KEY, JSON.stringify({type, at:Date.now()})); }catch(e){}
-    const url=amberIntentUrl(type,payload,extraFields);
+    const url=signerUrl(type,payload,extraFields);
     // an anchor click, because some browsers ignore location.href for intent:
     try{
       const a=document.createElement('a');
@@ -4716,8 +5022,18 @@ function amberCall(type, payload, extraFields){
     // moment Amber opens, timers are throttled while hidden, and on the way
     // back the visibility event fired before the timer had armed anything.
     // Instead of a delay, wait until we have actually been hidden once.
-    wasHidden=false;
+    wasHidden=false; everHidden=false;
     waiting={resolve,reject};
+    /* If a signer took the intent, this app is in the background within a
+       second or so. Still in the foreground after four means nothing claimed
+       it — say so now rather than sitting silent until the long timeout, which
+       is what made a broken button look like a dead one. */
+    setTimeout(()=>{
+      if(waiting && waiting.resolve===resolve && !everHidden)
+        amberFail(Native.on
+          ? 'Nothing opened, so no signer answered. Check Amber is installed, open it once, then try again.'
+          : 'Nothing opened. Amber is an Android app — in a browser, use a bunker or a browser extension instead.');
+    },4000);
     setTimeout(()=>{ if(waiting&&waiting.resolve===resolve) amberFail('Amber did not answer. Is it installed?'); },120000);
   });
 }
@@ -4725,26 +5041,37 @@ function amberCall(type, payload, extraFields){
 /* If the page reloaded while Amber had the request, finish the login here.
    Only a login is worth resuming — anything else was mid-flow and is better
    retried than guessed at. */
+/* Kept in memory for the life of the page, so a callback arriving after the
+   reload can still be matched to what we asked for. */
+let resumeNote=null;
+
+function amberResumeWith(v){
+  if(!resumeNote || resumeNote.type!=='get_public_key') return false;
+  if(Date.now()-resumeNote.at > 300000) return false;
+  const t=String(v||'').trim(); if(!t) return false;
+  const pk = t.indexOf('npub1')===0 ? npubDecode(t) : t.toLowerCase();
+  if(!pk || !/^[0-9a-f]{64}$/.test(pk)) return false;
+  resumeNote=null;
+  S.nostr={mode:'amber', pk, relays:(S.nostr&&S.nostr.relays)||RELAYS_DEFAULT.slice(),
+    autoBackup:true, publishWorkouts:false};
+  save(); render(); toast('Signed in as '+shortNpub(pk));
+  return true;
+}
+
 function amberResume(){
-  let note=null;
-  try{ const r=sessionStorage.getItem(AMB_KEY); if(r) note=JSON.parse(r); sessionStorage.removeItem(AMB_KEY); }catch(e){}
-  if(!note || note.type!=='get_public_key' || Date.now()-note.at > 300000) return;
-  const finish=v=>{
-    const t=String(v||'').trim(); if(!t) return;
-    const pk = t.indexOf('npub1')===0 ? npubDecode(t) : t;
-    if(!pk || pk.length!==64) return;
-    S.nostr={mode:'amber', pk, relays:(S.nostr&&S.nostr.relays)||RELAYS_DEFAULT.slice(),
-      autoBackup:true, publishWorkouts:false};
-    save(); render(); toast('Signed in as '+shortNpub(pk));
-  };
+  try{ const r=sessionStorage.getItem(AMB_KEY); if(r) resumeNote=JSON.parse(r); sessionStorage.removeItem(AMB_KEY); }catch(e){}
+  if(!resumeNote || resumeNote.type!=='get_public_key' || Date.now()-resumeNote.at > 300000){ resumeNote=null; return; }
+  const ask1=()=>askText('Paste what Amber copied:', '', v=>{ amberResumeWith(v); }, {ok:'Sign in'});
+  /* Give the deep link a moment to arrive first — with a callback URL there is
+     usually nothing on the clipboard to find. */
   setTimeout(()=>{
+    if(!resumeNote) return;                 // the callback already finished it
     if(navigator.clipboard && navigator.clipboard.readText){
-      navigator.clipboard.readText().then(t=>{
-        if(t&&t.trim()) finish(t);
-        else askText('Paste what Amber copied:', '', v=>{ if(v) finish(v); }, {ok:'Sign in'});
-      }).catch(()=>askText('Paste what Amber copied:', '', v=>{ if(v) finish(v); }, {ok:'Sign in'}));
-    }else askText('Paste what Amber copied:', '', v=>{ if(v) finish(v); }, {ok:'Sign in'});
-  },400);
+      navigator.clipboard.readText()
+        .then(t=>{ if(looksLikeSignerResult(t) && amberResumeWith(t)) return; ask1(); })
+        .catch(ask1);
+    }else ask1();
+  },900);
 }
 
 /* returnType=signature means the event id is ours to compute */
@@ -4765,18 +5092,114 @@ async function amberSign(ev){
   return draft;
 }
 
-/* --- one interface over the three ways in --- */
+/* ============================== BUNKER (NIP-46) ==============================
+
+   A remote signer. Your key lives in nsecBunker, nsec.app, Amber's bunker mode
+   or similar, and this app asks it to sign over a relay rather than over an
+   Android intent. Which makes it the one route that works everywhere: desktop
+   browsers, the APK, and anywhere Amber's intent does not survive the trip.
+
+   The app generates its own throwaway keypair for the conversation. That is
+   not your identity — your key never leaves the bunker — but it does authorise
+   this session, so it is kept out of the file export and listed under Privacy
+   alongside everything else that leaves the device.
+
+   nostr-tools does the protocol. Rolling it by hand would mean secp256k1
+   Schnorr signing, which this app has never needed before, plus NIP-44 v2,
+   request correlation and auth_url challenges. */
+
+const NOSTR_SRC='nostr.js';
+let nostrLoad=null, bunker=null, bunkerErr=null;
+
+function loadNostrTools(){
+  if(window.NostrTools && window.NostrTools.ready) return Promise.resolve(window.NostrTools);
+  if(nostrLoad) return nostrLoad;
+  nostrLoad=new Promise((res,rej)=>{
+    const el=document.createElement('script');
+    el.src=NOSTR_SRC; el.async=true;
+    el.onload=()=>{
+      if(window.NostrTools && window.NostrTools.ready) res(window.NostrTools);
+      else { nostrLoad=null; rej(new Error('The signer file loaded but looked wrong')); }
+    };
+    el.onerror=()=>{ nostrLoad=null; el.remove();
+      rej(new Error('Could not load the bunker code. It needs one connection the first time.')); };
+    document.head.appendChild(el);
+  });
+  return nostrLoad;
+}
+
+function bunkerCfg(){ return (S.nostr && S.nostr.bunker) || null; }
+
+/* Connected lazily, on the first thing that actually needs signing, so being
+   signed in does not mean a relay socket every time the app opens. */
+async function bunkerConnect(){
+  if(bunker) return bunker;
+  const cfg=bunkerCfg();
+  if(!cfg || !cfg.clientSec) throw new Error('No bunker is set up on this device');
+  const T=await loadNostrTools();
+  const sec=hexToBytes(cfg.clientSec);
+  const pointer={pubkey:cfg.pubkey, relays:(cfg.relays||[]).slice(), secret:cfg.secret||null};
+  const b=T.BunkerSigner.fromBunker(sec, pointer, {
+    onauth:url=>{
+      /* the bunker wants a human to approve this in a browser */
+      ask('Your bunker needs you to approve this.\n\nOpen the approval page, say yes, then come back.',
+        ()=>{ try{ window.open(url,'_blank','noopener'); }catch(e){ toast('Could not open it'); } },
+        'Open it');
+    }
+  });
+  await b.connect();
+  bunker=b;
+  return b;
+}
+function bunkerDrop(){ try{ if(bunker && bunker.close) bunker.close(); }catch(e){} bunker=null; }
+
+function hexToBytes(h){
+  const s=String(h||''); const n=s.length>>1; const out=new Uint8Array(n);
+  for(let i=0;i<n;i++) out[i]=parseInt(s.substr(i*2,2),16);
+  return out;
+}
+function bytesToHex(b){
+  return Array.from(b).map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+
+/* Paste a bunker:// URI. Everything needed to reconnect is stored: the
+   signer's pubkey, its relays, the one-time secret, and our own client key. */
+async function bunkerLogin(uri){
+  const T=await loadNostrTools();
+  const p=await T.parseBunkerInput(String(uri||'').trim());
+  if(!p) throw new Error('That does not look like a bunker:// address');
+  if(!p.relays || !p.relays.length) throw new Error('That bunker address names no relay to reach it on');
+  const sec=T.generateSecretKey();
+  const cfg={pubkey:p.pubkey, relays:p.relays.slice(0,6), secret:p.secret||null, clientSec:bytesToHex(sec)};
+  /* connect before storing anything, so a bad address does not leave a
+     half-signed-in app behind */
+  const b=T.BunkerSigner.fromBunker(sec, p, {});
+  await b.connect();
+  const pk=await b.getPublicKey();
+  if(!pk || !/^[0-9a-f]{64}$/i.test(pk)) throw new Error('The bunker did not return a usable key');
+  bunker=b;
+  S.nostr={mode:'bunker', pk:pk.toLowerCase(), bunker:cfg,
+    relays:(S.nostr&&S.nostr.relays)||RELAYS_DEFAULT.slice(),
+    autoBackup:true, publishWorkouts:false};
+  save(); render();
+  toast('Signed in as '+shortNpub(S.nostr.pk));
+  fetchOwnProfile();
+}
+
+/* --- one interface over the four ways in --- */
 const Signer={
   get mode(){ return S.nostr?S.nostr.mode:null; },
   get pk(){ return S.nostr?S.nostr.pk:null; },
-  get canWrite(){ return this.mode==='amber'||this.mode==='nip07'; },
+  get canWrite(){ return this.mode==='amber'||this.mode==='nip07'||this.mode==='bunker'; },
   async getPublicKey(mode){
     if(mode==='nip07'){ if(!window.nostr) throw new Error('No signing extension found'); return await window.nostr.getPublicKey(); }
+    if(mode==='bunker'){ const b=await bunkerConnect(); return await b.getPublicKey(); }
     const r=await amberCall('get_public_key');
     return r.indexOf('npub1')===0 ? npubDecode(r) : r.trim();
   },
   async signEvent(ev){
     if(this.mode==='nip07') return await window.nostr.signEvent(ev);
+    if(this.mode==='bunker'){ const b=await bunkerConnect(); return await b.signEvent(ev); }
     return await amberSign(ev);
   },
   async encrypt(plain){
@@ -4784,6 +5207,7 @@ const Signer={
       if(window.nostr.nip44&&window.nostr.nip44.encrypt) return await window.nostr.nip44.encrypt(this.pk, plain);
       return await window.nostr.nip04.encrypt(this.pk, plain);
     }
+    if(this.mode==='bunker'){ const b=await bunkerConnect(); return await b.nip44Encrypt(this.pk, plain); }
     return await amberCall('nip44_encrypt', plain, {pubKey:this.pk, current_user:this.pk});
   },
   async decrypt(ct){
@@ -4791,6 +5215,7 @@ const Signer={
       if(window.nostr.nip44&&window.nostr.nip44.decrypt) return await window.nostr.nip44.decrypt(this.pk, ct);
       return await window.nostr.nip04.decrypt(this.pk, ct);
     }
+    if(this.mode==='bunker'){ const b=await bunkerConnect(); return await b.nip44Decrypt(this.pk, ct); }
     return await amberCall('nip44_decrypt', ct, {pubKey:this.pk, current_user:this.pk});
   }
 };
@@ -4806,6 +5231,17 @@ async function nostrLogin(mode){
     fetchOwnProfile();
   }catch(e){ toast(e.message||'Sign-in failed'); }
 }
+function bunkerAsk(){
+  askText('Paste the bunker:// address from your signer.\n\nnsecBunker, nsec.app and Amber’s bunker mode all give you one.', '',
+    async v=>{
+      const t=String(v||'').trim();
+      if(!t) return;
+      toast('Connecting to your bunker…');
+      try{ await bunkerLogin(t); }
+      catch(e){ ask(String(e && e.message || 'Could not reach that bunker').slice(0,240), ()=>{}, 'Right'); }
+    }, {multiline:true, placeholder:'bunker://…', ok:'Connect'});
+}
+
 function nostrLoginNpub(){
   askText('Paste your npub. This signs you in read-only \u2014 you can restore a backup but not make one.', '', v=>{
     const pk=npubDecode(v||'');
@@ -4815,7 +5251,145 @@ function nostrLoginNpub(){
   }, {placeholder:'npub1…', ok:'Sign in'});
 }
 function nostrLogout(){ ask('Sign out? Your workout history stays on this device.',
-  ()=>{ S.nostr=null; save(); render(); toast('Signed out'); }, 'Sign out'); }
+  ()=>{ bunkerDrop(); S.nostr=null; save(); render(); toast('Signed out'); }, 'Sign out'); }
+
+/* ============================== THE WALLET ==============================
+
+   A Spark wallet, for zapping people on the Social tab. Spark is a Bitcoin
+   L2; the SDK is a real wallet, which means for the first time this app holds
+   a key that can spend money. That deserves stating plainly rather than
+   burying:
+
+     The twelve words live in localStorage, which Android may clear when the
+     device runs short of space. That is survivable because of the backup
+     below, and only because of it.
+
+     The backup is the same trick the workout history already uses: the
+     mnemonic is NIP-44 encrypted to your own nostr key by Amber and published
+     as a NIP-78 event. Reinstall, sign in with Amber, and the wallet comes
+     back with nothing to write down. The cost is that your sats now ride on
+     your nostr key and on a relay keeping one event — so the words are also
+     shown once, for anyone who wants paper.
+
+     It is a tips wallet. The app says so everywhere it can, because a hot
+     wallet inside a WebView is not where savings belong.
+
+   The SDK itself is several megabytes, so it is a separate file loaded the
+   first time somebody opens the wallet and never before. Anyone who does not
+   zap never downloads it. */
+
+const SPARK_SRC='spark.js';
+const SPARK_NETWORK='MAINNET';
+const WALLET_D='groundwork-wallet-v1';
+const ZAP_PRESETS=[21,100,500,2100];
+const ZAP_MAX_FEE=10;          // sats we will spend on routing before giving up
+const ZAP_CONFIRM_OVER=5000;   // anything bigger asks twice
+
+let sparkLoad=null, sparkWallet=null, walletBusy=false;
+
+/* Safari clears a web app's storage after about seven days without opening
+   it, and there is no native iOS build to escape into — the web app is the
+   iPhone. For a streak that is annoying; for a wallet it is somebody's money,
+   so the wallet screens say so rather than leaving it to the README. */
+function fragileStorage(){ return IOS && !Native.on; }
+
+function walletInit(){
+  if(!S.spark) S.spark={mnemonic:null, defaultZap:100, backedUp:false, seen:false, balance:null, balanceAt:0};
+  return S.spark;
+}
+function hasWallet(){ walletInit(); return !!S.spark.mnemonic; }
+
+/* Fetched once, cached by the service worker from then on. */
+function loadSpark(){
+  if(window.Spark && window.Spark.ready) return Promise.resolve(window.Spark);
+  if(sparkLoad) return sparkLoad;
+  sparkLoad=new Promise((res,rej)=>{
+    const el=document.createElement('script');
+    el.src=SPARK_SRC; el.async=true;
+    el.onload=()=>{
+      if(window.Spark && window.Spark.ready) res(window.Spark);
+      else { sparkLoad=null; rej(new Error('The wallet file loaded but looked wrong')); }
+    };
+    el.onerror=()=>{ sparkLoad=null; el.remove();
+      rej(new Error('Could not load the wallet. It needs one connection the first time.')); };
+    document.head.appendChild(el);
+  });
+  return sparkLoad;
+}
+
+/* Spark authenticates with its operators on startup, so this needs a
+   connection every time — there is no offline balance. */
+async function walletOpen(){
+  if(sparkWallet) return sparkWallet;
+  if(!hasWallet()) throw new Error('No wallet on this device yet');
+  const Sp=await loadSpark();
+  const {wallet}=await Sp.SparkWallet.initialize({
+    mnemonicOrSeed:S.spark.mnemonic, options:{network:SPARK_NETWORK}});
+  sparkWallet=wallet;
+  return wallet;
+}
+
+async function walletCreate(){
+  const Sp=await loadSpark();
+  const r=await Sp.SparkWallet.initialize({options:{network:SPARK_NETWORK}});
+  if(!r || !r.mnemonic) throw new Error('Spark did not return a recovery phrase');
+  sparkWallet=r.wallet;
+  walletInit();
+  S.spark.mnemonic=r.mnemonic; S.spark.backedUp=false; S.spark.seen=false;
+  save();
+  return r.mnemonic;
+}
+
+async function walletImport(words){
+  const m=String(words||'').trim().toLowerCase().replace(/\s+/g,' ');
+  const n=m?m.split(' ').length:0;
+  if(n!==12 && n!==24) throw new Error('A recovery phrase is twelve or twenty-four words');
+  const Sp=await loadSpark();
+  const r=await Sp.SparkWallet.initialize({mnemonicOrSeed:m, options:{network:SPARK_NETWORK}});
+  sparkWallet=r.wallet;
+  walletInit();
+  S.spark.mnemonic=m; S.spark.backedUp=false; S.spark.seen=true;
+  save();
+}
+
+async function walletBalance(force){
+  walletInit();
+  if(!force && S.spark.balance!=null && Date.now()-S.spark.balanceAt < 30000) return S.spark.balance;
+  const w=await walletOpen();
+  const b=await w.getBalance();
+  const sats=Number(b && b.balance!=null ? b.balance : 0);
+  S.spark.balance=sats; S.spark.balanceAt=Date.now(); save();
+  return sats;
+}
+
+/* --- the backup, encrypted to your own nostr key --- */
+async function walletBackup(silent){
+  walletInit();
+  if(!S.spark.mnemonic) throw new Error('No wallet to back up');
+  if(!Signer.canWrite) throw new Error('A read-only sign-in cannot back up');
+  const ct=await Signer.encrypt(JSON.stringify({v:1, mnemonic:S.spark.mnemonic, at:Date.now()}));
+  const ev=await Signer.signEvent({kind:30078, created_at:Math.floor(Date.now()/1000),
+    tags:[['d',WALLET_D],['client','groundwork']], content:ct, pubkey:Signer.pk});
+  const r=await relayPublish(ev);
+  const ok=r.filter(x=>x.status==='fulfilled').length;
+  if(!ok) throw new Error('No relay accepted the backup');
+  S.spark.backedUp=true; S.spark.backedUpAt=Date.now(); save();
+  if(!silent) toast('Wallet backed up to '+ok+' relay'+(ok===1?'':'s'));
+  return ok;
+}
+
+async function walletRestore(){
+  if(!Signer.canWrite) throw new Error('Restoring needs Amber or an extension, to decrypt');
+  const evs=await relayFetch({kinds:[30078], authors:[Signer.pk], '#d':[WALLET_D], limit:4});
+  if(!evs.length) throw new Error('No wallet backup found on your relays');
+  evs.sort((a,b)=>b.created_at-a.created_at);
+  const plain=await Signer.decrypt(evs[0].content);
+  let body; try{ body=JSON.parse(plain); }catch(e){ throw new Error('That backup did not decrypt cleanly'); }
+  if(!body || !body.mnemonic) throw new Error('That backup held no recovery phrase');
+  await walletImport(body.mnemonic);
+  S.spark.backedUp=true; S.spark.backedUpAt=evs[0].created_at*1000; save();
+  return true;
+}
 
 /* --- relays --- */
 function relayPublish(ev, relays){
@@ -4855,9 +5429,14 @@ async function nostrBackup(silent){
   if(!Signer.canWrite){ if(!silent) toast('Read-only sign-in cannot back up'); return; }
   try{
     if(!silent) toast('Encrypting\u2026');
+    /* An explicit list rather than all of S, so a new field is a decision
+       rather than an accident — the wallet's recovery phrase has its own
+       event and must never ride along in here. */
     const payload={v:1, at:Date.now(), levels:S.levels, weights:S.weights, ready:S.ready,
       logs:S.logs, checkins:S.checkins, unit:S.unit, db:S.db, target:S.target, bestDay:S.bestDay,
-      profile:S.profile, weighins:S.weighins, cardio:S.cardio};
+      profile:S.profile, weighins:S.weighins, cardio:S.cardio,
+      prog:S.prog, shape:S.shape, deload:S.deload, variety:S.variety,
+      tierOverride:S.tierOverride, assess:S.assess};
     const ct=await Signer.encrypt(JSON.stringify(payload));
     const ev=await Signer.signEvent({kind:30078, created_at:Math.floor(Date.now()/1000),
       tags:[['d',BACKUP_D],['client','groundwork']], content:ct, pubkey:Signer.pk});
@@ -4915,6 +5494,10 @@ function mergeData(d){
   if(d.tierOverride!=null && S.tierOverride==null) S.tierOverride=d.tierOverride;
   if(d.deload && d.deload.last && (!S.deload||!S.deload.last || d.deload.last>S.deload.last))
     S.deload=Object.assign({}, S.deload, {last:d.deload.last});
+  /* Wallets are never merged from a file. Exports do not carry the recovery
+     phrase, and a wallet silently arriving from an imported file is not
+     something anybody asked for. Only the zap preference crosses. */
+  if(d.spark && d.spark.defaultZap){ walletInit(); S.spark.defaultZap=d.spark.defaultZap; }
   planCache={};
   save();
   return S.logs.length-before;
@@ -5006,6 +5589,7 @@ function socialInit(){
   if(!d.pledges) d.pledges=[];
   if(!d.dropped) d.dropped=[];
   if(d.partner===undefined) d.partner=null;
+  if(!d.board) d.board={rows:{}, at:0};
 }
 function crewList(){ socialInit(); return S.social.crew; }
 function profOf(pk){ socialInit(); return S.social.profiles[pk]||{}; }
@@ -5185,6 +5769,221 @@ function cheered(evId, mark){
   return (S.social.cheered||[]).indexOf(evId+':'+(mark||'cheer'))>=0;
 }
 
+/* ============================== ZAPS ==============================
+
+   Cheering costs nothing, which is most of the point of it. A zap is the
+   other thing: a few sats that left your wallet, following NIP-57 so it shows
+   up in every other nostr client too rather than only here.
+
+   Every zap is three round trips — the recipient's lightning address for an
+   invoice, Amber to sign the request, then Spark to pay it. The sheet says so
+   rather than appearing to hang.
+
+   Worth being clear-eyed about what this introduces: until now the app made
+   no HTTP requests at all, only WebSockets to relays you chose. A zap fetches
+   a URL built from a *stranger's profile*. Everything in lnurlFor() exists
+   because of that. */
+
+function zapAddress(pk){
+  const p=profOf(pk)||{};
+  const l16=String(p.lud16||'').trim();
+  if(l16) return {kind:'lud16', value:l16};
+  if(String(p.lud06||'').trim()) return {kind:'lud06', value:''};
+  return null;
+}
+
+/* A hostname out of someone else's profile is untrusted input that we are
+   about to make the device connect to. Refuse anything that is not plainly a
+   public https host: no IP literals, no ports or credentials, nothing that
+   resolves inside the network the phone happens to be sitting on. */
+function safeLnHost(h){
+  if(!h || h.length>253) return false;
+  if(h.indexOf(':')>=0 || h.indexOf('@')>=0 || h.indexOf('/')>=0) return false;
+  if(/^\d+(\.\d+){3}$/.test(h)) return false;
+  if(/^\[/.test(h)) return false;
+  if(/(^|\.)(localhost|local|internal|intranet|lan|home|arpa|test|invalid|example|onion)$/i.test(h)) return false;
+  return /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,}$/i.test(h);
+}
+function lnurlFor(addr){
+  const m=/^([a-z0-9._%+\-]{1,64})@([a-z0-9.\-]{1,253})$/i.exec(String(addr||'').trim());
+  if(!m) return null;
+  const host=m[2].toLowerCase();
+  if(!safeLnHost(host)) return null;
+  return 'https://'+host+'/.well-known/lnurlp/'+encodeURIComponent(m[1]);
+}
+
+/* Fetch with a leash: https only, no credentials, no referrer, a timeout, and
+   a ceiling on how much we will read from a host we do not control. */
+async function lnFetch(url, ms){
+  if(!/^https:\/\//i.test(url)) throw new Error('That lightning address is not https');
+  const ctl=new AbortController();
+  const t=setTimeout(()=>ctl.abort(), ms||9000);
+  try{
+    const r=await fetch(url, {signal:ctl.signal, credentials:'omit',
+      referrerPolicy:'no-referrer', redirect:'follow', cache:'no-store'});
+    if(!r.ok) throw new Error('Their server said '+r.status);
+    const txt=await r.text();
+    if(txt.length>200000) throw new Error('Their server sent something far too big');
+    return JSON.parse(txt);
+  }catch(e){
+    if(e.name==='AbortError') throw new Error('Their server did not answer');
+    if(e instanceof SyntaxError) throw new Error('Their server sent something that was not a lightning address');
+    throw e;
+  }finally{ clearTimeout(t); }
+}
+
+/* The amount a bolt11 invoice actually asks for, in sats, straight off the
+   human-readable part. We never pay an invoice without checking this against
+   what was requested. */
+function bolt11Sats(inv){
+  const m=/^ln(bc|tb|bcrt)(\d+)([munp])?1/i.exec(String(inv||'').trim());
+  if(!m) return null;                                    // includes zero-amount invoices
+  const n=parseInt(m[2],10);
+  if(!isFinite(n)) return null;
+  const perUnit={m:100000, u:100, n:0.1, p:0.0001};      // sats per unit
+  const u=(m[3]||'').toLowerCase();
+  const sats = u ? n*perUnit[u] : n*1e8;                  // bare number is whole BTC
+  if(!isFinite(sats) || sats<0) return null;
+  return Math.round(sats);
+}
+
+function zapped(id){ socialInit(); return (S.social.zapped||[]).indexOf(id)>=0; }
+function zapNote(id){
+  socialInit();
+  S.social.zapped=(S.social.zapped||[]).concat([id]).slice(-400); save();
+}
+
+/* Resolve a person to something we can actually pay. Separated from the
+   paying so it can be tested without a wallet anywhere near it. */
+async function zapResolve(pk, sats){
+  const a=zapAddress(pk);
+  if(!a) throw new Error(nameOf(pk)+' has no lightning address in their nostr profile, so there is nothing to pay.');
+  if(a.kind==='lud06') throw new Error(nameOf(pk)+' uses an older LNURL rather than a lightning address, which this app cannot read. Ask them for an address like name@example.com.');
+  const url=lnurlFor(a.value);
+  if(!url) throw new Error('Their lightning address does not look like one this app is willing to fetch.');
+  const meta=await lnFetch(url);
+  if(!meta || meta.tag!=='payRequest' || !meta.callback) throw new Error('That address is not set up to receive.');
+  if(!/^https:\/\//i.test(meta.callback)) throw new Error('Their server asked us to use an insecure address.');
+  const min=Math.ceil((meta.minSendable||1000)/1000), max=Math.floor((meta.maxSendable||1e11)/1000);
+  if(sats<min) throw new Error('They do not accept less than '+min+' sats.');
+  if(sats>max) throw new Error('They do not accept more than '+max.toLocaleString()+' sats.');
+  return {meta, min, max, zappable: !!(meta.allowsNostr && meta.nostrPubkey)};
+}
+
+/* The NIP-57 request. Signed by Amber, handed to their server, and echoed
+   back by it as a public receipt — which is what makes a zap a zap rather
+   than a private payment. */
+async function zapRequest(pk, evId, sats){
+  const tags=[['p',pk],['relays'].concat((S.nostr.relays||[]).slice(0,4)),['amount',String(sats*1000)]];
+  if(evId) tags.push(['e',evId]);
+  return await Signer.signEvent({kind:9734, created_at:Math.floor(Date.now()/1000),
+    tags, content:'', pubkey:Signer.pk});
+}
+
+async function zapInvoice(res, pk, evId, sats){
+  const u=new URL(res.meta.callback);
+  u.searchParams.set('amount', String(sats*1000));
+  if(res.zappable){
+    const req=await zapRequest(pk, evId, sats);
+    u.searchParams.set('nostr', JSON.stringify(req));
+  }
+  const out=await lnFetch(u.toString(), 15000);
+  if(!out || !out.pr) throw new Error(out && out.reason ? String(out.reason).slice(0,140) : 'Their server did not return an invoice.');
+  /* the one check that matters: never pay an invoice for an amount nobody
+     agreed to */
+  const asked=bolt11Sats(out.pr);
+  if(asked==null) throw new Error('Their server returned an invoice with no amount on it.');
+  if(asked!==sats) throw new Error('Their server asked for '+asked.toLocaleString()+' sats rather than '+sats.toLocaleString()+'. Nothing was sent.');
+  return out.pr;
+}
+
+async function zapPay(invoice){
+  const w=await walletOpen();
+  return await w.payLightningInvoice({invoice, maxFeeSats:ZAP_MAX_FEE});
+}
+
+/* --- the sheet --- */
+let zapTo=null;
+function zapOpen(pk, evId){
+  if(!S.nostr){ toast('Sign in first'); return; }
+  if(pk===S.nostr.pk){ toast('Zap someone else'); return; }
+  if(!Signer.canWrite){ toast('A read-only sign-in cannot zap'); return; }
+  walletInit();
+  if(!hasWallet()){
+    ask('Zapping sends real bitcoin, so it needs a wallet on this device. Setting one up takes about a minute and nothing goes into it until you put it there.',
+      ()=>{ go('you'); openSub('wallet'); }, 'Set up a wallet');
+    return;
+  }
+  zapTo={pk, evId, sats:S.spark.defaultZap||100};
+  zapPaint();
+}
+function zapSet(n){ if(zapTo){ zapTo.sats=n; zapPaint(); } }
+function zapCustom(){
+  askText('How many sats?', String(zapTo?zapTo.sats:100), v=>{
+    const n=Math.max(1,Math.min(1000000,parseInt(v,10)||0));
+    if(n && zapTo){ zapTo.sats=n; zapPaint(); }
+  }, {numeric:true, ok:'Set'});
+}
+function zapPaint(){
+  if(!zapTo) return;
+  const bal=S.spark.balance;
+  modalOpen(`
+    <p class="small" style="margin:0 0 4px;line-height:1.55">Zap <b>${nameOf(zapTo.pk)}</b></p>
+    <p class="tiny muted" style="margin:0 0 12px">${bal!=null?bal.toLocaleString()+' sats in your wallet':'Wallet balance unknown until it connects'}</p>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px">
+      ${ZAP_PRESETS.map(n=>`<button class="chip" style="${zapTo.sats===n?'border-color:var(--brass);color:var(--brass);font-weight:600':''}" onclick="zapSet(${n})">${n}</button>`).join('')}
+      <button class="chip" onclick="zapCustom()">${ZAP_PRESETS.indexOf(zapTo.sats)<0?zapTo.sats.toLocaleString():'Other'}</button>
+    </div>
+    <p class="tiny muted" style="margin:0 0 12px;line-height:1.5">Amber will ask you to sign, then Spark pays it. Three steps, so give it a few seconds.</p>
+    <button class="btn sm" style="background:var(--brass);color:var(--surface)" onclick="zapGo()">Send ${zapTo.sats.toLocaleString()} sats</button>
+    <button class="btn ghost sm" onclick="zapTo=null;modalClose()">Cancel</button>`);
+}
+function zapBusy(msg){
+  modalOpen(`<p class="small" style="margin:0;line-height:1.55">${msg}</p>
+    <p class="tiny muted" style="margin:10px 0 0">Do not close the app.</p>`);
+}
+async function zapGo(){
+  if(!zapTo || walletBusy) return;
+  const {pk, evId, sats}=zapTo;
+  if(sats>=ZAP_CONFIRM_OVER){
+    zapTo=null;
+    ask('Send '+sats.toLocaleString()+' sats to '+nameOf(pk)+'? That is a large zap and it cannot be undone.',
+      ()=>{ zapTo={pk, evId, sats}; zapGoNow(); }, 'Send it');
+    return;
+  }
+  zapGoNow();
+}
+async function zapGoNow(){
+  const {pk, evId, sats}=zapTo||{};
+  if(!pk) return;
+  walletBusy=true;
+  try{
+    zapBusy('Finding where to send it…');
+    const res=await zapResolve(pk, sats);
+    zapBusy(res.zappable ? 'Waiting for you to sign in Amber…' : 'Asking for an invoice…');
+    const inv=await zapInvoice(res, pk, evId, sats);
+    zapBusy('Paying '+sats.toLocaleString()+' sats…');
+    await zapPay(inv);
+    S.spark.balance = S.spark.balance!=null ? Math.max(0, S.spark.balance-sats) : null;
+    S.spark.defaultZap=sats; save();
+    if(evId) zapNote(evId);
+    modalClose(); zapTo=null;
+    toast(res.zappable ? 'Zapped '+nameOf(pk) : 'Sent '+sats.toLocaleString()+' sats');
+    walletBalance(true).catch(()=>{});
+    render();
+  }catch(e){
+    modalClose(); zapTo=null;
+    ask(String(e && e.message || 'That did not work').slice(0,300), ()=>{}, 'Right');
+  }
+  walletBusy=false;
+}
+function zapChip(pk, evId){
+  if(!S.nostr || pk===S.nostr.pk || !Signer.canWrite) return '';
+  const done=evId && zapped(evId);
+  return `<button class="chip fa" aria-label="Zap ${nameOf(pk)}"${done?' disabled':''}
+    onclick="zapOpen('${pk}',${evId?`'${esc(evId)}'`:'null'})">${done?'⚡︎':'⚡'}</button>`;
+}
+
 /* --- the activity feed ---
    Assembled from what is already cached: published sessions, challenge joins
    and pledges. No new relay traffic, so it costs nothing to show. */
@@ -5261,6 +6060,178 @@ function dayHeading(ts){
   if(k===today) return 'Today';
   if(k===dayKey(new Date(Date.now()-864e5))) return 'Yesterday';
   return new Date(ts*1000).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'});
+}
+
+/* ============================== THE BOARD ==============================
+
+   A leaderboard in an app built on the idea that comparison discourages
+   beginners needs a defensible answer to "ranked on what?". This one ranks
+   on days you turned up and nothing else. No weights, no reps, no volume,
+   anywhere on the screen — the same rule the Social tab has always had,
+   for the same reason: turning up three times a week looks identical
+   whoever you are, and that is the only part worth copying.
+
+   Two rules keep it honest rather than merely nice:
+
+     One session per day. Somebody training twice on Tuesday does not beat
+     somebody training on Tuesday and Thursday. This also means publishing
+     the same session twenty times buys nothing.
+
+     Two distinct days to appear at all, which keeps the tail of people who
+     published once and vanished out of the way.
+
+   None of it is verifiable. Anyone can publish a workout record they did
+   not earn, and the screen says so rather than implying a rigour it does
+   not have. */
+
+const BOARD_DAYS=30;          // the window everyone is ranked over
+const BOARD_ON_TARGET=3;      // sessions in a week that make it a full week
+const BOARD_MIN_DAYS=2;       // fewer than this and you do not appear
+const BOARD_PROFILES=25;      // how many names to look up after a sync
+
+/* Pure: takes {pk: [{at}, …]} and returns the ranked rows. Everything that
+   makes the board fair or unfair lives in here, so it can be tested without
+   a relay in sight. */
+function rankBoard(bySession, nowSec){
+  const now = nowSec || Math.floor(Date.now()/1000);
+  const cut = now - BOARD_DAYS*86400;
+  const out = [];
+  Object.keys(bySession||{}).forEach(pk=>{
+    const list = bySession[pk] || [];
+    const days = {};
+    let last = 0;
+    list.forEach(e=>{
+      const at = e && e.at;
+      if(!at || at < cut) return;
+      if(at > now + 3600) return;            // dated in the future: not real
+      days[dayKey(new Date(at*1000))] = 1;
+      if(at > last) last = at;
+    });
+    const dayList = Object.keys(days);
+    if(dayList.length < BOARD_MIN_DAYS) return;
+    /* weeks on target counts *days* per week, not sessions, so the one-a-day
+       cap carries all the way through */
+    const perWeek = {};
+    dayList.forEach(d=>{
+      const wk = weekKey(new Date(d+'T12:00:00'));
+      perWeek[wk] = (perWeek[wk]||0) + 1;
+    });
+    const weeks = Object.keys(perWeek).filter(w=>perWeek[w] >= BOARD_ON_TARGET).length;
+    out.push({pk, days:dayList.length, weeks, last});
+  });
+  return out.sort((a,b)=> b.days-a.days || b.weeks-a.weeks || b.last-a.last);
+}
+
+function boardRows(scope){
+  socialInit();
+  if(scope==='crew'){
+    const mine = {};
+    [S.nostr.pk].concat(crewList()).forEach(pk=>{ mine[pk] = sessionsOf(pk); });
+    return rankBoard(mine);
+  }
+  /* the global pool, plus our own sessions so we are ranked on the same
+     footing even before a relay has echoed them back */
+  const pool = Object.assign({}, S.social.board.rows||{});
+  if(S.nostr && S.nostr.publishWorkouts) pool[S.nostr.pk] = sessionsOf(S.nostr.pk);
+  return rankBoard(pool);
+}
+
+let boardScope='global', boardSyncing=false, boardFailed=false;
+function boardGo(s){ boardScope=s; render(); window.scrollTo(0,0); }
+
+/* The one query in the app with no `authors` filter: whoever the relays feel
+   like returning. That is the honest meaning of "global" without a server,
+   and the screen says as much. */
+async function boardSync(force){
+  if(!S.nostr || boardSyncing) return;
+  socialInit();
+  if(!force && Date.now()-(S.social.board.at||0) < 300000) return;
+  if(navigator.onLine===false){ if(force) toast('No connection'); return; }
+  boardSyncing=true; boardFailed=false; paintSyncing(true);
+  try{
+    const works = await relayFetch({kinds:[1301],
+      since: Math.floor(Date.now()/1000) - BOARD_DAYS*86400, limit:600});
+    const byPk={};
+    works.forEach(w=>{
+      if(!w || !w.pubkey || w.pubkey.length!==64) return;
+      (byPk[w.pubkey]=byPk[w.pubkey]||[]).push({id:w.id, at:w.created_at});
+    });
+    S.social.board={rows:byPk, at:Date.now()};
+    /* names for the top of the board only — looking up every stranger the
+       relays returned would be a fetch storm for rows nobody scrolls to */
+    const want=rankBoard(byPk).slice(0,BOARD_PROFILES)
+      .map(r=>r.pk).filter(pk=>!S.social.profiles[pk]);
+    if(want.length){
+      const metas=await relayFetch({kinds:[0], authors:want, limit:want.length*2});
+      metas.sort((a,b)=>a.created_at-b.created_at);
+      metas.forEach(m=>{ try{ S.social.profiles[m.pubkey]=JSON.parse(m.content); }catch(e){} });
+    }
+    save();
+  }catch(e){ boardFailed=true; }
+  boardSyncing=false; paintSyncing(false);
+  if(force) toast(boardFailed?'Could not reach the relays':'Board updated');
+  if(tab==='social' && socTab==='board') viewSocial();
+}
+
+function boardRow(r, i, me){
+  const mine = r.pk===me;
+  return `<div class="feedrow brow${mine?' boardme':''}">
+    <div class="brank${i<3?' top':''}">${i+1}</div>
+    ${avatarHtml(r.pk,'av')}
+    <div class="ft">
+      <span class="fw">${mine?'You':nameOf(r.pk)}</span>
+      <div class="fm">${r.weeks?`${r.weeks} full week${r.weeks===1?'':'s'}`:'building up'} · ${agoText(r.last)}</div>
+    </div>
+    <div style="text-align:right;flex:0 0 auto">
+      <div class="num" style="font-size:19px;color:${mine?'var(--brass)':'var(--pine)'}">${r.days}</div>
+      <div class="tiny muted">days</div>
+    </div>
+    ${mine?'':zapChip(r.pk, null)}
+  </div>`;
+}
+
+function socBoard(){
+  const me = S.nostr.pk;
+  const rows = boardRows(boardScope);
+  const mineAt = rows.findIndex(r=>r.pk===me);
+  const shown = rows.slice(0,50);
+  const offBoard = boardScope==='global' && !S.nostr.publishWorkouts;
+
+  const scope=`<div class="seg" role="tablist" style="margin-top:14px">
+    ${[['global','Everyone'],['crew','Your people']].map(([k,n])=>
+      `<button role="tab" aria-selected="${boardScope===k}" class="${boardScope===k?'on':''}" onclick="boardGo('${k}')">${n}</button>`).join('')}
+  </div>`;
+
+  if(!shown.length){
+    return scope + `<div class="card" style="margin-top:14px"><h3 style="font-size:16px">Nothing to rank yet</h3>
+      <p class="small muted" style="margin:8px 0 0">${boardScope==='global'
+        ? 'No published sessions came back from your relays in the last month. The board only ever sees people who have public publishing switched on, which most people leave off.'
+        : crewList().length
+          ? 'Nobody you have added has published two separate days in the last month.'
+          : 'Add people on the People tab and they will be ranked here.'}</p>
+      ${boardScope==='global'?`<button class="btn ghost sm" onclick="boardSync(true)">Look again</button>`:''}
+    </div>`;
+  }
+
+  return scope + `
+  <div class="card" style="margin-top:14px;padding-top:6px">
+    <div class="exhead" style="margin-top:10px"><span>Last ${BOARD_DAYS} days</span><span>days turned up</span></div>
+    ${shown.map((r,i)=>boardRow(r,i,me)).join('')}
+  </div>
+
+  ${mineAt>=50?`<div class="card"><p class="small muted" style="margin:0">You are ${mineAt+1}${mineAt+1===1?'st':''} with ${rows[mineAt].days} days. Only the top 50 are listed.</p></div>`:''}
+
+  ${offBoard?`<div class="card"><h3 style="font-size:15px">You are not on this board</h3>
+    <p class="small muted" style="margin:6px 0 0">Your sessions are not published, so nobody's relay has them. Publishing is unencrypted and public by design — it shows that you trained and when, never what you lifted.</p>
+    <button class="btn ghost sm" onclick="openSub('acct')">Where to turn it on</button></div>`:''}
+
+  <p class="tiny muted" style="margin:16px 0 0;text-align:center;line-height:1.6">
+    Ranked on days you turned up, never on what you lifted.<br>
+    One session a day counts once, so training twice on a Tuesday wins nothing.<br>
+    ${boardScope==='global'
+      ? 'Anyone can publish a workout record they did not earn, and none of this is checked. Treat it as a nudge, not a record.'
+      : 'Only the people you have added, ranked the same way.'}
+  </p>`;
 }
 
 /* --- quiet lately: who has dropped off --- */
@@ -5642,7 +6613,15 @@ notifInit();
    from the Today screen. */
 try{
   const A=window.Capacitor?.Plugins?.App;
-  if(A && A.addListener) A.addListener('backButton', ()=>{ if(!goBack()) A.exitApp(); });
+  if(A && A.addListener){
+    A.addListener('backButton', ()=>{ if(!goBack()) A.exitApp(); });
+    /* The other half of the groundwork:// deep link the manifest registers.
+       Without this every signer answer had to come back through the
+       clipboard, which is why it so often did not. */
+    A.addListener('appUrlOpen', d=>{ try{ amberReturn(d && d.url); }catch(e){} });
+    /* and the same link when it cold-started the app rather than resuming it */
+    if(A.getLaunchUrl) A.getLaunchUrl().then(r=>{ if(r && r.url) amberReturn(r.url); }).catch(()=>{});
+  }
 }catch(e){}
 
 /* The social screen is the only part that needs the network. */

@@ -6,11 +6,18 @@ The whole app is one file: `www/index.html`. No build step, no framework, no bun
 
 ## Nostr
 
-Optional, and off until you sign in. Three ways in, under **You → Nostr account**:
+Optional, and off until you sign in. Four ways in, under **You → Nostr account**:
 
-- **Amber** (NIP-55). The main path on Android. The app hands Amber a request over a `nostrsigner:` link and Amber replies on a `groundwork://` link. Your private key never enters this app.
+- **Amber** (NIP-55). The main path on Android, and only offered on Android. The app hands Amber a request over a `nostrsigner:` link and Amber replies on a `groundwork://` link. Your private key never enters this app.
+- **Bunker** (NIP-46). Paste the `bunker://` address from nsecBunker, nsec.app, Amber's bunker mode or similar. Your key stays in the signer and every signature is a round trip over a relay — so this is the one route that works everywhere, desktop included.
 - **Browser extension** (NIP-07). Only appears if `window.nostr` exists, so it's for desktop browsers, not the APK.
 - **npub, read-only**. Restores a backup, can't make one.
+
+#### A note on the Amber link
+
+The first release built Chrome's `intent:…#Intent;scheme=nostrsigner;…;end` URL. That works in Chrome for Android and nowhere else — and specifically not in the APK, where Capacitor hands an unknown scheme to `new Intent(ACTION_VIEW, Uri.parse(url))`. The scheme of an `intent:` URL is literally `intent`, nothing claims it, and the tap did nothing at all. It now builds a plain NIP-55 `nostrsigner:` URI.
+
+Two things went with it. The `groundwork://` deep link that `scripts/patch-android.py` has always registered is finally listened for, so answers come back over the link rather than by scraping the clipboard — which needed a secure context, a permission prompt, and the page surviving the trip. And if nothing takes the intent, the app says so in about four seconds instead of sitting silent for two minutes.
 
 ### Encrypted backup
 
@@ -42,13 +49,81 @@ The catch is that it only works for people who have public workout publishing sw
 
 Cheering someone publishes a `kind 7` reaction to their most recent workout.
 
+### The board
+
+A leaderboard, under **Social → Board**, with two scopes: everyone the relays return, and just the people you have added.
+
+It ranks on **days you turned up in the last thirty**, and nothing else. No weights, no reps, no volume — the same constraint the rest of the Social tab has always had, for the same reason. A beginner and a veteran who both trained three times this week are level, because they are.
+
+Two rules do the work:
+
+- **One session a day counts once.** Training twice on a Tuesday beats nobody, and publishing the same session twenty times buys nothing. Weeks on target are counted from days for the same reason.
+- **Two separate days to appear at all**, which keeps out the long tail of people who published once and vanished.
+
+The global scope is the only query in the app with no `authors` filter — `kind 1301` over the last thirty days, whatever your relays feel like returning. Names are looked up for the top 25 only, so scrolling does not cause a fetch storm.
+
+What it cannot do, and says on the screen rather than implying otherwise: none of it is verified. Anyone can publish a workout record they did not earn. It only ever sees people who have public publishing switched on, which most people leave off, and it is whatever your relays hold rather than the whole world. It is a nudge, not a record.
+
+### Zaps
+
+You can send someone sats from the Social tab — feed rows, the People list, your partner, and the board. It follows NIP-57, so the zap shows up in every other nostr client too, not only here.
+
+Each zap is three steps, and the sheet says so rather than appearing to hang: the recipient's lightning address is fetched for an invoice, Amber signs the `kind 9734` request, and Spark pays it.
+
+It degrades rather than failing silently. No lightning address in their profile and it says so. An old-style `lud06` LNURL and it says it cannot read one. A server that does not do nostr and it still pays, labelled a tip rather than a public zap — and Amber is not asked for a signature that would only be thrown away.
+
+**The invoice amount is checked against what you agreed before anything is paid.** If their server returns an invoice for a different number, nothing is sent and the screen says what happened.
+
+This is the first thing in the app that makes an HTTPS request. Everything else is a WebSocket to a relay you chose; a zap fetches a URL built out of a stranger's profile. So it will only fetch an ordinary public https host — no bare IP addresses, no ports or credentials, nothing resolving inside whatever network the phone is on — with a timeout and a ceiling on how much it will read. Routing fees are capped, and anything over 5,000 sats asks twice.
+
+### The wallet
+
+**You → Wallet** sets up a [Spark](https://spark.money) wallet on the device. Balance, receive by invoice, a default zap amount, and the twelve words.
+
+It is a tips wallet and the app says so everywhere it can. The keys live in this app's storage, which Android may clear when space runs short.
+
+That is survivable because of the backup, and only because of it: the recovery phrase is NIP-44 encrypted to your own nostr key by Amber and published as a `kind 30078` event with the `d` tag `groundwork-wallet-v1` — the same mechanism as the workout backup. Reinstall, sign in with Amber, and the wallet comes back with nothing to write down.
+
+The honest costs, which the screen states rather than buries:
+
+- Your sats now ride on your nostr key. Whoever gets your nsec gets the wallet.
+- And on a relay keeping one event. If every relay drops it and the device is wiped, it is gone.
+- A read-only npub sign-in cannot decrypt, so it cannot spend.
+
+So the twelve words are also shown, for anyone who wants paper. They are **excluded from the file export**, which is plain JSON headed for the Downloads folder, and an imported file can never install a wallet.
+
+Worth knowing: `SparkWallet.initialize()` authenticates with Spark's operators, so the wallet needs a connection every time it opens. There is no offline balance.
+
+#### The two generated files
+
+Everything else in the repo is hand-edited. These are not:
+
+| | size | needed by |
+|---|---|---|
+| `www/nostr.js` | ~100 KB | bunker (NIP-46) sign-in |
+| `www/spark.js` | ~6 MB | the zapping wallet |
+
+`spark.js` is roughly twenty times the size of the rest of the app, because two WASM blobs are inlined as base64. Neither file is precached by the service worker or loaded at startup: each is fetched the first time it is actually wanted and cached from then on, so anyone who never zaps never downloads six megabytes, and anyone who never uses a bunker never downloads the other.
+
+To move to newer versions:
+
+```
+./scripts/build-vendor.sh                 # both
+./scripts/build-vendor.sh nostr           # just one
+SPARK_VERSION=0.13.0 ./scripts/build-vendor.sh spark
+```
+
+Then bump `CACHE` in `www/sw.js` and commit the result. Editing `index.html` by hand still needs no build step of any kind.
+
 ### Relays
 
 Four defaults, editable under **You → Nostr account → Relays**. One `wss://` relay is the minimum.
 
 ### What needs a real device
 
-Amber is an Android app, so NIP-55 only works in the installed APK — not in a browser. Relay connections are WebSockets, which a browser preview's security policy will also block. Build the APK to test any of this.
+Amber is an Android app, so NIP-55 only works in the installed APK — not in a browser, and the button is not offered in one. Relay connections are WebSockets, which a browser preview's security policy will also block. Build the APK to test any of this.
+
+Bunker sign-in is the exception: it is relays all the way down, so it works in a browser as well as the APK. If Amber ever misbehaves, that is the route that does not depend on an Android intent surviving a WebView.
 
 ## Repo layout
 
@@ -57,11 +132,13 @@ www/index.html                    the entire app
 capacitor.config.json             app id, name, notification icon
 package.json                      Capacitor + plugins
 www/manifest.webmanifest          makes it installable from a browser
+www/nostr.js                      nostr-tools, bundled — for bunker sign-in
+www/spark.js                      the Spark SDK, bundled — for the wallet
+scripts/build-vendor.sh           regenerates both; nothing else needs a build
 www/sw.js                         offline support
 www/icon-*.png                    app icons
 scripts/patch-android.py          permissions, deep link, signer visibility
 .github/workflows/android.yml     builds the APK
-.github/workflows/ios.yml         builds an unsigned .ipa on a Mac runner
 .github/workflows/pages.yml       publishes www/ to GitHub Pages
 ```
 
@@ -184,36 +261,26 @@ This needs **Settings → Pages → Source** set to **GitHub Actions**. Left on 
 
 A `.nojekyll` file is added during the build so nothing gets filtered on the way out.
 
-## iOS
+**One workflow, deliberately.** GitHub offers a "Deploy static content to Pages" starter that publishes the whole repo, and for a while this repo had both it and `pages.yml`. They share a concurrency group and trigger on the same push, so every deploy was a race between serving the app at the site root and serving it under `/www/` — which changes the service worker's scope and the manifest's `start_url`, and quietly breaks installed copies. If Pages ever starts behaving strangely, check there is still only one workflow deploying it.
 
-Three ways to run this on an iPhone, in order of effort.
+## iPhone
 
-### 1. Add to Home Screen — works today, no Mac, no account
+There is no iOS build and there is not going to be one. Two targets get looked after: the **Android APK** and the **web app**. On an iPhone, the web app is the answer.
 
-Open the page in Safari, tap Share, then **Add to Home Screen**. It installs as a proper app: own icon, no browser chrome, works offline, data kept separately from Safari.
+Open the page in Safari, tap Share, then **Add to Home Screen**. It installs as a proper app — own icon, no browser chrome, works offline, storage kept separately from Safari's.
 
-Everything works except the daily reminder. iOS does not let home-screen web apps schedule their own local notifications, and no amount of code gets around it. The reminder screen says so rather than pretending, and suggests a repeating phone alarm at the same time, which does the same job.
+### Why no native iOS
 
-Amber is Android-only, so nostr sign-in on iOS is limited to pasting an npub (read-only). A NIP-46 remote signer would fix that properly and is the right long-term answer.
+The native build never earned its keep. It bought exactly one thing the web app does not have — local notifications — and cost a macOS runner at ten times Linux rates for an unsigned `.ipa` that Apple expires after seven days when re-signed with a free account. That is not a distribution channel, it is a weekly chore.
 
-### 2. Native build, sideloaded
+Bunker sign-in closed the other gap. Nostr on iOS used to mean pasting an npub and living read-only, because Amber is Android-only. A NIP-46 bunker works anywhere there is a relay, so an iPhone on the web app now gets the whole thing: encrypted backup, publishing, the board, zaps.
 
-`.github/workflows/ios.yml` builds an unsigned `.ipa` on a macOS runner. Run it from the Actions tab — it is deliberately not on the push trigger, because macOS minutes cost roughly ten times what Linux ones do on private repos.
+### What an iPhone still misses
 
-The output is unsigned, so it will not install by itself. Tools like AltStore or Sideloadly re-sign it with a free Apple ID and install it over USB. Apps signed with a free account expire after seven days and need refreshing.
+- **The daily reminder.** iOS does not let home-screen web apps schedule local notifications, and no amount of code gets around it. The reminder screen says so and suggests a repeating phone alarm, which does the same job.
+- **Durable storage.** This is the one that bites. Safari clears web app storage after about seven days without opening it. Your history, your streak and — if you set one up — your wallet all live in that storage.
 
-This version does get local notifications, because it is a real app rather than a web page.
-
-### 3. App Store
-
-Needs an Apple Developer account at £79 a year, a signing certificate and provisioning profile stored as repo secrets, and review. Only worth it if other people are going to use this.
-
-### What differs on iOS
-
-- **Reminders**: home-screen app no, native build yes
-- **Amber sign-in**: no — Android only. npub read-only works, NIP-46 would be the fix
-- **Relay connections**: fine in both
-- **Storage**: iOS clears web app storage after about seven days of not opening it, so export or sign in for backup matters more here than on Android
+  So on an iPhone, signing in for the encrypted backup is not a nice-to-have. Open the app once a week and it never comes up; leave it a fortnight without a backup and you may come back to an empty app.
 
 ## Releasing properly
 

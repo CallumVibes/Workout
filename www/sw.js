@@ -1,6 +1,12 @@
-/* Offline support. The app is one file with no network calls of its own, so
-   a plain cache-first strategy is enough. Bump CACHE to ship an update. */
-const CACHE = 'groundwork-v6';
+/* Offline support. Cache-first for the app's own files. Bump CACHE to ship
+   an update.
+
+   spark.js and nostr.js are deliberately NOT precached. spark.js is several
+   megabytes and most people never open the wallet; nostr.js is only needed by
+   people signing in with a bunker. Each is fetched the first time it is
+   wanted, and the handler below caches it from then on, so both still work
+   offline afterwards. */
+const CACHE = 'groundwork-v10';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -21,6 +27,12 @@ self.addEventListener('fetch', e => {
   // never cache relay or signer traffic
   if (url.protocol === 'wss:' || url.protocol === 'ws:') return;
 
+  /* Anything not ours goes straight to the network, untouched. That means
+     lightning address lookups and Spark's own servers: a cached invoice or a
+     stale balance is worse than no answer at all, and none of it belongs in
+     a cache the app controls. */
+  if (url.origin !== location.origin) return;
+
   // the page itself: try the network so updates land, fall back to cache offline
   if (e.request.mode === 'navigate') {
     e.respondWith(
@@ -33,10 +45,8 @@ self.addEventListener('fetch', e => {
 
   e.respondWith(
     caches.match(e.request).then(hit => hit || fetch(e.request).then(r => {
-      if (r.ok && url.origin === location.origin) {
-        const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy));
-      }
+      if (r.ok) { const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); }
       return r;
-    }).catch(() => hit))
+    }))
   );
 });
