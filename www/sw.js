@@ -1,10 +1,12 @@
 /* Offline support. Cache-first for the app's own files. Bump CACHE to ship
    an update.
 
-   spark.js is deliberately NOT precached: it is several megabytes, and most
-   people never open the wallet. It is fetched the first time they do, and the
-   handler below caches it from then on, so it still works offline afterwards. */
-const CACHE = 'groundwork-v8';
+   spark.js and nostr.js are deliberately NOT precached. spark.js is several
+   megabytes and most people never open the wallet; nostr.js is only needed by
+   people signing in with a bunker. Each is fetched the first time it is
+   wanted, and the handler below caches it from then on, so both still work
+   offline afterwards. */
+const CACHE = 'groundwork-v9';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {

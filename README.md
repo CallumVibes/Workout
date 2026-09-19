@@ -6,11 +6,18 @@ The whole app is one file: `www/index.html`. No build step, no framework, no bun
 
 ## Nostr
 
-Optional, and off until you sign in. Three ways in, under **You → Nostr account**:
+Optional, and off until you sign in. Four ways in, under **You → Nostr account**:
 
-- **Amber** (NIP-55). The main path on Android. The app hands Amber a request over a `nostrsigner:` link and Amber replies on a `groundwork://` link. Your private key never enters this app.
+- **Amber** (NIP-55). The main path on Android, and only offered on Android. The app hands Amber a request over a `nostrsigner:` link and Amber replies on a `groundwork://` link. Your private key never enters this app.
+- **Bunker** (NIP-46). Paste the `bunker://` address from nsecBunker, nsec.app, Amber's bunker mode or similar. Your key stays in the signer and every signature is a round trip over a relay — so this is the one route that works everywhere, desktop included.
 - **Browser extension** (NIP-07). Only appears if `window.nostr` exists, so it's for desktop browsers, not the APK.
 - **npub, read-only**. Restores a backup, can't make one.
+
+#### A note on the Amber link
+
+The first release built Chrome's `intent:…#Intent;scheme=nostrsigner;…;end` URL. That works in Chrome for Android and nowhere else — and specifically not in the APK, where Capacitor hands an unknown scheme to `new Intent(ACTION_VIEW, Uri.parse(url))`. The scheme of an `intent:` URL is literally `intent`, nothing claims it, and the tap did nothing at all. It now builds a plain NIP-55 `nostrsigner:` URI.
+
+Two things went with it. The `groundwork://` deep link that `scripts/patch-android.py` has always registered is finally listened for, so answers come back over the link rather than by scraping the clipboard — which needed a secure context, a permission prompt, and the page surviving the trip. And if nothing takes the intent, the app says so in about four seconds instead of sitting silent for two minutes.
 
 ### Encrypted backup
 
@@ -87,16 +94,23 @@ So the twelve words are also shown, for anyone who wants paper. They are **exclu
 
 Worth knowing: `SparkWallet.initialize()` authenticates with Spark's operators, so the wallet needs a connection every time it opens. There is no offline balance.
 
-#### The one generated file
+#### The two generated files
 
-`www/spark.js` is the Spark SDK, bundled — about 6 MB, which is roughly twenty times the size of the rest of the app, because two WASM blobs are inlined. It is the only generated file in the repo and the only reason `scripts/` contains a build step.
+Everything else in the repo is hand-edited. These are not:
 
-It is **not** precached by the service worker and **not** loaded at startup. It is fetched the first time somebody opens the wallet, and cached from then on, so anyone who never zaps never downloads it.
+| | size | needed by |
+|---|---|---|
+| `www/nostr.js` | ~100 KB | bunker (NIP-46) sign-in |
+| `www/spark.js` | ~6 MB | the zapping wallet |
 
-To move to a newer SDK:
+`spark.js` is roughly twenty times the size of the rest of the app, because two WASM blobs are inlined as base64. Neither file is precached by the service worker or loaded at startup: each is fetched the first time it is actually wanted and cached from then on, so anyone who never zaps never downloads six megabytes, and anyone who never uses a bunker never downloads the other.
+
+To move to newer versions:
 
 ```
-./scripts/build-spark.sh              # or: SPARK_VERSION=0.13.0 ./scripts/build-spark.sh
+./scripts/build-vendor.sh                 # both
+./scripts/build-vendor.sh nostr           # just one
+SPARK_VERSION=0.13.0 ./scripts/build-vendor.sh spark
 ```
 
 Then bump `CACHE` in `www/sw.js` and commit the result. Editing `index.html` by hand still needs no build step of any kind.
@@ -107,7 +121,9 @@ Four defaults, editable under **You → Nostr account → Relays**. One `wss://`
 
 ### What needs a real device
 
-Amber is an Android app, so NIP-55 only works in the installed APK — not in a browser. Relay connections are WebSockets, which a browser preview's security policy will also block. Build the APK to test any of this.
+Amber is an Android app, so NIP-55 only works in the installed APK — not in a browser, and the button is not offered in one. Relay connections are WebSockets, which a browser preview's security policy will also block. Build the APK to test any of this.
+
+Bunker sign-in is the exception: it is relays all the way down, so it works in a browser as well as the APK. If Amber ever misbehaves, that is the route that does not depend on an Android intent surviving a WebView.
 
 ## Repo layout
 
@@ -116,8 +132,9 @@ www/index.html                    the entire app
 capacitor.config.json             app id, name, notification icon
 package.json                      Capacitor + plugins
 www/manifest.webmanifest          makes it installable from a browser
-www/spark.js                      the Spark SDK, bundled — the only generated file
-scripts/build-spark.sh            regenerates it, and nothing else needs a build
+www/nostr.js                      nostr-tools, bundled — for bunker sign-in
+www/spark.js                      the Spark SDK, bundled — for the wallet
+scripts/build-vendor.sh           regenerates both; nothing else needs a build
 www/sw.js                         offline support
 www/icon-*.png                    app icons
 scripts/patch-android.py          permissions, deep link, signer visibility

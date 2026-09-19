@@ -1847,7 +1847,7 @@ const STR=[
 const byStr = id => STR.find(s=>s.id===id) || MOB.find(m=>m.id===id);
 
 /* ============================== STATE ============================== */
-const BUILD='2026-09-19 23:15';
+const BUILD='2026-09-20 00:20';
 const KEY='groundwork.v1';
 let S = {
   setup:false,
@@ -3870,14 +3870,23 @@ function subAcct(){
       <button onclick="relayEdit()" style="text-decoration:underline;font-size:14px">${(S.nostr.relays||[]).length} connected</button></label></div>`:''}`
   :`<div class="card">
     <p class="small muted" style="margin:0">Optional. Gives you an encrypted backup of your history, readable only by you.</p>
-    <button class="btn sm" style="background:var(--pine);color:var(--surface)" onclick="nostrLogin('amber')">Sign in with Amber</button>
+    ${canAmber()
+      ? `<button class="btn sm" style="background:var(--pine);color:var(--surface)" onclick="nostrLogin('amber')">Sign in with Amber</button>`
+      : ''}
+    <button class="btn ${canAmber()?'ghost':''} sm" ${canAmber()?'':'style="background:var(--pine);color:var(--surface)"'} onclick="bunkerAsk()">Connect a bunker</button>
     ${window.nostr?`<button class="btn ghost sm" onclick="nostrLogin('nip07')">Use browser extension</button>`:''}
-    <button class="btn ghost sm" onclick="pasteSignIn()">Amber opened but nothing came back? Paste it here</button>
     <button class="btn ghost sm" onclick="nostrLoginNpub()">Paste an npub (read-only)</button>
-    ${!CAN_CLIP?`<div class="flag" style="margin-top:14px"><b>This copy cannot read the clipboard.</b> That needs an https address — opened from a downloaded file the browser refuses it, so Amber's answer has to be pasted by hand. Opening the app from its web address fixes that.</div>`:''}
-    <button class="btn ghost sm" onclick="askPaste()">Amber opened but nothing happened</button>
 
-    <p class="tiny muted" style="margin:12px 0 0">Your key stays in Amber. It returns each answer through the clipboard, so your phone may ask you to allow a paste.</p>
+    ${canAmber()?'':`<p class="tiny muted" style="margin:12px 0 0">Amber is an Android app, so it is not offered here. A bunker does the same job over a relay and works anywhere.</p>`}
+
+    <div class="flag" style="margin-top:14px"><b>A bunker</b> holds your key somewhere else — nsecBunker, nsec.app, or Amber's own bunker mode — and signs when asked. You paste the <code>bunker://</code> address it gives you. Your key never reaches this app either way.</div>
+
+    ${canAmber()?`<div style="margin-top:14px">
+      <p class="tiny muted" style="margin:0 0 6px">If Amber opens but nothing comes back:</p>
+      <button class="btn ghost sm" style="margin-top:0" onclick="pasteSignIn()">Paste what it copied</button>
+    </div>
+    ${!CAN_CLIP?`<div class="flag" style="margin-top:14px"><b>This copy cannot read the clipboard.</b> That needs an https address — opened from a downloaded file the browser refuses it. The app now asks Amber to reply over a <code>groundwork://</code> link instead, but pasting by hand still works if that does not arrive.</div>`:''}
+    <p class="tiny muted" style="margin:12px 0 0">Your key stays in Amber. It replies over a link back into this app, falling back to the clipboard if that does not arrive.</p>`:''}
   </div>`);
 }
 
@@ -4046,6 +4055,11 @@ function subPrivacy(){
     <div class="prow"><span>Analytics</span><span>None, ever</span></div>
     <div class="prow"><span>Accounts</span><span>None — no server</span></div>
     <div class="prow"><span>Relays contacted</span><span>${n?(n.relays||[]).length:'None'}</span></div>
+    <div class="prow"><span>Signing</span><span>${!n?'Not signed in'
+      :n.mode==='bunker'?'Your bunker, over '+((n.bunker&&n.bunker.relays)||[]).length+' relay'+(((n.bunker&&n.bunker.relays)||[]).length===1?'':'s')
+      :n.mode==='amber'?'Amber, on this device'
+      :n.mode==='nip07'?'A browser extension'
+      :'Read-only'}</span></div>
     <div class="prow"><span>Web fonts</span><span>${S.webfonts?'Google, each launch':'Not loaded'}</span></div>
     <div class="prow"><span>Wallet</span><span>${hasWallet()?'Spark’s servers, when open':'Not set up'}</span></div>
     <div class="prow"><span>Zaps</span><span>${hasWallet()?'The payee’s lightning host':'None sent'}</span></div>
@@ -4078,6 +4092,13 @@ function subPrivacy(){
     ${n?`<div style="margin-top:12px">${(n.relays||[]).map(r=>`<div class="prow"><span style="overflow:hidden;text-overflow:ellipsis">${esc(r)}</span><span></span></div>`).join('')}</div>
     <button class="btn ghost sm" onclick="relayEdit()">Change relays</button>`:''}
   </div>
+
+  ${n&&n.mode==='bunker'?`<div class="card">
+    <h3 style="font-size:15px">Your bunker</h3>
+    <p class="small muted" style="margin:6px 0 0">Your key lives in your signer, not here. Every signature is a round trip over the relays below, which see that two keys are talking and when, but not what about — the messages are encrypted to each other.</p>
+    <div style="margin-top:12px">${((n.bunker&&n.bunker.relays)||[]).map(r=>`<div class="prow"><span style="overflow:hidden;text-overflow:ellipsis">${esc(r)}</span><span></span></div>`).join('')}</div>
+    <p class="tiny muted" style="margin:10px 0 0">This app also holds a throwaway key for talking to the bunker. It is not your identity and cannot sign anything on its own, but it does authorise this session, so it is left out of the file export.</p>
+  </div>`:''}
 
   <div class="card">
     <h3 style="font-size:15px">Zapping</h3>
@@ -4126,6 +4147,10 @@ function exportData(){
      there. The wallet has its own encrypted backup, on your relays. */
   const out=Object.assign({}, S);
   if(out.spark) out.spark=Object.assign({}, out.spark, {mnemonic:null, balance:null});
+  /* The bunker's client key authorises this signing session. Not an identity
+     key, but not something to drop into the Downloads folder either. */
+  if(out.nostr && out.nostr.bunker)
+    out.nostr=Object.assign({}, out.nostr, {bunker:Object.assign({}, out.nostr.bunker, {clientSec:null, secret:null})});
   const blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='groundwork-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
@@ -4811,22 +4836,67 @@ function shortNpub(hex){ if(!hex) return ''; const n=npubEncode(hex); return n.s
    encodeURIComponent escapes it to %3F, which survives that split. */
 
 const SIGNER_SCHEME='nostrsigner';
+const AMBER_CALLBACK='groundwork://amber?r=';
 
-function amberIntentUrl(type, payload, extraFields){
-  const fields = Object.assign({
-    type: type,
-    compressionType: 'none',
-    returnType: 'signature',
-    appName: 'Groundwork'
+/* The kinds this app signs, named up front so Amber can grant once at sign-in
+   rather than asking again on every backup and every zap. */
+const SIGNER_PERMS=[
+  {type:'sign_event', kind:0},
+  {type:'sign_event', kind:1},
+  {type:'sign_event', kind:7},
+  {type:'sign_event', kind:1301},
+  {type:'sign_event', kind:9734},
+  {type:'sign_event', kind:30078},
+  {type:'nip44_encrypt'},
+  {type:'nip44_decrypt'}
+];
+
+/* A plain NIP-55 URI, and deliberately *not* Chrome's `intent:…#Intent;…;end`
+   form, which is what this used to build.
+
+   That syntax works in Chrome for Android and nowhere else. Inside the APK,
+   Capacitor hands an unrecognised scheme to `new Intent(ACTION_VIEW,
+   Uri.parse(url))` — and the scheme of an `intent:` URL is literally "intent",
+   which nothing on the device claims. Android throws ActivityNotFoundException,
+   Capacitor logs it, and the button appears dead. Parsing it properly would
+   need Intent.parseUri(URI_INTENT_SCHEME), which Capacitor does not do.
+
+   `nostrsigner:` parses to the scheme Amber actually registers, so ACTION_VIEW
+   resolves. The <queries> block Android 11+ needs to see it at all is already
+   in scripts/patch-android.py. */
+function signerUrl(type, payload, extraFields){
+  const q = Object.assign({
+    compressionType:'none',
+    returnType:'signature',
+    type:type,
+    appName:'Groundwork',
+    callbackUrl:AMBER_CALLBACK
   }, extraFields||{});
-  const S = Object.keys(fields)
-    .map(k => 'S.' + k + '=' + encodeURIComponent(fields[k]))
-    .join(';');
-  return 'intent:' + (payload ? encodeURIComponent(payload) : '')
-    + '#Intent;scheme=' + SIGNER_SCHEME + ';' + S + ';end';
+  if(type==='get_public_key' && !q.permissions) q.permissions=JSON.stringify(SIGNER_PERMS);
+  const qs=Object.keys(q).map(k=>k+'='+encodeURIComponent(q[k])).join('&');
+  return SIGNER_SCHEME+':'+(payload?encodeURIComponent(payload):'')+'?'+qs;
 }
 
-let waiting=null, wasHidden=false;
+/* Whether a signer could be there at all. Amber is an Android app; offering
+   the button on a desktop is promising something that cannot happen. */
+function canAmber(){ return Native.on || /Android/i.test(navigator.userAgent||''); }
+
+/* Anything coming back from a signer is one of four shapes. Used to stop a
+   stale clipboard being mistaken for an answer now that the callback URL is
+   the real route home. */
+function looksLikeSignerResult(t){
+  const s=String(t||'').trim();
+  if(!s) return false;
+  if(s.charAt(0)==='{') return true;                 // a whole signed event
+  if(/^npub1[a-z0-9]{20,}$/i.test(s)) return true;   // a public key, bech32
+  if(/^[0-9a-f]{64}$/i.test(s)) return true;         // a public key, hex
+  if(/^[0-9a-f]{128}$/i.test(s)) return true;        // a signature
+  return /^[A-Za-z0-9+/=_-]{40,}$/.test(s);          // nip44 ciphertext
+}
+
+/* wasHidden is reset every time we come back, so it cannot answer "did we ever
+   leave?" — which is the question that tells us whether a signer exists. */
+let waiting=null, wasHidden=false, everHidden=false;
 function amberSettle(v){ try{ sessionStorage.removeItem(AMB_KEY); }catch(e){}
   const w=waiting; if(!w) return; waiting=null; w.resolve(String(v).trim()); }
 function amberFail(m){ try{ sessionStorage.removeItem(AMB_KEY); }catch(e){}
@@ -4838,9 +4908,30 @@ function askPaste(){
 }
 
 document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState!=='visible'){ if(waiting) wasHidden=true; return; }
+  if(document.visibilityState!=='visible'){ if(waiting){ wasHidden=true; everHidden=true; } return; }
   if(!waiting || !wasHidden) return;          // ignore the hop out to Amber
   wasHidden=false;
+  amberTryClipboard();
+});
+/* Belt and braces: if the browser froze the page hard enough to miss the
+   visibility event, pick it up on focus instead. */
+window.addEventListener('focus',()=>{
+  if(!waiting || !wasHidden) return;
+  wasHidden=false;
+  amberTryClipboard();
+});
+
+/* The fallback route home, for signers or Android versions where the callback
+   URL does not arrive. Two changes now that the callback is the main road:
+
+   It waits longer, so a deep link already on its way wins the race. Whichever
+   arrives first clears `waiting`, and the loser then finds nothing to do.
+
+   And it only accepts something shaped like an answer. Amber does not copy
+   anything when it has a callback URL, so whatever is on the clipboard is
+   probably a shopping list — and handing that to the caller as a public key
+   is worse than asking. */
+function amberTryClipboard(){
   setTimeout(()=>{
     if(!waiting) return;
     // The clipboard API needs a secure context. Opened from a file:// or
@@ -4848,23 +4939,41 @@ document.addEventListener('visibilitychange',()=>{
     // to asking rather than failing silently.
     if(!navigator.clipboard || !navigator.clipboard.readText){ askPaste(); return; }
     navigator.clipboard.readText()
-      .then(t=>{ if(t && t.trim()) amberSettle(t); else askPaste(); })
+      .then(t=>{ if(looksLikeSignerResult(t)) amberSettle(t); else askPaste(); })
       .catch(()=>askPaste());
-  },250);
-});
-/* Belt and braces: if the browser froze the page hard enough to miss the
-   visibility event, pick it up on focus instead. */
-window.addEventListener('focus',()=>{
-  if(!waiting || !wasHidden) return;
-  wasHidden=false;
-  setTimeout(()=>{
-    if(!waiting) return;
-    if(!navigator.clipboard || !navigator.clipboard.readText){ askPaste(); return; }
-    navigator.clipboard.readText()
-      .then(t=>{ if(t && t.trim()) amberSettle(t); else askPaste(); })
-      .catch(()=>askPaste());
-  },250);
-});
+  },700);
+}
+
+/* The way home. The manifest has registered groundwork:// since the first
+   release and nothing has ever listened for it — every answer came back by
+   reading the clipboard, which needs a secure context, a permission prompt,
+   and the page surviving the trip.
+
+   Deliberately only settles a request that is already in flight, or finishes a
+   sign-in the page was reloaded in the middle of. A groundwork:// link from
+   anywhere else finds nothing waiting and does nothing, so a web page cannot
+   use one to sign anybody in. */
+function amberReturn(url){
+  const s=String(url||'');
+  if(s.slice(0,13).toLowerCase()!=='groundwork://') return false;
+  let v='';
+  const qi=s.indexOf('?');
+  if(qi>=0){
+    try{
+      const p=new URLSearchParams(s.slice(qi+1));
+      v = p.get('r') || p.get('event') || p.get('signature') || p.get('result') || '';
+    }catch(e){}
+  }
+  /* some builds append the answer straight onto the callback with no key */
+  if(!v && qi>=0){
+    const tail=s.slice(s.lastIndexOf('=')+1);
+    if(tail && tail!==s) { try{ v=decodeURIComponent(tail); }catch(e){ v=tail; } }
+  }
+  v=String(v||'').trim();
+  if(!v) return false;
+  if(waiting){ amberSettle(v); return true; }
+  return amberResumeWith(v);
+}
 
 /* Whether the clipboard can be read at all. Needs https (or localhost) — from
    a downloaded file the API simply is not there. */
@@ -4895,7 +5004,7 @@ function amberCall(type, payload, extraFields){
     // Some browsers reload the page on the way back from an external app, which
     // would lose the promise. Leave a note so the next load can finish the job.
     try{ sessionStorage.setItem(AMB_KEY, JSON.stringify({type, at:Date.now()})); }catch(e){}
-    const url=amberIntentUrl(type,payload,extraFields);
+    const url=signerUrl(type,payload,extraFields);
     // an anchor click, because some browsers ignore location.href for intent:
     try{
       const a=document.createElement('a');
@@ -4907,8 +5016,18 @@ function amberCall(type, payload, extraFields){
     // moment Amber opens, timers are throttled while hidden, and on the way
     // back the visibility event fired before the timer had armed anything.
     // Instead of a delay, wait until we have actually been hidden once.
-    wasHidden=false;
+    wasHidden=false; everHidden=false;
     waiting={resolve,reject};
+    /* If a signer took the intent, this app is in the background within a
+       second or so. Still in the foreground after four means nothing claimed
+       it — say so now rather than sitting silent until the long timeout, which
+       is what made a broken button look like a dead one. */
+    setTimeout(()=>{
+      if(waiting && waiting.resolve===resolve && !everHidden)
+        amberFail(Native.on
+          ? 'Nothing opened, so no signer answered. Check Amber is installed, open it once, then try again.'
+          : 'Nothing opened. Amber is an Android app — in a browser, use a bunker or a browser extension instead.');
+    },4000);
     setTimeout(()=>{ if(waiting&&waiting.resolve===resolve) amberFail('Amber did not answer. Is it installed?'); },120000);
   });
 }
@@ -4916,26 +5035,37 @@ function amberCall(type, payload, extraFields){
 /* If the page reloaded while Amber had the request, finish the login here.
    Only a login is worth resuming — anything else was mid-flow and is better
    retried than guessed at. */
+/* Kept in memory for the life of the page, so a callback arriving after the
+   reload can still be matched to what we asked for. */
+let resumeNote=null;
+
+function amberResumeWith(v){
+  if(!resumeNote || resumeNote.type!=='get_public_key') return false;
+  if(Date.now()-resumeNote.at > 300000) return false;
+  const t=String(v||'').trim(); if(!t) return false;
+  const pk = t.indexOf('npub1')===0 ? npubDecode(t) : t.toLowerCase();
+  if(!pk || !/^[0-9a-f]{64}$/.test(pk)) return false;
+  resumeNote=null;
+  S.nostr={mode:'amber', pk, relays:(S.nostr&&S.nostr.relays)||RELAYS_DEFAULT.slice(),
+    autoBackup:true, publishWorkouts:false};
+  save(); render(); toast('Signed in as '+shortNpub(pk));
+  return true;
+}
+
 function amberResume(){
-  let note=null;
-  try{ const r=sessionStorage.getItem(AMB_KEY); if(r) note=JSON.parse(r); sessionStorage.removeItem(AMB_KEY); }catch(e){}
-  if(!note || note.type!=='get_public_key' || Date.now()-note.at > 300000) return;
-  const finish=v=>{
-    const t=String(v||'').trim(); if(!t) return;
-    const pk = t.indexOf('npub1')===0 ? npubDecode(t) : t;
-    if(!pk || pk.length!==64) return;
-    S.nostr={mode:'amber', pk, relays:(S.nostr&&S.nostr.relays)||RELAYS_DEFAULT.slice(),
-      autoBackup:true, publishWorkouts:false};
-    save(); render(); toast('Signed in as '+shortNpub(pk));
-  };
+  try{ const r=sessionStorage.getItem(AMB_KEY); if(r) resumeNote=JSON.parse(r); sessionStorage.removeItem(AMB_KEY); }catch(e){}
+  if(!resumeNote || resumeNote.type!=='get_public_key' || Date.now()-resumeNote.at > 300000){ resumeNote=null; return; }
+  const ask1=()=>askText('Paste what Amber copied:', '', v=>{ amberResumeWith(v); }, {ok:'Sign in'});
+  /* Give the deep link a moment to arrive first — with a callback URL there is
+     usually nothing on the clipboard to find. */
   setTimeout(()=>{
+    if(!resumeNote) return;                 // the callback already finished it
     if(navigator.clipboard && navigator.clipboard.readText){
-      navigator.clipboard.readText().then(t=>{
-        if(t&&t.trim()) finish(t);
-        else askText('Paste what Amber copied:', '', v=>{ if(v) finish(v); }, {ok:'Sign in'});
-      }).catch(()=>askText('Paste what Amber copied:', '', v=>{ if(v) finish(v); }, {ok:'Sign in'}));
-    }else askText('Paste what Amber copied:', '', v=>{ if(v) finish(v); }, {ok:'Sign in'});
-  },400);
+      navigator.clipboard.readText()
+        .then(t=>{ if(looksLikeSignerResult(t) && amberResumeWith(t)) return; ask1(); })
+        .catch(ask1);
+    }else ask1();
+  },900);
 }
 
 /* returnType=signature means the event id is ours to compute */
@@ -4956,18 +5086,114 @@ async function amberSign(ev){
   return draft;
 }
 
-/* --- one interface over the three ways in --- */
+/* ============================== BUNKER (NIP-46) ==============================
+
+   A remote signer. Your key lives in nsecBunker, nsec.app, Amber's bunker mode
+   or similar, and this app asks it to sign over a relay rather than over an
+   Android intent. Which makes it the one route that works everywhere: desktop
+   browsers, the APK, and anywhere Amber's intent does not survive the trip.
+
+   The app generates its own throwaway keypair for the conversation. That is
+   not your identity — your key never leaves the bunker — but it does authorise
+   this session, so it is kept out of the file export and listed under Privacy
+   alongside everything else that leaves the device.
+
+   nostr-tools does the protocol. Rolling it by hand would mean secp256k1
+   Schnorr signing, which this app has never needed before, plus NIP-44 v2,
+   request correlation and auth_url challenges. */
+
+const NOSTR_SRC='nostr.js';
+let nostrLoad=null, bunker=null, bunkerErr=null;
+
+function loadNostrTools(){
+  if(window.NostrTools && window.NostrTools.ready) return Promise.resolve(window.NostrTools);
+  if(nostrLoad) return nostrLoad;
+  nostrLoad=new Promise((res,rej)=>{
+    const el=document.createElement('script');
+    el.src=NOSTR_SRC; el.async=true;
+    el.onload=()=>{
+      if(window.NostrTools && window.NostrTools.ready) res(window.NostrTools);
+      else { nostrLoad=null; rej(new Error('The signer file loaded but looked wrong')); }
+    };
+    el.onerror=()=>{ nostrLoad=null; el.remove();
+      rej(new Error('Could not load the bunker code. It needs one connection the first time.')); };
+    document.head.appendChild(el);
+  });
+  return nostrLoad;
+}
+
+function bunkerCfg(){ return (S.nostr && S.nostr.bunker) || null; }
+
+/* Connected lazily, on the first thing that actually needs signing, so being
+   signed in does not mean a relay socket every time the app opens. */
+async function bunkerConnect(){
+  if(bunker) return bunker;
+  const cfg=bunkerCfg();
+  if(!cfg || !cfg.clientSec) throw new Error('No bunker is set up on this device');
+  const T=await loadNostrTools();
+  const sec=hexToBytes(cfg.clientSec);
+  const pointer={pubkey:cfg.pubkey, relays:(cfg.relays||[]).slice(), secret:cfg.secret||null};
+  const b=T.BunkerSigner.fromBunker(sec, pointer, {
+    onauth:url=>{
+      /* the bunker wants a human to approve this in a browser */
+      ask('Your bunker needs you to approve this.\n\nOpen the approval page, say yes, then come back.',
+        ()=>{ try{ window.open(url,'_blank','noopener'); }catch(e){ toast('Could not open it'); } },
+        'Open it');
+    }
+  });
+  await b.connect();
+  bunker=b;
+  return b;
+}
+function bunkerDrop(){ try{ if(bunker && bunker.close) bunker.close(); }catch(e){} bunker=null; }
+
+function hexToBytes(h){
+  const s=String(h||''); const n=s.length>>1; const out=new Uint8Array(n);
+  for(let i=0;i<n;i++) out[i]=parseInt(s.substr(i*2,2),16);
+  return out;
+}
+function bytesToHex(b){
+  return Array.from(b).map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+
+/* Paste a bunker:// URI. Everything needed to reconnect is stored: the
+   signer's pubkey, its relays, the one-time secret, and our own client key. */
+async function bunkerLogin(uri){
+  const T=await loadNostrTools();
+  const p=await T.parseBunkerInput(String(uri||'').trim());
+  if(!p) throw new Error('That does not look like a bunker:// address');
+  if(!p.relays || !p.relays.length) throw new Error('That bunker address names no relay to reach it on');
+  const sec=T.generateSecretKey();
+  const cfg={pubkey:p.pubkey, relays:p.relays.slice(0,6), secret:p.secret||null, clientSec:bytesToHex(sec)};
+  /* connect before storing anything, so a bad address does not leave a
+     half-signed-in app behind */
+  const b=T.BunkerSigner.fromBunker(sec, p, {});
+  await b.connect();
+  const pk=await b.getPublicKey();
+  if(!pk || !/^[0-9a-f]{64}$/i.test(pk)) throw new Error('The bunker did not return a usable key');
+  bunker=b;
+  S.nostr={mode:'bunker', pk:pk.toLowerCase(), bunker:cfg,
+    relays:(S.nostr&&S.nostr.relays)||RELAYS_DEFAULT.slice(),
+    autoBackup:true, publishWorkouts:false};
+  save(); render();
+  toast('Signed in as '+shortNpub(S.nostr.pk));
+  fetchOwnProfile();
+}
+
+/* --- one interface over the four ways in --- */
 const Signer={
   get mode(){ return S.nostr?S.nostr.mode:null; },
   get pk(){ return S.nostr?S.nostr.pk:null; },
-  get canWrite(){ return this.mode==='amber'||this.mode==='nip07'; },
+  get canWrite(){ return this.mode==='amber'||this.mode==='nip07'||this.mode==='bunker'; },
   async getPublicKey(mode){
     if(mode==='nip07'){ if(!window.nostr) throw new Error('No signing extension found'); return await window.nostr.getPublicKey(); }
+    if(mode==='bunker'){ const b=await bunkerConnect(); return await b.getPublicKey(); }
     const r=await amberCall('get_public_key');
     return r.indexOf('npub1')===0 ? npubDecode(r) : r.trim();
   },
   async signEvent(ev){
     if(this.mode==='nip07') return await window.nostr.signEvent(ev);
+    if(this.mode==='bunker'){ const b=await bunkerConnect(); return await b.signEvent(ev); }
     return await amberSign(ev);
   },
   async encrypt(plain){
@@ -4975,6 +5201,7 @@ const Signer={
       if(window.nostr.nip44&&window.nostr.nip44.encrypt) return await window.nostr.nip44.encrypt(this.pk, plain);
       return await window.nostr.nip04.encrypt(this.pk, plain);
     }
+    if(this.mode==='bunker'){ const b=await bunkerConnect(); return await b.nip44Encrypt(this.pk, plain); }
     return await amberCall('nip44_encrypt', plain, {pubKey:this.pk, current_user:this.pk});
   },
   async decrypt(ct){
@@ -4982,6 +5209,7 @@ const Signer={
       if(window.nostr.nip44&&window.nostr.nip44.decrypt) return await window.nostr.nip44.decrypt(this.pk, ct);
       return await window.nostr.nip04.decrypt(this.pk, ct);
     }
+    if(this.mode==='bunker'){ const b=await bunkerConnect(); return await b.nip44Decrypt(this.pk, ct); }
     return await amberCall('nip44_decrypt', ct, {pubKey:this.pk, current_user:this.pk});
   }
 };
@@ -4997,6 +5225,17 @@ async function nostrLogin(mode){
     fetchOwnProfile();
   }catch(e){ toast(e.message||'Sign-in failed'); }
 }
+function bunkerAsk(){
+  askText('Paste the bunker:// address from your signer.\n\nnsecBunker, nsec.app and Amber’s bunker mode all give you one.', '',
+    async v=>{
+      const t=String(v||'').trim();
+      if(!t) return;
+      toast('Connecting to your bunker…');
+      try{ await bunkerLogin(t); }
+      catch(e){ ask(String(e && e.message || 'Could not reach that bunker').slice(0,240), ()=>{}, 'Right'); }
+    }, {multiline:true, placeholder:'bunker://…', ok:'Connect'});
+}
+
 function nostrLoginNpub(){
   askText('Paste your npub. This signs you in read-only \u2014 you can restore a backup but not make one.', '', v=>{
     const pk=npubDecode(v||'');
@@ -5006,7 +5245,7 @@ function nostrLoginNpub(){
   }, {placeholder:'npub1…', ok:'Sign in'});
 }
 function nostrLogout(){ ask('Sign out? Your workout history stays on this device.',
-  ()=>{ S.nostr=null; save(); render(); toast('Signed out'); }, 'Sign out'); }
+  ()=>{ bunkerDrop(); S.nostr=null; save(); render(); toast('Signed out'); }, 'Sign out'); }
 
 /* ============================== THE WALLET ==============================
 
@@ -6362,7 +6601,15 @@ notifInit();
    from the Today screen. */
 try{
   const A=window.Capacitor?.Plugins?.App;
-  if(A && A.addListener) A.addListener('backButton', ()=>{ if(!goBack()) A.exitApp(); });
+  if(A && A.addListener){
+    A.addListener('backButton', ()=>{ if(!goBack()) A.exitApp(); });
+    /* The other half of the groundwork:// deep link the manifest registers.
+       Without this every signer answer had to come back through the
+       clipboard, which is why it so often did not. */
+    A.addListener('appUrlOpen', d=>{ try{ amberReturn(d && d.url); }catch(e){} });
+    /* and the same link when it cold-started the app rather than resuming it */
+    if(A.getLaunchUrl) A.getLaunchUrl().then(r=>{ if(r && r.url) amberReturn(r.url); }).catch(()=>{});
+  }
 }catch(e){}
 
 /* The social screen is the only part that needs the network. */
