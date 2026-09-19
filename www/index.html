@@ -1847,7 +1847,7 @@ const STR=[
 const byStr = id => STR.find(s=>s.id===id) || MOB.find(m=>m.id===id);
 
 /* ============================== STATE ============================== */
-const BUILD='2026-09-20 00:20';
+const BUILD='2026-09-20 01:05';
 const KEY='groundwork.v1';
 let S = {
   setup:false,
@@ -3904,8 +3904,13 @@ function subWallet(){
       <h3 style="font-size:16px">A wallet for zapping people</h3>
       <p class="small muted" style="margin:8px 0 0">Zaps are a few sats sent to somebody who turned up. This sets up a <b>Spark</b> wallet on this device to pay them with.</p>
       <div class="flag" style="margin-top:12px"><b>Pocket change only.</b> The keys live in this app's storage on this phone. That is fine for tipping and wrong for savings — keep anything you would miss in a wallet built for holding it.</div>
-      ${canSign?`<p class="small muted" style="margin:12px 0 0">Your recovery phrase will be encrypted to your own nostr key by Amber and stored on your relays, so reinstalling restores the wallet with nothing to write down. You can still see the twelve words and copy them somewhere if you would rather.</p>`
-        :`<p class="small muted" style="margin:12px 0 0">You are not signed in with Amber or an extension, so there is nowhere to put an encrypted backup. You will need to write the twelve words down yourself.</p>`}
+      ${fragileStorage()?`<div class="flag" style="margin-top:12px;border-color:#b4442e">
+        <b>On an iPhone this storage is not durable.</b> Safari clears a web app's data after about a week without opening it, and the twelve words go with it. That is not a bug in this app and nothing here can prevent it.
+        <br><br>${canSign
+          ? 'So back the wallet up before you put anything in. It happens automatically when you create one, but check it says backed up.'
+          : 'So sign in first, or write the twelve words on paper before funding it. Right now there is nowhere to back it up to.'}</div>`:''}
+      ${canSign?`<p class="small muted" style="margin:12px 0 0">Your recovery phrase will be encrypted to your own nostr key by your signer and stored on your relays, so reinstalling restores the wallet with nothing to write down. You can still see the twelve words and copy them somewhere if you would rather.</p>`
+        :`<p class="small muted" style="margin:12px 0 0">You are not signed in, so there is nowhere to put an encrypted backup. You will need to write the twelve words down yourself.</p>`}
       <button class="btn sm" style="background:var(--brass);color:var(--surface)" onclick="walletDoCreate()">Create a wallet</button>
       <button class="btn ghost sm" onclick="walletDoImport()">I have a recovery phrase</button>
       ${canSign?`<button class="btn ghost sm" onclick="walletDoRestore()">Restore from my relays</button>`:''}
@@ -3944,8 +3949,9 @@ function subWallet(){
   <div class="card" style="${w.backedUp?'':'border-color:var(--brass)'}">
     <h3 style="font-size:15px">Backup</h3>
     ${w.backedUp
-      ? `<p class="small muted" style="margin:6px 0 0">Encrypted to your nostr key and published to your relays${w.backedUpAt?' on '+new Date(w.backedUpAt).toLocaleDateString('en-GB',{day:'numeric',month:'long'}):''}. Reinstalling and signing in with Amber brings it back.</p>`
-      : `<p class="small" style="margin:6px 0 0">This wallet is not backed up. If this app's storage is cleared, whatever is in it is gone.</p>`}
+      ? `<p class="small muted" style="margin:6px 0 0">Encrypted to your nostr key and published to your relays${w.backedUpAt?' on '+new Date(w.backedUpAt).toLocaleDateString('en-GB',{day:'numeric',month:'long'}):''}. Reinstalling and signing back in brings it back.</p>`
+      : `<p class="small" style="margin:6px 0 0">This wallet is not backed up. If this app's storage is cleared, whatever is in it is gone.${
+          fragileStorage()?' On an iPhone that takes about a week of not opening the app — so this is a when, not an if.':''}</p>`}
     ${canSign?`<button class="btn ${w.backedUp?'ghost':'pine'} sm" onclick="walletDoBackup()">${w.backedUp?'Back up again':'Back it up now'}</button>`:''}
     <button class="btn ghost sm" onclick="walletShowWords()">Show my twelve words</button>
     <p class="tiny muted" style="margin:10px 0 0">Two ways to lose this wallet: lose your nostr key, or have every relay drop the backup. Paper survives both.</p>
@@ -5280,6 +5286,12 @@ const ZAP_MAX_FEE=10;          // sats we will spend on routing before giving up
 const ZAP_CONFIRM_OVER=5000;   // anything bigger asks twice
 
 let sparkLoad=null, sparkWallet=null, walletBusy=false;
+
+/* Safari clears a web app's storage after about seven days without opening
+   it, and there is no native iOS build to escape into — the web app is the
+   iPhone. For a streak that is annoying; for a wallet it is somebody's money,
+   so the wallet screens say so rather than leaving it to the README. */
+function fragileStorage(){ return IOS && !Native.on; }
 
 function walletInit(){
   if(!S.spark) S.spark={mnemonic:null, defaultZap:100, backedUp:false, seen:false, balance:null, balanceAt:0};
