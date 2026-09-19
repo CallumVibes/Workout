@@ -79,14 +79,72 @@ The `android/` folder is deliberately **not** committed. CI generates it on ever
 
 Edit `www/index.html` and push. Everything you'd want to adjust is near the top of the `<script>` block:
 
-- `EX` — the ten exercises, their rep ranges, cues, mistakes and difficulty ladders
-- `SESSIONS` — which exercises land in Session A and Session B
+- `EX` — the twenty-eight exercises, their rep ranges, cues, mistakes and difficulty ladders
+- `PLAN2` — the slot table: which movement pattern and muscle group each session slot is for, and which exercises may fill it
+- `TIERS`, `SHAPES`, `SET_FLOOR` — the coach's dials (see **How the workout is chosen**)
+- `SESSIONS` — the names and cooldowns for Session A and Session B
 - `MOB` — the three rest-day mobility moves
 - `LESSONS` — the daily ideas that cycle through the check-in
 - `NUDGES` — the notification wording
 - `BADGES` — the milestones
 
 The colour palette lives in the `:root` block at the top of the `<style>` section.
+
+## How the workout is chosen
+
+Everything in the `THE COACH` block of `www/index.html`. Nothing about it is a black box on the phone either — the Today screen carries a **Why this workout** note, and **You → Coaching** shows the same reasoning in full.
+
+### The spine stays the same
+
+Two full-body sessions alternate. Each has five slots, six once you have some history, and every slot names both a movement *pattern* and the *muscle group* it is there to train. Candidates are filtered to both, which is less pedantic than it sounds: chair dips are a perfectly good push, so without the muscle filter a stalled push-up rotates to dips and the chest quietly gets nothing for five months while the app reports a full house. That happened in testing. A slot is a promise about what gets trained.
+
+The first three slots are **anchors** and hold still, because progression needs the same movement week after week to mean anything. The rest rotate.
+
+### It meets you where you are
+
+Four tiers, worked out from your sessions, how far up the ladders you are, and — as a floor, so a returning lifter is not treated as a novice — what you said at setup. You can also just tell it, under **Coaching**.
+
+| | when | sets | slots | to move up a rung | formats |
+|---|---|---|---|---|---|
+| Finding your feet | first six sessions | 3 anchor, 2 accessory | 5 | one top session | straight sets only |
+| Building | 6–24 | 3 and 3 | 5 | one top session | + tempo, paired sets |
+| Steady | 25–80 | 4 and 3 | 6 | two in a row | + rounds |
+| Seasoned | 80+ | 4 and 3 | 6 | two in a row | + twelve-minute blocks |
+
+### It reads every session
+
+One number per movement per session — reps done, times the weight when there was one — compared against last time. Climbing a rung counts as progress by definition, since a harder version for fewer reps is the whole point.
+
+A movement that has not beaten itself in a while gets three escalating nudges, none of them dramatic:
+
+- **two sessions** — back to the bottom of the range with a four-second lowering and an extra set. A different kind of hard, not more of the same.
+- **four** — the slot rotates to a different movement in the same pattern.
+- **six, and going backwards** — the Today screen *offers* a rung down. It never takes one.
+
+### It prioritises what you can see
+
+Every muscle group has a floor of hard sets per week, and the last slot of each session goes to whatever is furthest below its floor. Compounds come first while you are fresh, rep ranges stay where size is built, and the check-in feeds back in: a night of bad sleep or a "properly sore" buys a set off the accessories rather than a skipped session.
+
+Six weeks on target schedules an **easy week** — a set off everything, targets mid-range, no novelty. It is the week the previous six turn into something visible, and it can be waved away.
+
+Floors bend to what your kit can reach. With nothing but a floor there is exactly one direct arm exercise in the app, which is a fact about home training rather than a fault in the programme, and the Progress screen says so rather than showing a red bar nobody can clear.
+
+### It does not let you get bored
+
+Accessory movements hold a slot for a few sessions and then hand over, staggered so the programme drifts rather than lurching. Occasionally the whole session comes in a different shape:
+
+- **Slow lowering** — same sets and reps, four seconds down on every one.
+- **Paired sets** — two movements on a screen, alternating, shorter rests.
+- **Rounds** — three times through the whole list, one set of each. The cues and figures step aside and it becomes a checklist.
+- **Twelve minutes** — four rounds against a clock. Tick what you finish.
+
+Novelty is rationed: never twice running, never on a tired day, never in an easy week, never in your first six sessions, and straight sets stay the clear majority. The two shapes that change the reps on purpose are marked as such, and a session run in one of them sits out the progress comparison entirely — a circuit day should never read as a collapse in performance.
+
+How much of this happens is a setting: **Steady**, **Balanced** or **Restless**, under **You → Coaching**.
+
+### What it will never do
+
+Move you up a rung, add weight, or drop you back down without asking. Those stay as offers on screen with two buttons. The app decides how much work you do and which movements do it; you decide how hard each one gets.
 
 ## Reminders
 
@@ -98,7 +156,7 @@ Reminders do nothing in a browser — they need the installed app. Android will 
 
 ## Equipment
 
-Setup asks what the person owns — nothing, weights, bands, a pull-up bar, or any combination — and the sessions are built from that. Each exercise declares the kit it needs, and each session slot is a *movement pattern* (squat, push, pull, hinge, core) with an ordered list of candidates. The first candidate whose kit is available wins.
+Setup asks what the person owns — nothing, weights, bands, a pull-up bar, or any combination — and the sessions are built from that. Each exercise declares the kit it needs, and each session slot is a *movement pattern* and a *muscle group* with a list of candidates. Which one wins is the coach's decision, described above.
 
 That means a bodyweight-only user still gets a pulling exercise, which matters: without one, a home programme trains the front of the body and nothing else, and round shoulders are the result. Under-table rows and doorframe rows fill that gap; pike push-ups cover overhead pressing.
 
@@ -109,6 +167,8 @@ The Learn tab and the ladder editor both filter to what the person can actually 
 ## Coming back after a break
 
 Fourteen days or more without a session and the Today screen offers to drop every exercise back a rung (two rungs after eight weeks). Nothing about your history or streaks changes. You can decline, and it will not ask again for three days.
+
+Everything the coach had learned about your rate of progress was learned before the break, so it is thrown away at the same time rather than left to call your first session back a collapse.
 
 ## Your data
 
