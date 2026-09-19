@@ -4,9 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Groundwork</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- No font request here. Loading web fonts tells Google every time the app
+     is opened, by everyone, signed in or not. The stylesheet already names
+     system fallbacks, so the app looks right without them. Opt in under
+     You -> Privacy if you want the designed typefaces. -->
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#E9EBE6" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#191B18" media="(prefers-color-scheme: dark)">
@@ -108,17 +109,24 @@ button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
 .kitopt.on .kn{color:var(--pine);font-weight:600}
 .av{width:38px;height:38px;border-radius:50%;background:var(--edge);color:var(--ink);display:grid;place-items:center;
   font-family:"Familjen Grotesk",sans-serif;font-weight:700;font-size:16px;flex:0 0 auto}
-.chip{border:1px solid var(--edge);border-radius:999px;padding:6px 11px;font-size:12.5px;color:var(--muted);background:var(--bg);flex:0 0 auto}
+.chip{border:1px solid var(--edge);border-radius:999px;padding:8px 13px;font-size:12.5px;color:var(--muted);
+  background:var(--bg);flex:0 0 auto;min-height:34px;display:inline-flex;align-items:center;justify-content:center}
 .chip:active{background:var(--edge)}
+.chip[disabled]{opacity:.45}
+.seg button[aria-selected="true"]{background:var(--pine);border-color:var(--pine);color:var(--surface);font-weight:600}
 
 .choices{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 .choice{flex:1;min-width:88px;border:1.5px solid var(--edge);border-radius:10px;padding:12px 8px;font-size:14px;background:var(--bg);text-align:center}
 .choice.on{border-color:var(--brass);background:var(--brass-soft);color:var(--brass);font-weight:600}
-.sessiontag{display:inline-block;font-size:12px;font-weight:600;color:var(--pine);background:var(--pine-soft);padding:3px 9px;border-radius:999px}
-.exlist{list-style:none;margin:14px 0 0;padding:0}
+.sessiontag{display:inline-block;font-size:12px;font-weight:600;color:var(--pine);
+  background:var(--pine-soft);padding:4px 10px;border-radius:999px;white-space:nowrap;flex:0 0 auto}
+.exhead{display:flex;justify-content:space-between;margin-top:16px;padding-bottom:6px;
+  font-size:11.5px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.exlist{list-style:none;margin:0;padding:0}
 .exlist li{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--edge);font-size:15px}
 .exlist li:first-child{border-top:none}
-.exlist .meta{color:var(--muted);font-size:13.5px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.exlist .meta{color:var(--muted);font-size:13px;white-space:nowrap;font-variant-numeric:tabular-nums;flex:0 0 auto}
+.exlist li > span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 .btn{display:block;width:100%;text-align:center;background:var(--ink);color:var(--bg);padding:15px;border-radius:11px;font-weight:600;font-size:16px;margin-top:16px}
 .btn:active{transform:translateY(1px)}
@@ -214,7 +222,9 @@ button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
 .profilecard{border-color:var(--pine)}
 .bigav{width:54px;height:54px;border-radius:50%;background:var(--pine);color:var(--surface);
   display:grid;place-items:center;font-family:"Familjen Grotesk",sans-serif;font-weight:700;
-  font-size:23px;flex:0 0 auto}
+  font-size:23px;flex:0 0 auto;position:relative;overflow:hidden}
+.av,.bigav{position:relative;overflow:hidden}
+.av img,.bigav img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .pstats{display:flex;justify-content:space-between;gap:8px;margin-top:20px;
   border-top:1px solid var(--edge);padding-top:16px;text-align:center}
 .pstats .num{font-size:20px;line-height:1.1}
@@ -252,6 +262,77 @@ button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
 .hist i{width:11px;height:11px;border-radius:2px;background:var(--edge)}
 .hist i.on{background:var(--pine)}
 
+/* --- patterns / analytics --- */
+.chart{position:relative;margin-top:14px}
+.bars{display:flex;align-items:flex-end;gap:2px;height:104px;position:relative}
+.bars.mini{height:44px;gap:2px}
+.bars button.bar{flex:1 1 0;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:0;background:none}
+.bars .bar i{display:block;width:100%;min-height:2px;border-radius:2px 2px 0 0;background:var(--edge)}
+.bars .bar.hit i{background:var(--pine)}
+.bars .bar.open i{background:repeating-linear-gradient(45deg,var(--pine-soft),var(--pine-soft) 3px,transparent 3px,transparent 6px);border:1px solid var(--pine-soft);border-bottom:0}
+.bars .bar.sel i{background:var(--brass)}
+.tline{position:absolute;left:0;right:0;border-top:1px dashed var(--muted);opacity:.45;pointer-events:none}
+.xlab{display:flex;gap:2px;margin-top:6px}
+.xlab span{flex:1 1 0;min-width:0;font-size:9.5px;color:var(--muted);text-align:center;white-space:nowrap;overflow:hidden}
+.seg{display:flex;gap:6px;margin-top:12px}
+.seg button{flex:1 1 0;padding:9px 4px;font-size:12.5px;border:1px solid var(--edge);border-radius:9px;background:var(--bg);color:var(--muted);white-space:nowrap}
+.seg button.on{background:var(--pine);border-color:var(--pine);color:var(--surface);font-weight:600}
+.cmp{margin-top:12px}
+.cmprow{display:grid;grid-template-columns:1fr 54px 54px 46px;gap:10px;align-items:baseline;
+  padding:10px 0;border-top:1px solid var(--edge);font-size:13.5px}
+.cmprow.hdr{font-size:11px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;border-top:0;padding-bottom:4px}
+.cmprow > span:not(:first-child){text-align:right}
+.delta{font-weight:600;font-size:12.5px}
+.delta.up{color:var(--pine)}
+.delta.dn{color:var(--brass)}
+.delta.flat{color:var(--muted)}
+.dow{display:flex;gap:5px;margin-top:14px}
+.dow > div{flex:1 1 0;min-width:0;text-align:center}
+.dow .dbar{height:50px;display:flex;align-items:flex-end}
+.dow .dbar i{display:block;width:100%;min-height:2px;border-radius:3px 3px 0 0;background:var(--pine-soft)}
+.dow .dbar i.top{background:var(--pine)}
+.dow .dl{font-size:11px;color:var(--muted);margin-top:6px}
+.runrow{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  padding:10px 0;border-top:1px solid var(--edge);font-size:13.5px}
+.runrow .rn{color:var(--muted);font-size:12.5px}
+.runrow.live .rv{color:var(--pine);font-weight:600}
+.selnote{margin-top:10px;padding:10px 12px;background:var(--bg);border:1px solid var(--edge);
+  border-radius:9px;font-size:13px;display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+
+/* --- social --- */
+.feedrow{display:flex;gap:11px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--edge)}
+.feedrow:first-child{border-top:0}
+.feedrow .ft{flex:1;min-width:0;font-size:14px;line-height:1.45}
+.feedrow .fw{font-weight:600}
+.feedrow .fm{font-size:12px;color:var(--muted);margin-top:2px}
+.feedrow .fa{flex:0 0 auto}
+.feedday{font-size:11.5px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;
+  margin:20px 0 2px}
+.feedday:first-child{margin-top:4px}
+.partner{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface);
+  border:1px solid var(--pine);border-radius:14px;margin-top:14px}
+.partner .pt{flex:1;min-width:0}
+.partner .pn{font-size:14.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.partner .ps{font-size:12.5px;color:var(--muted);margin-top:1px}
+.quiet{display:flex;align-items:center;gap:11px;padding:11px 0;border-top:1px solid var(--edge)}
+.quiet .qn{flex:1;min-width:0;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pledge{border-color:var(--brass)}
+.pledgebar{display:flex;gap:4px;margin-top:12px}
+.pledgebar i{flex:1 1 0;height:8px;border-radius:2px;background:var(--edge)}
+.pledgebar i.on{background:var(--brass)}
+.pledgebar i.miss{background:var(--edge);border:1px solid var(--brass);opacity:.5}
+.pledgebar i.now{background:var(--brass-soft)}
+
+/* --- setup wizard --- */
+.sudots{display:flex;gap:6px;margin-top:22px}
+.sudots i{flex:1 1 0;height:4px;border-radius:2px;background:var(--edge)}
+.sudots i.on{background:var(--pine)}
+.sudots i.done{background:var(--pine);opacity:.45}
+.suopts{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.suopt{border:1px solid var(--edge);background:var(--bg);color:var(--muted);
+  border-radius:999px;padding:9px 14px;font-size:13px;line-height:1.2;min-height:38px}
+.suopt.on{border-color:var(--pine);background:var(--pine-soft);color:var(--pine);font-weight:600}
+
 label.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 0;border-top:1px solid var(--edge);font-size:15px}
 label.row > span:first-child{flex:1 1 auto;min-width:0}
 .rowctl{display:flex;gap:8px;align-items:center;flex:0 1 auto;min-width:0}
@@ -264,6 +345,15 @@ label.stack{display:block;padding:13px 0;border-top:1px solid var(--edge);font-s
 label.stack > span{display:block;margin-bottom:8px}
 label.stack select{width:100%;text-align:left}
 
+#modal{position:fixed;inset:0;z-index:90;display:none}
+#modal.on{display:block}
+.modalback{position:absolute;inset:0;background:rgba(0,0,0,.5)}
+.modalcard{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(420px,calc(100vw - 40px));background:var(--surface);border:1px solid var(--edge);
+  border-radius:16px;padding:20px;box-shadow:0 18px 50px rgba(0,0,0,.35);max-height:80vh;overflow-y:auto}
+.modalinput{width:100%;font:inherit;background:var(--bg);color:var(--ink);
+  border:1px solid var(--edge);border-radius:10px;padding:11px 12px;-webkit-appearance:none}
+textarea.modalinput{resize:vertical;line-height:1.5}
 .toast{position:fixed;left:50%;transform:translateX(-50%) translateY(16px);bottom:92px;background:var(--ink);color:var(--bg);padding:11px 17px;border-radius:999px;font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:all .3s ease;z-index:70;max-width:90vw;text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .hidden{display:none !important}
@@ -288,7 +378,8 @@ label.stack select{width:100%;text-align:left}
 </div>
 
 <nav class="tabs" id="tabs"></nav>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div id="modal"></div>
 
 <script>
 /* ============================== DATA ============================== */
@@ -480,9 +571,13 @@ EX.push({
   }
 });
 const byId = id => EX.find(e=>e.id===id);
+/* Both sessions are full body — the letters only say which one is next, so
+   the names lead with what they train rather than with a filing label. */
 const SESSIONS = {
-  A:{name:'Session A', ex:['squat','pushup','row','bridge','plank'], cool:['quad','chest','child']},
-  B:{name:'Session B', ex:['split','press','rdl','ohp','curl'], cool:['hipflex','ham','tri']}
+  A:{name:'Full body', letter:'A', sub:'Squat, push, pull, hips, core',
+     ex:['squat','pushup','row','bridge','plank'], cool:['quad','chest','child']},
+  B:{name:'Full body', letter:'B', sub:'Lunge, press, hinge, shoulders, arms',
+     ex:['split','press','rdl','ohp','curl'], cool:['hipflex','ham','tri']}
 };
 
 /* Five exercises that fill the gaps for people without a pair of weights.
@@ -589,13 +684,14 @@ function sessionFor(key){
           || cands.find(id=>{ const e=byId(id); return e&&hasKit(e.kit||'db'); });
     if(pick){ picked.push(pick); used.add(pick); }
   });
-  return {name:base.name, cool:base.cool, ex:picked.length?picked:base.ex};
+  return {name:base.name, letter:base.letter, sub:base.sub, cool:base.cool,
+          ex:picked.length?picked:base.ex};
 }
 /* Adjustable or multiple pairs means adding weight is the better lever */
 function canAddWeight(){ return hasKit('db') && S.dbAdjustable; }
 
 const GUIDES = [
-  {t:'Why the Friends screen hides weights',b:`It only ever shows how <b>often</b> people train, never what they lifted.<br><br>If it showed the numbers, anyone starting out would come off worst against people who have been at it for years — and beginners are exactly the people who most need to keep going. Comparison is the fastest way to talk yourself out of something you have only just started.<br><br>Turning up three times a week looks identical whoever you are, and turning up is the thing worth copying.`},
+  {t:'Why the Social screen hides weights',b:`The Social screen only ever shows how <b>often</b> people train, never what they lifted.<br><br>If it showed the numbers, anyone starting out would come off worst against people who have been at it for years — and beginners are exactly the people who most need to keep going. Comparison is the fastest way to talk yourself out of something you have only just started.<br><br>Turning up three times a week looks identical whoever you are, and turning up is the thing worth copying.`},
   {t:'When to stretch, and when not to',b:`Two different things get called stretching, and mixing them up is why stretching has a mixed reputation.<br><br><b>Before training: moving stretches.</b> Arm circles, bodyweight squats, hip hinges. These warm the joint and rehearse the movement. Good.<br><br><b>Before training: long static holds.</b> Sitting in a hamstring stretch for a minute measurably weakens the muscle for the next twenty minutes or so. Skip it.<br><br><b>After training: long static holds.</b> Now they are useful. The muscle is warm, you are done lifting, and you are giving back the range the session just took.<br><br>That is exactly how the app is built: dynamic moves on the rest-day check-in, static holds at the end of a session. Stretch to mild tension and no further. If it is sharp, or you cannot breathe normally, back off.`},
   {t:'What actually makes a muscle grow', b:`Three things, in order of how much they matter.<br><br><b>1. Hard sets.</b> A set only counts if the last two or three reps are genuinely difficult. Stopping when it starts to burn is the single commonest reason people train for months and look the same.<br><br><b>2. Doing a bit more over time.</b> One more rep, a slower lowering, a harder version of the movement. That is progressive overload, and it is the whole game.<br><br><b>3. Food and sleep.</b> Muscle is built out of protein while you sleep. Aim for a decent protein source at every meal and seven-plus hours in bed. You cannot out-train four hours of sleep.<br><br>Notice that "which exercise" is not on the list. The exercises here are fine. What you do with them is what matters.`},
   {t:'How hard is hard enough?', b:`Use this scale on the last set of each exercise:<br><br><b>Too easy</b> — you finish and could have done six more. The set did almost nothing.<br><b>About right</b> — you finish with one or two reps left in you. Reps are slowing down, form still good.<br><b>Too far</b> — form falls apart, you are jerking the weight. Not more effective, just riskier.<br><br>Aim for "about right" on every set. It should feel uncomfortable and completely achievable at the same time. That feeling is the target, and you will get better at finding it after about three weeks.`},
@@ -614,7 +710,7 @@ const ESSENTIALS=[
   'How often, and why rest days matter',
   'What to expect, and when'
 ];
-const APP_NOTES=['Why the Friends screen hides weights'];
+const APP_NOTES=['Why the Social screen hides weights'];
 function guideTier(t){
   if(ESSENTIALS.indexOf(t)>=0) return 'essential';
   if(APP_NOTES.indexOf(t)>=0) return 'app';
@@ -784,11 +880,22 @@ const BAND_OF={
 };
 
 /* band 0-3 plus activity, mapped onto each ladder's length */
+/* The highest rung you could actually do with what you own. Several ladders
+   climb into weighted versions; without a weight, the assessment must stop
+   below those rather than prescribe an exercise you cannot perform. */
+function topRungFor(ex){
+  const top=ex.ladder.length-1;
+  if(!ex.load || hasKit('db')) return top;
+  let last=0;
+  for(let i=0;i<=top;i++) if(ex.ladder[i].nw) last=i;
+  return last;
+}
 function rungFor(ex, bands, activityBand){
   const b=bands[BAND_OF[ex.id]||'legs'];
   const mix=(b*3 + activityBand)/4;           // the answer matters more than the job
   const top=ex.ladder.length-1;
-  return Math.max(0, Math.min(top, Math.round(mix/3 * top * 0.75)));
+  const want=Math.max(0, Math.min(top, Math.round(mix/3 * top * 0.75)));
+  return Math.min(want, topRungFor(ex));
 }
 function applyAssessment(bands, activityBand){
   let n=0;
@@ -974,7 +1081,7 @@ const STR=[
 const byStr = id => STR.find(s=>s.id===id) || MOB.find(m=>m.id===id);
 
 /* ============================== STATE ============================== */
-const BUILD='2026-09-18 11:55';
+const BUILD='2026-09-19 16:45';
 const KEY='groundwork.v1';
 let S = {
   setup:false,
@@ -1239,7 +1346,7 @@ const TABS=[
   {id:'today',n:'Today',ic:'<path d="M4 7h16M4 12h16M4 17h10"/>'},
   {id:'progress',n:'Progress',ic:'<path d="M4 19V9M10 19V5M16 19v-7M4 19h17"/>'},
   {id:'learn',n:'Learn',ic:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 5.5v15"/>'},
-  {id:'crew',n:'Friends',ic:'<circle cx="9" cy="8" r="3"/><path d="M3 19a6 6 0 0 1 12 0"/><path d="M16 5.5a3 3 0 0 1 0 5.4M17.5 19a6 6 0 0 0-2-4.4"/>'},
+  {id:'social',n:'Social',ic:'<circle cx="9" cy="8" r="3"/><path d="M3 19a6 6 0 0 1 12 0"/><path d="M16 5.5a3 3 0 0 1 0 5.4M17.5 19a6 6 0 0 0-2-4.4"/>'},
   {id:'you',n:'You',ic:'<circle cx="12" cy="8" r="3.4"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/>'}
 ];
 function renderTabs(){
@@ -1248,42 +1355,34 @@ function renderTabs(){
 }
 function go(t){ stopAll(); sub=null; asq=null; tab=t; renderTabs(); render(); window.scrollTo(0,0); }
 
+/* Logging a set or cheering someone re-renders the whole view. Without this
+   the page jumps to the top every time, which is maddening mid-session. */
+let lastViewKey='';
 function render(){
   if(!S.setup){ return viewSetup(); }
-  ({today:viewToday, learn:viewLearn, progress:viewProgress, crew:viewCrew, you:viewYou})[tab]();
+  const key=tab+'|'+(sub||'')+'|'+(tab==='social'?socTab:'');
+  const y = key===lastViewKey ? (window.scrollY||0) : 0;
+  ({today:viewToday, learn:viewLearn, progress:viewProgress, social:viewSocial, you:viewYou})[tab]();
+  lastViewKey=key;
+  if(y) window.scrollTo(0,y);
 }
 const $v=document.getElementById('view');
 
-function viewSetup(){
-  document.getElementById('tabs').classList.add('hidden');
-  document.body.style.paddingBottom='24px';
-  $v.innerHTML=`
-  <div style="padding-top:28px">
-    <h1 style="font-size:32px;line-height:1.12">Three sessions a week,<br>at home, from zero.</h1>
-    <p class="muted" style="margin-top:14px;max-width:44ch">Full-body strength training built around a pair of weights and whatever furniture you already own. Every movement has a guide. The app decides when you're ready for a harder version.</p>
-    <div class="card" style="margin-top:24px">
-      <h2 style="font-size:16px">Set up</h2>
-      <div style="padding:4px 0 2px"><span style="font-size:15px">What have you got?</span>
-        <p class="tiny muted" style="margin:4px 0 10px">Pick everything that applies.</p>
-        <div id="kitpick">${KIT.map(k=>`<button type="button" class="kitopt${k.id==='none'?' on':''}" data-kit="${k.id}" onclick="toggleKit(this)">
-          <span class="kn">${k.n}</span><span class="kd">${k.d}</span></button>`).join('')}</div></div>
-      <div id="dbrow" class="hidden">
-        <label class="row"><span>Each weight is</span>
-          <span class="rowctl">
-            <input type="number" class="qty" id="s_db" value="10" min="0.5" step="0.5">
-            <select class="unit" id="s_unit"><option value="kg">kg</option><option value="lb">lb</option></select>
-          </span></label>
-        <label class="row"><span>Can you change the weight?<br><span class="tiny muted">Adjustable, or several pairs</span></span>
-          <input type="checkbox" id="s_adj" style="width:20px;height:20px;flex:0 0 auto;accent-color:var(--pine)"></label>
-      </div>
-      <label class="row"><span>Sessions per week</span>
-        <select id="s_tgt"><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option></select></label>
-      <p class="tiny muted" style="margin:14px 0 0">Guess if you are not sure. You can change it later.</p>
-      <button class="btn" onclick="finishSetup()">Start</button>
-    </div>
-    <p class="tiny muted" style="margin-top:18px">Stored on this device only. If you have a heart or joint condition, have a word with your GP first.</p>
-  </div>`;
+/* ============================== SETUP ==============================
+   Four short steps rather than one long form. The answers do real work:
+   equipment decides which movements exist, the three ability questions and
+   the activity level decide which rung of each ladder you start on, and the
+   last step shows the workout that falls out of all of it. Nothing is
+   written to storage until Start, so backing out leaves no trace. */
+
+let su=null;
+const SU_STEPS=['Equipment','About you','What you can do','Your first workout'];
+function suInit(){
+  if(su) return;
+  su={step:0, name:'', activity:null, bands:{}, height:null, hUnit:'cm', weight:null};
 }
+
+/* Shared with the Equipment settings screen. */
 function toggleKit(btn){
   const id=btn.dataset.kit, on=btn.classList.toggle('on');
   if(id!=='none'&&on) document.querySelector('.kitopt[data-kit=none]')?.classList.remove('on');
@@ -1296,17 +1395,218 @@ function readKit(){
   const on=[...document.querySelectorAll('.kitopt.on')].map(b=>b.dataset.kit).filter(k=>k!=='none');
   return on.length?on:['none'];
 }
-function finishSetup(){
+
+/* The kit picker writes straight through to S (unsaved) so that sessionFor
+   and the rung maths below can be the real ones rather than a copy. */
+function suReadKit(){
+  const el=id=>document.getElementById(id);
+  if(!document.querySelector('.kitopt')) return;
   S.kit=readKit();
-  S.dbAdjustable=!!document.getElementById('s_adj')?.checked;
-  S.db=parseFloat(document.getElementById('s_db')?.value)||10;
-  S.unit=document.getElementById('s_unit').value;
-  S.target=parseInt(document.getElementById('s_tgt').value);
+  if(el('s_db'))   S.db=parseFloat(el('s_db').value)||S.db;
+  if(el('s_unit')) S.unit=el('s_unit').value;
+  if(el('s_adj'))  S.dbAdjustable=!!el('s_adj').checked;
+}
+function suReadAbout(){
+  const el=id=>document.getElementById(id);
+  if(el('su_name'))   su.name=el('su_name').value.trim().slice(0,30);
+  if(el('su_height')) su.height=parseFloat(el('su_height').value)||null;
+  if(el('su_hunit'))  su.hUnit=el('su_hunit').value;
+  if(el('su_weight')) su.weight=parseFloat(el('su_weight').value)||null;
+}
+function suRead(){
+  if(su.step===0) suReadKit();
+  if(su.step===1) suReadAbout();
+}
+/* Apply the answers to S in memory. Called before the preview and again on
+   finish, so what you are shown is exactly what you get. */
+function suApply(){
+  const band=(ACTIVITY.find(a=>a.k===su.activity)||{band:1}).band;
+  const bands={}; ASSESS.forEach(q=>bands[q.k]=su.bands[q.k]??0);
+  EX.forEach(e=>{ S.levels[e.id]=rungFor(e,bands,band); });
+}
+function suGo(d){
+  suRead();
+  const next=su.step+d;
+  if(next<0) return;
+  if(next>SU_STEPS.length-1) return;
+  su.step=next; render(); window.scrollTo(0,0);
+}
+function suSet(k,v){ suRead(); su[k]=v; render(); }
+function suBand(k,v){ su.bands[k]=v; render(); }
+
+function viewSetup(){
+  suInit();
+  document.getElementById('tabs').classList.add('hidden');
+  document.body.style.paddingBottom='24px';
+  const body=[suKit, suAbout, suAble, suPlan][su.step]();
+  const last=su.step===SU_STEPS.length-1;
+
+  $v.innerHTML=`
+  <div style="padding-top:${su.step===0?28:22}px">
+    ${su.step===0?`
+    <h1 style="font-size:32px;line-height:1.12">Three sessions a week,<br>at home, from zero.</h1>
+    <p class="muted" style="margin-top:14px;max-width:44ch">Full-body strength training built around a pair of weights and whatever furniture you already own. Every movement has a guide. The app decides when you're ready for a harder version.</p>`:''}
+
+    <div class="sudots" role="progressbar" aria-valuemin="1" aria-valuemax="${SU_STEPS.length}" aria-valuenow="${su.step+1}">
+      ${SU_STEPS.map((n,i)=>`<i class="${i<su.step?'done':i===su.step?'on':''}"></i>`).join('')}
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="tiny muted">Step ${su.step+1} of ${SU_STEPS.length}</div>
+      <h2 style="font-size:18px;margin-top:3px">${SU_STEPS[su.step]}</h2>
+      ${body}
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:16px">
+      ${su.step>0?`<button class="btn ghost" style="margin:0;flex:0 0 34%" onclick="suGo(-1)">Back</button>`:''}
+      ${last
+        ? `<button class="btn" style="margin:0;flex:1" onclick="finishSetup()">Start</button>`
+        : `<button class="btn pine" style="margin:0;flex:1" onclick="suGo(1)">${su.step===0?'Next':'Continue'}</button>`}
+    </div>
+
+    <p class="tiny muted" style="margin-top:18px">Stored on this device only. If you have a heart or joint condition, have a word with your GP first.</p>
+  </div>`;
+}
+
+/* --- step 1: equipment --- */
+function suKit(){
+  return `
+  <p class="tiny muted" style="margin:8px 0 10px">Pick everything that applies. Sessions are built from whatever is here.</p>
+  <div id="kitpick">${KIT.map(k=>{
+    const on = k.id==='none' ? kitList()[0]==='none' : kitList().indexOf(k.id)>=0;
+    return `<button type="button" class="kitopt${on?' on':''}" data-kit="${k.id}" onclick="toggleKit(this)">
+      <span class="kn">${k.n}</span><span class="kd">${k.d}</span></button>`}).join('')}</div>
+  <div id="dbrow" class="${hasKit('db')?'':'hidden'}">
+    <label class="row"><span>Each weight is</span>
+      <span class="rowctl">
+        <input type="number" class="qty" id="s_db" value="${S.db}" min="0.5" step="0.5">
+        <select class="unit" id="s_unit">
+          <option value="kg" ${S.unit==='kg'?'selected':''}>kg</option>
+          <option value="lb" ${S.unit==='lb'?'selected':''}>lb</option></select>
+      </span></label>
+    <label class="row"><span>Can you change the weight?<br><span class="tiny muted">Adjustable, or several pairs</span></span>
+      <input type="checkbox" id="s_adj" ${S.dbAdjustable?'checked':''} style="width:20px;height:20px;flex:0 0 auto;accent-color:var(--pine)"></label>
+  </div>`;
+}
+
+/* --- step 2: about you --- */
+function suAbout(){
+  return `
+  <p class="tiny muted" style="margin:8px 0 12px">How active you already are shifts your starting point. The rest is optional and only here so you can watch it change.</p>
+
+  <label class="row" style="border-top:none"><span>What should the app call you?</span></label>
+  <input type="text" id="su_name" class="modalinput" value="${esc(su.name)}" placeholder="Optional"
+    autocapitalize="words" enterkeyhint="next" style="margin-bottom:4px">
+
+  <div style="margin-top:18px"><span style="font-size:15px">How active are you normally?</span>
+    <p class="tiny muted" style="margin:4px 0 4px">Outside of training.</p>
+    ${ACTIVITY.map(a=>`<button class="pickrow${su.activity===a.k?' on':''}" style="border-top:1px solid var(--edge)"
+      onclick="suSet('activity','${a.k}')">
+      <span><span style="display:block">${a.n}</span><span class="tiny muted">${a.d}</span></span>
+      ${su.activity===a.k?'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>':''}
+    </button>`).join('')}
+  </div>
+
+  <label class="row"><span>Height</span><span class="rowctl">
+    <input type="number" class="qty" id="su_height" value="${su.height||''}" min="80" max="260" placeholder="—">
+    <select class="unit" id="su_hunit">
+      <option value="cm" ${su.hUnit!=='in'?'selected':''}>cm</option>
+      <option value="in" ${su.hUnit==='in'?'selected':''}>in</option></select></span></label>
+  <label class="row"><span>Bodyweight</span><span class="rowctl">
+    <input type="number" class="qty" id="su_weight" step="0.1" value="${su.weight||''}" placeholder="—">
+    <span class="tiny muted">${S.unit}</span></span></label>
+  <p class="tiny muted" style="margin:12px 0 0">Neither is required, and neither changes your programme.</p>`;
+}
+
+/* --- step 3: the three ability questions --- */
+function suAble(){
+  const done=ASSESS.filter(q=>su.bands[q.k]!=null).length;
+  return `
+  <p class="tiny muted" style="margin:8px 0 6px">Answer for how you are today, not how you were. This sets where you start on every ladder, which beats starting everyone at the bottom.</p>
+  ${ASSESS.map(q=>`<div style="margin-top:18px">
+    <span style="font-size:15px">${q.q}</span>
+    <div class="suopts">${q.o.map(o=>`<button class="suopt${su.bands[q.k]===o.b?' on':''}"
+      onclick="suBand('${q.k}',${o.b})">${o.n}</button>`).join('')}</div>
+  </div>`).join('')}
+  <p class="tiny muted" style="margin:16px 0 0">${done===ASSESS.length
+    ? 'All three answered. Anything left blank would be treated as the easiest option.'
+    : `${ASSESS.length-done} left. Skipping one starts you at the bottom of that ladder, which you can change later.`}</p>`;
+}
+
+/* --- step 4: the workout those answers produce --- */
+function suPlan(){
+  suApply();
+  const sess=sessionFor('A'), next=sessionFor('B');
+  const band=(ACTIVITY.find(a=>a.k===su.activity)||{band:1});
+  const capped=sess.ex.map(byId).filter(e=>e && e.load && !hasKit('db')
+    && topRungFor(e) < e.ladder.length-1 && (S.levels[e.id]||0)===topRungFor(e))
+    .map(e=>e.name.toLowerCase());
+  return `
+  <p class="tiny muted" style="margin:8px 0 12px">Built from your answers. Nothing here is fixed — every movement can be changed once you are in.</p>
+
+  <label class="row"><span>Sessions per week</span>
+    <select id="s_tgt" onchange="S.target=parseInt(this.value);render()">${[2,3,4].map(n=>
+      `<option value="${n}" ${S.target===n?'selected':''}>${n}</option>`).join('')}</select></label>
+
+  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:18px">
+    <div style="min-width:0">
+      <h3 style="font-size:16px">${sess.name} ${sess.letter}</h3>
+      <div class="tiny muted" style="margin-top:2px">${sess.sub} · about 25 minutes</div>
+    </div>
+    <span class="sessiontag">First up</span>
+  </div>
+  <div class="exhead"><span>Exercise</span><span>Target</span></div>
+  <ul class="exlist">
+    ${sess.ex.map(id=>{const e=byId(id), lv=e.ladder[S.levels[id]||0];
+      return `<li><span>${lv.n}</span><span class="meta">${e.sets} sets of ${e.reps[0]}–${e.reps[1]}${e.hold?' sec':''}</span></li>`}).join('')}
+    <li style="color:var(--muted)"><span>Cooldown stretches</span><span class="meta">3 holds of 30 sec</span></li>
+  </ul>
+
+  <p class="tiny muted" style="margin:14px 0 0">Session B alternates with it: ${next.sub.toLowerCase()}.</p>
+
+  <div class="flag" style="margin-top:14px"><b>Why these versions.</b> ${
+    su.activity ? `You said ${band.n.toLowerCase()}` : 'No activity level given'
+  }${ASSESS.filter(q=>su.bands[q.k]!=null).length
+    ? `, and your answers put you partway up each ladder.`
+    : `, and you skipped the ability questions, so everything starts at the bottom rung.`} Hit the top of the rep range on every set and the app offers the next version up.</div>
+  ${capped.length?`<p class="tiny muted" style="margin:10px 0 0">${capped.join(' and ')} ${capped.length===1?'stops':'stop'} where ${capped.length===1?'it does':'they do'} because the harder versions need a weight. Add one under Equipment and the rest of the ladder opens up.</p>`:''}`;
+}
+
+function finishSetup(){
+  suRead(); suApply();
+  S.kit=S.kit&&S.kit.length?S.kit:['none'];
   EX.forEach(e=>{ if(S.weights[e.id]===undefined) S.weights[e.id]=S.db; });
+  S.profile=Object.assign({}, S.profile, {
+    name: su.name||null,
+    activity: su.activity||null,
+    height: su.height||null,
+    hUnit: su.hUnit||'cm',
+    assessedAt: Object.keys(su.bands).length?Date.now():null
+  });
+  if(su.weight) logWeight(su.weight);
   S.setup=true; save();
+  su=null;
   document.getElementById('tabs').classList.remove('hidden');
   document.body.style.paddingBottom='';
   go('today');
+}
+
+/* One line on Today: the person who would notice if you skipped. */
+function todayPartner(){
+  if(!S.nostr) return '';
+  const P=partnerLine(); if(!P) return '';
+  const hit=P.st.thisWeek>=S.target;
+  return `<div class="partner">
+    ${avatarHtml(P.pk,'av')}
+    <div class="pt">
+      <div class="pn">${nameOf(P.pk)}</div>
+      <div class="ps">${P.st.thisWeek} this week \u00b7 ${agoText(P.st.last)}</div>
+    </div>
+    <div style="text-align:right;flex:0 0 auto">
+      <div class="num" style="font-size:20px;color:${hit?'var(--pine)':'var(--muted)'}">${P.st.thisWeek}</div>
+      <div class="tiny muted">of ${S.target}</div>
+    </div>
+  </div>`;
 }
 
 function viewToday(){
@@ -1334,6 +1634,8 @@ function viewToday(){
       <div class="tiny muted" style="margin-top:7px">${ci||trainedToday?'Checked in today':'Not yet today'}</div>
     </div>
   </div>
+
+  ${todayPartner()}
 
   ${ci||trainedToday ? '' : `<div class="card checkin" style="margin-top:14px">
     <h2 style="font-size:17px">${rest?'Rest day check-in':'Check in'}</h2>
@@ -1367,21 +1669,26 @@ function viewToday(){
     <div class="flag" style="border-color:var(--brass)"><b>Today's idea.</b> ${lb} <span class="muted">— ${lt.toLowerCase()}</span></div>
     ${trainedToday
       ? `<button class="btn ghost sm" onclick="showExtra()">Add an extra session</button>`
-      : `<button class="btn ghost sm" onclick="showSession('${key}')">Look at ${sess.name.toLowerCase()} anyway</button>`}
+      : `<button class="btn ghost sm" onclick="showSession('${key}')">See today's workout anyway</button>`}
     <div id="peek"></div>
   </div>`
   : `<div class="card" style="margin-top:14px">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <h2 style="font-size:18px">${sess.name}</h2>
-      <span class="sessiontag">${sess.ex.length} moves · ~25 min</span>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
+      <div style="min-width:0">
+        <h2 style="font-size:19px">Today's workout</h2>
+        <div class="tiny muted" style="margin-top:2px">${sess.sub} · about 25 minutes</div>
+      </div>
+      <span class="sessiontag">Workout ${sess.letter}</span>
     </div>
     ${readyList.length?`<div class="flag" style="margin-top:12px"><b>Step up today.</b> You hit the top of the range last time on ${readyList.map(id=>byId(id).name.toLowerCase()).join(', ')}. The app will offer a harder version when you get there.</div>`:''}
+    <div class="exhead"><span>Exercise</span><span>Target</span></div>
     <ul class="exlist">
       ${sess.ex.map(id=>{const e=byId(id),lv=e.ladder[S.levels[id]];
-        return `<li><span>${lv.n}</span><span class="meta">${e.sets} × ${e.reps[0]}–${e.reps[1]}${e.unit==='sec'?'s':''}</span></li>`}).join('')}
-      <li style="color:var(--muted)"><span>Cooldown — ${sess.cool.map(id=>byStr(id).target.toLowerCase()).join(', ')}</span><span class="meta">3 stretches</span></li>
+        return `<li><span>${lv.n}</span><span class="meta">${e.sets} sets of ${e.reps[0]}–${e.reps[1]}${e.hold?' sec':''}</span></li>`}).join('')}
+      <li style="color:var(--muted)"><span>Cooldown stretches</span><span class="meta">3 holds of 30 sec</span></li>
     </ul>
-    <button class="btn pine" onclick="startSession('${key}')">Start ${sess.name.toLowerCase()}</button>
+    <p class="tiny muted" style="margin:12px 0 0">A range, not a number. Start near the lower end and add reps each week — reach the top on every set and the app moves you to a harder version.</p>
+    <button class="btn pine" onclick="startSession('${key}')">Start the workout</button>
   </div>`}
 
   <div class="card" style="margin-top:14px">
@@ -1416,7 +1723,7 @@ function last7(){
 function showExtra(){
   const key=extraKey(), sess=sessionFor(key);
   document.getElementById('peek').innerHTML=`
-    <p class="small muted" style="margin:14px 0 0">Today's session is logged and cannot be repeated. If you want more, this is ${sess.name.toLowerCase()} — different movements, so nothing you trained today gets worked twice.</p>
+    <p class="small muted" style="margin:14px 0 0">Today's workout is logged and cannot be repeated. An extra uses the other set of movements — ${sess.sub.toLowerCase()} — so nothing you trained today gets worked twice.</p>
     <ul class="exlist" style="margin-top:12px">
       ${sess.ex.map(id=>{const e=byId(id),lv=e.ladder[S.levels[id]||0];
         return `<li><span>${lv.n}</span><span class="meta">${e.sets} × ${e.reps[0]}–${e.reps[1]}${e.unit==='sec'?'s':''}</span></li>`}).join('')}</ul>
@@ -1436,7 +1743,8 @@ function lastSummary(){
   const days=Math.floor((Date.now()-dt.getTime())/864e5);
   const reps=l.entries.reduce((a,e)=>a+e.sets.reduce((b,s)=>b+(s.hold?0:s.reps),0),0);
   const when = days===0?'Today':days===1?'Yesterday':`${days} days ago`;
-  return `${when} — ${SESSIONS[l.session].name}, ${l.entries.length} exercises, ${reps} reps. ${days>=4?'Worth getting the next one in.':'Rest day is doing its job.'}`;
+  const nm=SESSIONS[l.session]?SESSIONS[l.session].name+' '+SESSIONS[l.session].letter:l.session;
+  return `${when} — ${nm}, ${l.entries.length} exercises, ${reps} reps. ${days>=4?'Worth getting the next one in.':'Rest day is doing its job.'}`;
 }
 
 function learnRow(title, sub, onclick, searchText, tickId, num){
@@ -1480,7 +1788,7 @@ function viewLearn(){
 
   <div id="lnext" class="card" style="margin-bottom:22px">
     <h3 style="font-size:15px">For your next session</h3>
-    <p class="tiny muted" style="margin:5px 0 0">${sess.name} — tap any of these to read it through first.</p>
+    <p class="tiny muted" style="margin:5px 0 0">${sess.sub} — tap any of these to read it through first.</p>
     <div class="nextwrap">${sess.ex.map(id=>{const e=byId(id);
       return `<button class="chip" onclick="learnJump('${id}')">${e.ladder[S.levels[id]||0].n}</button>`}).join('')}</div>
   </div>
@@ -1715,7 +2023,7 @@ function viewProgress(){
       return `<div class="accordion">
         <button class="achead" onclick="acc(this,null,null,${idx})" style="padding:13px 2px">
           <span><span style="font-size:14.5px">${dt.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</span>
-          <span class="tiny muted"> \u00b7 ${SESSIONS[l.session]?SESSIONS[l.session].name:l.session}${l.extra?' (extra)':''} \u00b7 ${reps} reps</span></span>
+          <span class="tiny muted"> \u00b7 ${SESSIONS[l.session]?SESSIONS[l.session].name+' '+SESSIONS[l.session].letter:l.session}${l.extra?' (extra)':''} \u00b7 ${reps} reps</span></span>
           <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>
         <div class="acbody"></div></div>`}).join('')}</div>
       ${S.logs.length>40?`<p class="tiny muted" style="margin:12px 0 0">Showing the last 40 of ${S.logs.length}.</p>`:''}`
@@ -1749,18 +2057,174 @@ function last21(){
     o+=`<i class="${trainedOn(k)?'trained':S.checkins[k]?'checked':''}" style="width:12px;height:12px"></i>`; }
   return o;
 }
-function deleteLog(i){
-  const l=S.logs[i]; if(!l) return;
-  if(!confirm('Delete the session from '+new Date(l.date).toLocaleDateString('en-GB',{day:'numeric',month:'long'})+'? Streaks will be recalculated.')) return;
-  S.logs.splice(i,1); save(); render(); toast('Session deleted');
+/* ============================== PATTERNS ==============================
+   Everything here reads S.logs and S.checkins. Nothing is stored — the
+   numbers are derived on render so deleting a session corrects them all. */
+
+let anaRange = 12;      // weeks in view on the detail screen
+let anaGrain = 'week';  // 'week' | 'month'
+let anaSel   = null;    // index of the tapped bar
+
+function firstLogAt(){
+  if(!S.logs.length) return null;
+  return S.logs.reduce((a,l)=>{ const t=new Date(l.date).getTime(); return t<a?t:a; }, Infinity);
+}
+function weeksTracked(){
+  const f=firstLogAt(); if(f==null) return 0;
+  return Math.round((mondayOf(new Date())-mondayOf(new Date(f)))/(7*864e5))+1;
+}
+/* n weeks ending `back` weeks ago. back=0 ends on the current, unfinished week. */
+function weekSlice(n, back){
+  back=back||0;
+  const m=weekCounts(), now=mondayOf(new Date()), out=[];
+  for(let i=n-1;i>=0;i--){
+    const off=i+back, d=new Date(now.getTime()-off*7*864e5), k=weekKey(d);
+    out.push({k, d, c:m[k]||0, hit:(m[k]||0)>=S.target, open:off===0});
+  }
+  return out;
+}
+function monthSlice(n, back){
+  back=back||0;
+  const m={};
+  S.logs.forEach(l=>{ const d=new Date(l.date);
+    const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    m[k]=(m[k]||0)+1; });
+  const now=new Date(), out=[];
+  for(let i=n-1;i>=0;i--){
+    const off=i+back, d=new Date(now.getFullYear(), now.getMonth()-off, 1);
+    const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    out.push({k, d, c:m[k]||0, open:off===0});
+  }
+  return out;
+}
+function sliceStats(rows){
+  const closed=rows.filter(r=>!r.open);
+  const sessions=rows.reduce((a,r)=>a+r.c,0);
+  const hit=closed.filter(r=>r.hit).length;
+  return {
+    sessions, span:rows.length, closed:closed.length, hit,
+    rate: closed.length ? Math.round(hit/closed.length*100) : 0,
+    avg:  rows.length   ? sessions/rows.length : 0
+  };
+}
+function delta(now, was, dp){
+  dp = dp==null?0:dp;
+  const d = now-was;
+  const cls = Math.abs(d) < (dp?0.05:0.5) ? 'flat' : (d>0?'up':'dn');
+  const txt = cls==='flat' ? '–' : (d>0?'+':'−')+Math.abs(d).toFixed(dp);
+  return `<span class="delta ${cls}">${txt}</span>`;
 }
 
-function viewCrew(){
+/* Runs of weeks that hit target. Mirrors streak(): one short week holds a run
+   open without extending it, two in a row break it. */
+function streakRuns(){
+  const f=firstLogAt(); if(f==null) return [];
+  const m=weekCounts(), now=mondayOf(new Date()), thisK=weekKey(now);
+  const runs=[]; let run=null;
+  for(let w=mondayOf(new Date(f)); w<=now; w=new Date(w.getTime()+7*864e5)){
+    const k=weekKey(w), c=m[k]||0;
+    if(k===thisK && c<S.target) break;           // week still in progress
+    if(c>=S.target){ if(!run) run={from:k,to:k,n:0}; run.n++; run.to=k; }
+    else if(c>=S.target-1 && run){ run.to=k; }   // held, not extended
+    else if(run){ runs.push(run); run=null; }
+  }
+  if(run){ run.live=true; runs.push(run); }
+  return runs;
+}
+function dowCounts(weeks){
+  const cut = mondayOf(new Date()).getTime() - (weeks-1)*7*864e5;
+  const out=[0,0,0,0,0,0,0];
+  S.logs.forEach(l=>{ const t=new Date(l.date);
+    if(t.getTime()>=cut) out[(t.getDay()+6)%7]++; });
+  return out;
+}
+function gapStats(){
+  const days=Array.from(new Set(S.logs.map(l=>{
+    const x=new Date(l.date); x.setHours(0,0,0,0); return x.getTime();
+  }))).sort((a,b)=>a-b);
+  if(days.length<2) return null;
+  let max=0, tot=0;
+  for(let i=1;i<days.length;i++){
+    const g=Math.round((days[i]-days[i-1])/864e5);
+    tot+=g; if(g>max) max=g;
+  }
+  const since=daysSinceLast()||0;
+  return {max:Math.max(max,since), avg:tot/(days.length-1), sessions:days.length};
+}
+/* Second half of the window against the first — is it going up or down? */
+function momentum(weeks){
+  const rows=weekSlice(weeks,0).filter(r=>!r.open);
+  if(rows.length<4) return null;
+  const half=Math.floor(rows.length/2);
+  const a=rows.slice(0,half), b=rows.slice(-half);
+  const av=a.reduce((x,r)=>x+r.c,0)/a.length, bv=b.reduce((x,r)=>x+r.c,0)/b.length;
+  const d=bv-av;
+  return {diff:d, dir: Math.abs(d)<0.25?'flat':(d>0?'up':'down'), recent:bv, earlier:av, half};
+}
+function anaRows(){
+  return anaGrain==='month' ? monthSlice(anaRange,0) : weekSlice(anaRange,0);
+}
+function anaTarget(){
+  return anaGrain==='month' ? Math.round(S.target*4.33) : S.target;
+}
+function anaLabel(r, i, n){
+  if(anaGrain==='month'){
+    return r.d.getMonth()===0
+      ? "'"+String(r.d.getFullYear()).slice(2)
+      : r.d.toLocaleDateString('en-GB',{month:'narrow'});
+  }
+  const every = n>26?4 : n>12?2 : 1;
+  return (i%every===0 || i===n-1) ? String(r.d.getDate()) : '';
+}
+function anaLong(r){
+  if(anaGrain==='month') return r.d.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  const end=new Date(r.d.getTime()+6*864e5);
+  const o={day:'numeric',month:'short'};
+  return r.d.toLocaleDateString('en-GB',o)+' – '+end.toLocaleDateString('en-GB',o);
+}
+
+/* --- chart rendering: plain divs, so it scales with the card --- */
+function barsHtml(rows, target, opts){
+  opts=opts||{};
+  const n=rows.length;
+  const max=Math.max(target||0, ...rows.map(r=>r.c), 1);
+  const tl = target ? `<div class="tline" style="bottom:${(target/max*100).toFixed(1)}%"></div>` : '';
+  const bars = rows.map((r,i)=>{
+    const h=(r.c/max*100).toFixed(1);
+    const cls=[ 'bar', r.hit?'hit':'', (r.open&&!r.hit)?'open':'', anaSel===i&&!opts.mini?'sel':'' ].filter(Boolean).join(' ');
+    const tap = opts.mini ? '' : ` onclick="anaPick(${i})"`;
+    const lab = opts.mini ? '' : ` aria-label="${esc(anaLong(r))}: ${r.c}"`;
+    return `<button class="${cls}"${tap}${lab}><i style="height:${r.c?Math.max(3,h):0}%"></i></button>`;
+  }).join('');
+  return `<div class="chart">
+    <div class="bars${opts.mini?' mini':''}">${tl}${bars}</div>
+    ${opts.mini?'':`<div class="xlab">${rows.map((r,i)=>`<span>${anaLabel(r,i,n)}</span>`).join('')}</div>`}
+  </div>`;
+}
+function anaPick(i){ anaSel = (anaSel===i?null:i); render(); }
+function anaSet(k,v){
+  if(k==='range') anaRange=v;
+  else { anaGrain=v; anaRange = v==='month' ? Math.min(anaRange,12) : Math.max(anaRange,8); }
+  anaSel=null; render();
+}
+
+function deleteLog(i){
+  const l=S.logs[i]; if(!l) return;
+  ask('Delete the session from '+new Date(l.date).toLocaleDateString('en-GB',{day:'numeric',month:'long'})+'? Streaks will be recalculated.',
+    ()=>{ S.logs.splice(i,1); save(); render(); toast('Session deleted'); }, 'Delete', true);
+}
+
+/* Three views behind one tab: what happened, who is here, what is promised.
+   Each stays short enough to read on a phone without scrolling forever. */
+let socTab='feed';
+function socGo(t){ socTab=t; render(); window.scrollTo(0,0); }
+
+function viewSocial(){
   socialInit();
   if(!S.nostr){
-    $v.innerHTML=`<div class="topbar"><h1>Friends</h1></div>
+    $v.innerHTML=`<div class="topbar"><h1>Social</h1></div>
     <div class="card"><h3 style="font-size:16px">Training with other people</h3>
-      <p class="small muted" style="margin:8px 0 0">People who train alongside someone else stick at it far longer than people who train alone. This screen shows who has turned up lately, and lets you set challenges together.</p>
+      <p class="small muted" style="margin:8px 0 0">People who train alongside someone else stick at it far longer than people who train alone. This screen shows who has turned up lately, lets you pick one person to be accountable to, and lets you set challenges together.</p>
       <p class="small muted" style="margin:10px 0 0">It runs on nostr, so there is no account to make and no server holding your data. Sign in and you can add anyone by their npub.</p>
       <button class="btn pine" onclick="go('you')">Sign in to get started</button></div>
     <div class="card"><h3 style="font-size:15px">What other people see</h3>
@@ -1768,59 +2232,150 @@ function viewCrew(){
     return;
   }
 
-  const crew=crewList(), me=S.nostr.pk;
-  const mine=friendStats(me);
-  const rows=crew.map(pk=>({pk, st:friendStats(pk)}))
-    .sort((a,b)=>(b.st.thisWeek-a.st.thisWeek)||(b.st.last-a.st.last));
-  const active=rows.filter(r=>r.st.thisWeek>0).length;
-  const chs=(S.social.challenges||[]).filter(c=>!chWindow(c).done)
-    .sort((a,b)=>b.at-a.at);
-
-  $v.innerHTML=`
-  <div class="topbar"><h1>Friends</h1>
+  const P=partnerLine();
+  const head=`
+  <div class="topbar"><h1>Social</h1>
     <button class="date" onclick="socialSync(true)" style="text-decoration:underline">
       Refresh <span id="syncdot" style="opacity:0;color:var(--pine)">\u2022</span></button></div>
 
-  <div class="card" style="border-color:var(--pine)">
+  ${P?`<div class="partner">
+    ${avatarHtml(P.pk,'av')}
+    <div class="pt">
+      <div class="pn">${nameOf(P.pk)}</div>
+      <div class="ps">Your partner \u00b7 ${P.text}</div>
+    </div>
+    <button class="chip" aria-label="Cheer ${nameOf(P.pk)}" onclick="cheer('${P.pk}',null,'cheer')">\u{1F525}</button>
+  </div>`:''}
+
+  <div class="seg" role="tablist" style="margin-top:14px">
+    ${[['feed','Feed'],['people','People'],['goals','Goals']].map(([k,n])=>
+      `<button role="tab" aria-selected="${socTab===k}" class="${socTab===k?'on':''}" onclick="socGo('${k}')">${n}</button>`).join('')}
+  </div>
+  ${navigator.onLine===false?`<p class="tiny muted" style="margin:12px 0 0;text-align:center">Offline — showing what was last synced.</p>`
+    :syncFailed?`<p class="tiny muted" style="margin:12px 0 0;text-align:center">Could not reach the relays. <button style="color:var(--pine);text-decoration:underline" onclick="socialSync(true)">Try again</button></p>`:''}`;
+
+  $v.innerHTML = head + ({feed:socFeed, people:socPeople, goals:socGoals})[socTab]();
+  socialSync();
+}
+
+/* --- feed --- */
+function socFeed(){
+  const rows=socialFeed(14);
+  if(!rows.length){
+    return `<div class="card" style="margin-top:14px"><h3 style="font-size:16px">Nothing here yet</h3>
+      <p class="small muted" style="margin:8px 0 0">${crewList().length
+        ? 'Nobody has published a session in the last two weeks. Turning up is the only thing that shows here.'
+        : 'Add someone on the People tab and their sessions will appear here.'}</p>
+      ${S.nostr.publishWorkouts?'':`<p class="tiny muted" style="margin:10px 0 0">Your own sessions are not published either. Turn that on under You if you want to appear on other people's screens.</p>`}
+    </div>`;
+  }
+  let last='';
+  const body=rows.map(f=>{
+    const head=dayHeading(f.at);
+    const hd = head!==last ? `<div class="feedday">${head}</div>` : '';
+    last=head;
+    const mine = f.pk===S.nostr.pk;
+    const can = !mine && f.t==='train' && f.id;
+    return `${hd}<div class="feedrow">
+      ${avatarHtml(f.pk,'av')}
+      <div class="ft">${feedText(f)}<div class="fm">${whenText(f.at)}</div></div>
+      ${can?`<button class="chip fa" aria-label="Cheer ${nameOf(f.pk)}" onclick="cheer('${f.pk}','${esc(f.id)}')"${
+        cheered(f.id)?' disabled':''}>${cheered(f.id)?'Sent':'\u{1F525}'}</button>`:''}
+    </div>`;
+  }).join('');
+  return `<div class="card" style="margin-top:14px;padding-top:6px">${body}</div>
+  <p class="tiny muted" style="margin:16px 0 0;text-align:center">Last two weeks. Frequency only, never weights.</p>`;
+}
+
+/* --- people --- */
+function socPeople(){
+  const crew=crewList(), me=S.nostr.pk, mine=friendStats(me);
+  const rows=crew.map(pk=>({pk, st:friendStats(pk)}))
+    .sort((a,b)=>(b.st.thisWeek-a.st.thisWeek)||(b.st.last-a.st.last));
+  const active=rows.filter(r=>r.st.thisWeek>0).length;
+  const quiet=quietList();
+  const par=partnerPk();
+
+  return `
+  <div class="card" style="border-color:var(--pine);margin-top:14px">
     <div style="display:flex;align-items:center;gap:12px">
-      <div class="av" style="background:var(--pine);color:var(--surface)">${initialOf(me)}</div>
+      ${avatarHtml(me,'av','background:var(--pine);color:var(--surface)')}
       <div style="flex:1">
         <div style="font-size:15px;font-weight:600">You</div>
         <div class="tiny muted">${mine.thisWeek} session${mine.thisWeek===1?'':'s'} this week</div>
       </div>
       <div class="dotline">${mine.dots.map(d=>`<i class="${d?'trained':''}"></i>`).join('')}</div>
     </div>
-    ${S.nostr.publishWorkouts?'':`<p class="tiny muted" style="margin:12px 0 0">Your friends cannot see you yet. Turn on publishing under You to appear on their screens.</p>`}
+    ${S.nostr.publishWorkouts?'':`<p class="tiny muted" style="margin:12px 0 0">Nobody can see you yet. Turn on publishing under You to appear on their screens.</p>`}
   </div>
+
+  ${quiet.length?`<div class="card" style="margin-top:14px">
+    <h3 style="font-size:15px">Quiet lately</h3>
+    <p class="tiny muted" style="margin:5px 0 0">Nothing published in over a week. A wave costs nothing.</p>
+    ${quiet.slice(0,5).map(r=>`<div class="quiet">
+      ${avatarHtml(r.pk,'av')}
+      <span class="qn">${nameOf(r.pk)}<br><span class="tiny muted">${agoText(r.st.last)}</span></span>
+      ${r.st.topId?`<button class="chip" onclick="cheer('${r.pk}','${esc(r.st.topId)}','nudge')"${
+        cheered(r.st.topId,'nudge')?' disabled':''}>${
+        cheered(r.st.topId,'nudge')?'Sent':'\u{1F44B} Nudge'}</button>`:''}
+    </div>`).join('')}
+  </div>`:''}
 
   ${crew.length?`
   <div style="display:flex;justify-content:space-between;align-items:baseline;margin:22px 0 8px">
-    <h2 style="font-size:15px">Your friends</h2>
+    <h2 style="font-size:15px">Your people</h2>
     <span class="tiny muted">${active} of ${crew.length} active this week</span></div>
-  ${rows.map(r=>`<div class="card" style="padding:14px;margin-top:10px">
+  ${rows.map(r=>`<div class="card" style="padding:14px;margin-top:10px${r.pk===par?';border-color:var(--pine)':''}">
     <div style="display:flex;align-items:center;gap:12px">
-      <div class="av">${initialOf(r.pk)}</div>
+      ${avatarHtml(r.pk,'av')}
       <div style="flex:1;min-width:0">
-        <div style="font-size:15px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${nameOf(r.pk)}</div>
+        <div style="font-size:15px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${nameOf(r.pk)}${
+          r.pk===par?' <span class="tiny" style="color:var(--pine)">· partner</span>':''}</div>
         <div class="tiny muted">${agoText(r.st.last)}${r.st.weeks?` \u00b7 ${r.st.weeks} week streak`:''}</div>
       </div>
       <div style="text-align:right">
-        <div class="num" style="font-size:22px;color:${r.st.thisWeek>=3?'var(--pine)':'var(--muted)'}">${r.st.thisWeek}</div>
+        <div class="num" style="font-size:22px;color:${r.st.thisWeek>=S.target?'var(--pine)':'var(--muted)'}">${r.st.thisWeek}</div>
         <div class="tiny muted">this week</div>
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;margin-top:11px">
-      <div class="dotline" style="flex:1">${r.st.dots.map(d=>`<i class="${d?'trained':''}"></i>`).join('')}</div>
-      <button class="chip" onclick="cheer('${r.pk}')">\u{1F525} Cheer</button>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:11px;flex-wrap:wrap">
+      <div class="dotline" style="flex:1;min-width:70px">${r.st.dots.map(d=>`<i class="${d?'trained':''}"></i>`).join('')}</div>
+      <button class="chip" aria-label="Cheer ${nameOf(r.pk)}" onclick="cheer('${r.pk}')">\u{1F525}</button>
+      <button class="chip" onclick="setPartner('${r.pk}')"${r.pk===par?' style="color:var(--pine);border-color:var(--pine)"':''}>${r.pk===par?'Partnered':'Partner'}</button>
       <button class="chip" onclick="crewRemove('${r.pk}')">Remove</button>
     </div></div>`).join('')}
   <button class="btn ghost sm" onclick="crewAdd()">Add someone by npub</button>
+  <p class="tiny muted" style="margin:14px 0 0">A partner is one person whose week shows at the top of this screen. Being noticed by one person beats being ranked against ten.</p>
   `:`
   <div class="card" style="margin-top:14px"><h3 style="font-size:16px">Nobody here yet</h3>
     <p class="small muted" style="margin:8px 0 0">One person is enough. What works is somebody noticing whether you turned up.</p>
     <button class="btn pine sm" onclick="crewImportFollows()">Import from your nostr follows</button>
     <button class="btn ghost sm" onclick="crewAdd()">Add someone by npub</button>
+  </div>`}`;
+}
+
+/* --- goals: pledges and challenges --- */
+function socGoals(){
+  const mp=myPledge();
+  const others=(S.social.pledges||[]).filter(p=>p.pk!==S.nostr.pk&&!pledgeWindow(p).done)
+    .sort((a,b)=>b.at-a.at);
+  const chs=(S.social.challenges||[]).filter(c=>!chWindow(c).done).sort((a,b)=>b.at-a.at);
+
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:baseline;margin:22px 0 8px">
+    <h2 style="font-size:15px">Your pledge</h2>
+    ${(!mp&&Signer.canWrite)?`<button class="tiny" style="color:var(--pine);text-decoration:underline" onclick="pledgeCreate()">New</button>`:''}</div>
+
+  ${mp?pledgeCard(mp,true):`
+  <div class="card"><h3 style="font-size:15px">Nothing pledged</h3>
+    <p class="small muted" style="margin:8px 0 0">Say out loud how often you are training and for how long. It publishes to nostr, nothing is staked, and the result posts honestly either way.</p>
+    ${Signer.canWrite?`<button class="btn sm" style="background:var(--brass);color:var(--surface)" onclick="pledgeCreate()">Make a pledge</button>`
+      :`<p class="tiny muted" style="margin:10px 0 0">Read-only sign-in cannot publish.</p>`}
   </div>`}
+
+  ${others.length?`
+  <div style="margin:26px 0 8px"><h2 style="font-size:15px">Pledges from your people</h2></div>
+  ${others.slice(0,6).map(p=>pledgeCard(p,false)).join('')}`:''}
 
   <div style="display:flex;justify-content:space-between;align-items:baseline;margin:26px 0 8px">
     <h2 style="font-size:15px">Challenges</h2>
@@ -1828,19 +2383,20 @@ function viewCrew(){
 
   ${chs.length?chs.map(c=>{
     const w=chWindow(c), mem=chMembers(c), joined=chJoined(c);
+    const tgt=Math.max(1,Math.min(999,parseInt(c.target)||1));
     const board=mem.map(pk=>({pk, n:chScore(c,pk)})).sort((a,b)=>b.n-a.n);
     return `<div class="card" style="margin-top:10px">
       <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline">
         <h3 style="font-size:16px">${esc(String(c.title||'Untitled').slice(0,80))}</h3>
         <span class="sessiontag" style="${w.live?'':'color:var(--brass);background:var(--brass-soft)'}">${w.live?w.daysLeft+' days left':'starts soon'}</span></div>
-      <p class="tiny muted" style="margin:6px 0 0">${Math.max(1,Math.min(999,parseInt(c.target)||1))} sessions each \u00b7 ${mem.length} taking part \u00b7 set by ${c.host===S.nostr.pk?'you':nameOf(c.host)}</p>
+      <p class="tiny muted" style="margin:6px 0 0">${tgt} sessions each \u00b7 ${mem.length} taking part \u00b7 set by ${c.host===S.nostr.pk?'you':nameOf(c.host)}</p>
       <div style="margin-top:12px">${board.map(b=>`
         <div style="padding:9px 0;border-top:1px solid var(--edge)">
           <div style="display:flex;justify-content:space-between;gap:10px;font-size:14px">
             <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.pk===S.nostr.pk?'You':nameOf(b.pk)}</span>
-            <span class="tiny muted" style="white-space:nowrap">${b.n} of ${c.target}${b.n>=c.target?' \u2713':''}</span></div>
+            <span class="tiny muted" style="white-space:nowrap">${b.n} of ${tgt}${b.n>=tgt?' \u2713':''}</span></div>
           <div style="height:5px;border-radius:3px;background:var(--edge);margin-top:6px;overflow:hidden">
-            <div style="height:100%;width:${Math.min(100,b.n/c.target*100)}%;background:${b.n>=c.target?'var(--brass)':'var(--pine)'};border-radius:3px"></div></div>
+            <div style="height:100%;width:${Math.min(100,b.n/tgt*100)}%;background:${b.n>=tgt?'var(--brass)':'var(--pine)'};border-radius:3px"></div></div>
         </div>`).join('')}</div>
       ${joined?'':`<button class="btn pine sm" onclick="chJoinById('${esc(c.id)}')">Join this one</button>`}
     </div>`}).join(''):`
@@ -1849,8 +2405,24 @@ function viewCrew(){
     ${Signer.canWrite?`<button class="btn sm" style="background:var(--pine);color:var(--surface)" onclick="chCreate()">Set one up</button>`:''}
   </div>`}
 
-  <p class="tiny muted" style="margin:20px 0 0;text-align:center">Frequency only, never weights. Anyone with publishing off looks quiet even if they are training.</p>`;
-  socialSync();
+  <p class="tiny muted" style="margin:20px 0 0;text-align:center">Everyone is measured on sessions, not weight. Anyone with publishing off looks quiet even if they are training.</p>`;
+}
+
+function pledgeCard(p, mine){
+  const w=pledgeWindow(p), sc=pledgeScore(p);
+  const bars=sc.weeks.map(x=>`<i class="${x.future?'':x.hit?'on':x.open?'now':'miss'}"></i>`).join('');
+  return `<div class="card pledge" style="margin-top:10px">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline">
+      <h3 style="font-size:16px">${mine?'You':nameOf(p.pk)} \u00b7 ${p.perWeek} a week</h3>
+      <span class="sessiontag" style="color:var(--brass);background:var(--brass-soft)">${
+        w.done?'finished':w.weeksLeft+' week'+(w.weeksLeft===1?'':'s')+' left'}</span></div>
+    <p class="tiny muted" style="margin:6px 0 0">${p.weeks} week pledge \u00b7 kept ${sc.kept} of ${sc.closed} so far</p>
+    <div class="pledgebar">${bars}</div>
+    ${mine?`<div style="display:flex;gap:8px;margin-top:14px">
+      <button class="chip" onclick='pledgeReport(${JSON.stringify(p).replace(/'/g,"&#39;")})'>Post the result</button>
+      <button class="chip" onclick='pledgeDrop(${JSON.stringify(p).replace(/'/g,"&#39;")})'>Drop</button>
+    </div>`:''}
+  </div>`;
 }
 
 /* The profile.
@@ -1875,10 +2447,10 @@ function trainingSince(){
   return new Date(first);
 }
 function setName(){
-  const v=prompt('What should the app call you?', (S.profile||{}).name||'');
-  if(v===null) return;
-  S.profile=Object.assign({}, S.profile, {name:v.trim().slice(0,30)||null});
-  save(); render();
+  askText('What should the app call you?', (S.profile||{}).name||'', v=>{
+    S.profile=Object.assign({}, S.profile, {name:v.trim().slice(0,30)||null});
+    save(); render();
+  }, {placeholder:'Your name', ok:'Save'});
 }
 
 /* Best single set per movement: furthest up the ladder first, then most reps */
@@ -1909,7 +2481,7 @@ function profileHeader(){
   return `
   <div class="card profilecard">
     <div style="display:flex;align-items:center;gap:14px">
-      <div class="bigav">${avatarLetter()}</div>
+      ${avatarHtml(S.nostr?S.nostr.pk:null,'bigav')}
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:8px">
           <h2 style="font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${displayName()}</h2>
@@ -1946,11 +2518,13 @@ function profileBody(){
     <h3 style="font-size:15px">Right now</h3>
     <div class="prow"><span>Training</span><span>${S.target} times a week</span></div>
     <div class="prow"><span>Equipment</span><span>${kitSummary()}</span></div>
-    <div class="prow"><span>Next up</span><span>${sess.name}</span></div>
+    <div class="prow"><span>Next up</span><span>${sess.name} ${sess.letter}</span></div>
     ${(S.cardio||[]).length?`<div class="prow"><span>Also logging</span><span>${
       Array.from(new Set(cardioLog().map(c=>c.k))).map(k=>(cardioOf(k)||{}).n).filter(Boolean).join(', ').toLowerCase()
     }</span></div>`:''}
   </div>
+
+  ${patternCard()}
 
   ${bs.length?`<div class="card">
     <h3 style="font-size:15px">Best sets</h3>
@@ -1977,7 +2551,7 @@ function profileBody(){
    one concern, and the menu shows what each is currently set to. */
 let sub=null;
 function openSub(k){ sub=k; render(); window.scrollTo(0,0); }
-function closeSub(){ sub=null; asq=null; render(); window.scrollTo(0,0); }
+function closeSub(){ sub=null; asq=null; anaSel=null; render(); window.scrollTo(0,0); }
 
 function subhead(title){
   return `<div class="subbar">
@@ -2005,13 +2579,18 @@ const MENU=[
   {k:'remind',n:'Daily reminder',   sum:()=>!Native.on?'Not available on this platform':(S.notify?`On at ${S.notifyAt||'19:00'}`:'Off')},
   {k:'look',  n:'Appearance',       sum:()=>({auto:'Match device',light:'Light',dark:'Dark'})[S.theme||'auto']},
   {k:'acct',  n:'Nostr account',    sum:()=>S.nostr?shortNpub(S.nostr.pk):'Not signed in'},
+  {k:'priv',  n:'Privacy',          sum:()=>{
+    const out=[]; if(S.webfonts) out.push('web fonts'); if(S.avatars) out.push('pictures');
+    if(S.nostr&&S.nostr.publishWorkouts) out.push('publishing');
+    return out.length?('On: '+out.join(', ')):'Nothing leaves this device';
+  }},
   {k:'data',  n:'Your data',        sum:()=>`${S.logs.length} session${S.logs.length===1?'':'s'} on this device`}
 ];
 
 function viewYou(){
   if(sub==='me' && asq) return drawAssess();
   if(sub) return ({me:subMe,kit:subKit,train:subTrain,ladder:subLadder,remind:subRemind,
-                   look:subLook,acct:subAcct,data:subData})[sub]();
+                   look:subLook,acct:subAcct,priv:subPrivacy,data:subData,stats:subStats})[sub]();
   $v.innerHTML=`<div class="topbar"><h1>You</h1></div>
   ${profileHeader()}
   ${profileBody()}
@@ -2062,6 +2641,142 @@ function subMe(){
     <button class="btn sm" style="background:var(--pine);color:var(--surface)" onclick="startAssess()">${p.assessedAt?'Do it again':'Set my levels'}</button>
     <p class="tiny muted" style="margin:10px 0 0">This overwrites every ladder position. Your history and streaks are untouched.</p>
   </div>`;
+}
+
+/* --- the summary card on You --- */
+function patternCard(){
+  if(!S.logs.length) return '';
+  const span=Math.min(12, Math.max(4, weeksTracked()));
+  const rows=weekSlice(span,0), st=sliceStats(rows), sk=streak();
+  const mo=momentum(span);
+  return `<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+      <h3 style="font-size:15px">Patterns</h3>
+      <span class="tiny muted">last ${span} week${span===1?'':'s'}</span>
+    </div>
+    ${barsHtml(rows, S.target, {mini:true})}
+    <div class="pstats" style="margin-top:14px">
+      <div><div class="num">${st.avg.toFixed(1)}</div><div class="tiny muted">avg a week</div></div>
+      <div><div class="num">${st.rate}<span style="font-size:13px">%</span></div><div class="tiny muted">weeks hit</div></div>
+      <div><div class="num" style="color:var(--pine)">${sk.cur}</div><div class="tiny muted">streak</div></div>
+      <div><div class="num">${sk.best}</div><div class="tiny muted">best</div></div>
+    </div>
+    ${mo&&mo.dir!=='flat'?`<p class="tiny muted" style="margin:12px 0 0">Last ${mo.half} weeks are ${
+      mo.dir==='up'?'ahead of':'behind'} the ${mo.half} before, ${Math.abs(mo.diff).toFixed(1)} sessions a week.</p>`:''}
+    <button class="btn ghost sm" onclick="openSub('stats')">See the detail</button>
+  </div>`;
+}
+
+/* --- the drill-down --- */
+function subStats(){
+  if(!S.logs.length){
+    $v.innerHTML=subhead('Patterns')+`<div class="card">
+      <p class="small muted">Log a session and this fills in.</p></div>`;
+    return;
+  }
+  const rows=anaRows(), tgt=anaTarget();
+  const now=sliceStats(rows);
+  const prev=sliceStats(anaGrain==='month'?monthSlice(anaRange,anaRange):weekSlice(anaRange,anaRange));
+  const sk=streak(), runs=streakRuns().slice().reverse();
+  const breaks=runs.filter(r=>!r.live).length;
+  const gaps=gapStats(), mo=momentum(Math.max(8,anaRange));
+  const unit=anaGrain==='month'?'month':'week';
+  const dowSpan=Math.max(8,anaGrain==='month'?anaRange*4:anaRange);
+  const dw=dowCounts(dowSpan), dmax=Math.max(...dw,1);
+  const DN=['M','T','W','T','F','S','S'];
+  const sel = anaSel!=null && rows[anaSel] ? rows[anaSel] : null;
+  const tracked=weeksTracked();
+
+  const ranges = anaGrain==='month'
+    ? [[6,'6m'],[12,'1y'],[24,'2y']]
+    : [[8,'8w'],[12,'12w'],[26,'26w'],[52,'1y']];
+
+  $v.innerHTML=subhead('Patterns')+`
+  <div class="card">
+    <div class="seg" role="tablist" aria-label="Grouping">
+      <button role="tab" aria-selected="${anaGrain==='week'}" class="${anaGrain==='week'?'on':''}" onclick="anaSet('grain','week')">Weeks</button>
+      <button role="tab" aria-selected="${anaGrain==='month'}" class="${anaGrain==='month'?'on':''}" onclick="anaSet('grain','month')">Months</button>
+    </div>
+    <div class="seg" role="tablist" aria-label="Range">${ranges.map(([n,l])=>
+      `<button role="tab" aria-selected="${anaRange===n}" class="${anaRange===n?'on':''}" onclick="anaSet('range',${n})">${l}</button>`).join('')}</div>
+
+    ${barsHtml(rows, tgt)}
+    ${sel?`<div class="selnote">
+      <span>${anaLong(sel)}${anaGrain==='week'?`<br><span class="tiny muted">${
+        sel.open ? (sel.hit?'Target already met':`${Math.max(0,S.target-sel.c)} to go this week`)
+                 : (sel.hit?'On target':`${S.target-sel.c} short`)
+      }</span>`:''}</span>
+      <span class="num">${sel.c}<span class="tiny muted" style="font-weight:400"> session${sel.c===1?'':'s'}</span></span>
+    </div>`:`<p class="tiny muted" style="margin:10px 0 0">Dashed line is your target of ${tgt} a ${unit}. Tap a bar for the count.</p>`}
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:15px">Against the ${anaRange} ${unit}s before</h3>
+    <div class="cmp">
+      <div class="cmprow hdr"><span></span><span>Now</span><span>Before</span><span></span></div>
+      <div class="cmprow"><span>Sessions</span><span class="num">${now.sessions}</span>
+        <span class="muted">${prev.sessions}</span>${delta(now.sessions,prev.sessions)}</div>
+      <div class="cmprow"><span>Average a ${unit}</span><span class="num">${now.avg.toFixed(1)}</span>
+        <span class="muted">${prev.avg.toFixed(1)}</span>${delta(now.avg,prev.avg,1)}</div>
+      ${anaGrain==='week'?`<div class="cmprow"><span>Weeks on target</span><span class="num">${now.hit}</span>
+        <span class="muted">${prev.hit}</span>${delta(now.hit,prev.hit)}</div>
+      <div class="cmprow"><span>Hit rate</span><span class="num">${now.rate}%</span>
+        <span class="muted">${prev.rate}%</span>${delta(now.rate,prev.rate)}</div>`:''}
+    </div>
+    ${prev.sessions===0?`<p class="tiny muted" style="margin:12px 0 0">Nothing logged in the earlier window, so the comparison starts from zero.</p>`:''}
+  </div>
+
+  ${mo?`<div class="card">
+    <h3 style="font-size:15px">Direction</h3>
+    <p class="small" style="margin:8px 0 0">${
+      mo.dir==='flat' ? `Holding steady at about ${mo.recent.toFixed(1)} sessions a week.`
+      : mo.dir==='up' ? `Up. The last ${mo.half} weeks averaged ${mo.recent.toFixed(1)} a week against ${mo.earlier.toFixed(1)} before that.`
+      : `Down. The last ${mo.half} weeks averaged ${mo.recent.toFixed(1)} a week against ${mo.earlier.toFixed(1)} before that.`
+    }</p>
+  </div>`:''}
+
+  <div class="card">
+    <h3 style="font-size:15px">Which days you train</h3>
+    <p class="tiny muted" style="margin:5px 0 0">Last ${dowSpan} weeks.</p>
+    <div class="dow">${dw.map((v,i)=>`<div>
+      <div class="dbar"><i class="${v===dmax&&v>0?'top':''}" style="height:${v?Math.max(4,v/dmax*100):0}%"></i></div>
+      <div class="dl">${DN[i]}</div>
+      <div class="dl" style="margin-top:1px">${v||''}</div>
+    </div>`).join('')}</div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:15px">Streaks</h3>
+    <div class="statgrid" style="margin-top:12px">
+      <div class="stat"><div class="v num" style="color:var(--pine)">${sk.cur}</div><div class="k">current run of weeks</div></div>
+      <div class="stat"><div class="v num">${sk.best}</div><div class="k">longest run</div></div>
+      <div class="stat"><div class="v num">${breaks}</div><div class="k">time${breaks===1?'':'s'} restarted</div></div>
+      <div class="stat"><div class="v num">${tracked}</div><div class="k">weeks tracked</div></div>
+    </div>
+    ${runs.length?`<div style="margin-top:16px">
+      <div class="tiny muted">Every run, newest first</div>
+      ${runs.slice(0,8).map(r=>{
+        const f=new Date(r.from), t=new Date(r.to);
+        const o={day:'numeric',month:'short'};
+        return `<div class="runrow${r.live?' live':''}">
+          <span class="rn">${f.toLocaleDateString('en-GB',o)} – ${r.live?'now':t.toLocaleDateString('en-GB',o)}</span>
+          <span class="rv num">${r.n} week${r.n===1?'':'s'}</span></div>`}).join('')}
+      ${runs.length>8?`<p class="tiny muted" style="margin:10px 0 0">Showing the last 8 of ${runs.length}.</p>`:''}
+    </div>`:`<p class="tiny muted" style="margin:12px 0 0">No full week on target yet. ${S.target} sessions in one week starts the run.</p>`}
+  </div>
+
+  ${gaps?`<div class="card">
+    <h3 style="font-size:15px">Gaps</h3>
+    <div class="cmp">
+      <div class="cmprow" style="grid-template-columns:1fr auto;border-top:0"><span>Typical gap between sessions</span>
+        <span class="num">${gaps.avg.toFixed(1)} days</span></div>
+      <div class="cmprow" style="grid-template-columns:1fr auto"><span>Longest break</span>
+        <span class="num">${gaps.max} days</span></div>
+      <div class="cmprow" style="grid-template-columns:1fr auto"><span>Days since the last one</span>
+        <span class="num">${daysSinceLast()}</span></div>
+    </div>
+    ${gaps.max>=14?`<p class="tiny muted" style="margin:12px 0 0">A break over two weeks drops your ladders a rung when you come back. That is deliberate.</p>`:''}
+  </div>`:''}`;
 }
 
 function sparkline(){
@@ -2179,7 +2894,7 @@ function subAcct(){
   $v.innerHTML=subhead('Nostr account')+(S.nostr?`
   <div class="card">
     <div style="display:flex;align-items:center;gap:11px">
-      <div class="av" style="background:var(--pine);color:var(--surface)">${initialOf(S.nostr.pk)}</div>
+      ${avatarHtml(S.nostr.pk,'av','background:var(--pine);color:var(--surface)')}
       <div style="flex:1;min-width:0">
         <div style="font-size:14px;font-family:'Familjen Grotesk',sans-serif;word-break:break-all">${shortNpub(S.nostr.pk)}</div>
         <div class="tiny muted">${{amber:'Signed with Amber',nip07:'Signed with a browser extension',npub:'Read-only'}[S.nostr.mode]}</div>
@@ -2203,10 +2918,68 @@ function subAcct(){
     <p class="small muted" style="margin:0">Optional. Gives you an encrypted backup of your history, readable only by you.</p>
     <button class="btn sm" style="background:var(--pine);color:var(--surface)" onclick="nostrLogin('amber')">Sign in with Amber</button>
     ${window.nostr?`<button class="btn ghost sm" onclick="nostrLogin('nip07')">Use browser extension</button>`:''}
+    <button class="btn ghost sm" onclick="pasteSignIn()">Amber opened but nothing came back? Paste it here</button>
     <button class="btn ghost sm" onclick="nostrLoginNpub()">Paste an npub (read-only)</button>
+    ${!CAN_CLIP?`<div class="flag" style="margin-top:14px"><b>This copy cannot read the clipboard.</b> That needs an https address — opened from a downloaded file the browser refuses it, so Amber's answer has to be pasted by hand. Opening the app from its web address fixes that.</div>`:''}
+    <button class="btn ghost sm" onclick="askPaste()">Amber opened but nothing happened</button>
 
     <p class="tiny muted" style="margin:12px 0 0">Your key stays in Amber. It returns each answer through the clipboard, so your phone may ask you to allow a paste.</p>
   </div>`);
+}
+
+function subPrivacy(){
+  const n=S.nostr;
+  $v.innerHTML=subhead('Privacy')+`
+  <div class="card">
+    <h3 style="font-size:15px">What leaves this device</h3>
+    <p class="tiny muted" style="margin:5px 0 0">Everything, listed. Nothing else happens.</p>
+    <div class="prow"><span>Workout data</span><span>${n&&n.autoBackup?'Encrypted to your relays':'Nothing leaves'}</span></div>
+    <div class="prow"><span>Analytics</span><span>None, ever</span></div>
+    <div class="prow"><span>Accounts</span><span>None — no server</span></div>
+    <div class="prow"><span>Relays contacted</span><span>${n?(n.relays||[]).length:'None'}</span></div>
+    <div class="prow"><span>Web fonts</span><span>${S.webfonts?'Google, each launch':'Not loaded'}</span></div>
+    <div class="prow"><span>Other people's pictures</span><span>${S.avatars?'Loaded from their hosts':'Not loaded'}</span></div>
+    <div class="prow"><span>Training partner</span><span>${partnerPk()?'Kept on this device':'Not set'}</span></div>
+    <div class="prow"><span>Pledges</span><span>${myPledge()?'Published to nostr':'None published'}</span></div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:15px">Web fonts</h3>
+    <p class="small muted" style="margin:6px 0 0">The app was designed in two typefaces served by Google. Loading them tells Google your IP address every time you open the app, whether or not you use any nostr features. Off by default — your device's own fonts are used instead.</p>
+    <label class="row"><span>Load the designed typefaces</span>
+      <input type="checkbox" ${S.webfonts?'checked':''} style="width:20px;height:20px;flex:0 0 auto;accent-color:var(--pine)"
+        onchange="setWebFonts(this.checked)"></label>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:15px">Profile pictures</h3>
+    <p class="small muted" style="margin:6px 0 0">Nostr avatars are hosted wherever the person chose. Showing them means your device asks that host for the image, which tells it your IP address. Off by default — initials are used instead, which give away nothing.</p>
+    <label class="row"><span>Show profile pictures</span>
+      <input type="checkbox" ${S.avatars?'checked':''} style="width:20px;height:20px;flex:0 0 auto;accent-color:var(--pine)"
+        onchange="S.avatars=this.checked;save();render()"></label>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:15px">Relays</h3>
+    <p class="small muted" style="margin:6px 0 0">${n
+      ? `Connecting to a relay tells it your IP address and what you asked for. Your backup is encrypted before it leaves, so a relay stores a blob it cannot read — but it does know your key connected, and when.`
+      : `You are not signed in, so no relay is contacted at all.`}</p>
+    ${n?`<div style="margin-top:12px">${(n.relays||[]).map(r=>`<div class="prow"><span style="overflow:hidden;text-overflow:ellipsis">${esc(r)}</span><span></span></div>`).join('')}</div>
+    <button class="btn ghost sm" onclick="relayEdit()">Change relays</button>`:''}
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:15px">Routing relays over Tor</h3>
+    <p class="small muted" style="margin:6px 0 0">The app cannot do this itself. Relay connections are made by the browser, and a web page has no way to choose its own route — so anything claiming otherwise would be lying to you.</p>
+    <p class="small muted" style="margin:8px 0 0">What does work: install <b>Orbot</b> and run it in VPN mode with this app selected. Everything the app sends then goes through Tor, and relays see an exit node rather than you.</p>
+    <div class="flag" style="margin-top:12px"><b>It hides where you are, not who you are.</b> You query relays with the same public key every time, so a relay can build the same picture of your training either way. Tor does nothing about that. A fresh key, or no key at all, is the only fix for it.</div>
+    <p class="tiny muted" style="margin:10px 0 0">Some relays are slow over Tor and some refuse it. If backups start timing out, that is usually why.</p>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:15px">If you want to go further</h3>
+    <p class="small muted" style="margin:6px 0 0">Signed out, the app makes no network connections at all — everything except backup and friends works offline. Keep publishing off unless you want your training visible, because it is unencrypted and public by design. And if a relay operator knowing your key bothers you, use a key you keep for this and nothing else.</p>
+  </div>`;
 }
 
 function subData(){
@@ -2235,7 +3008,8 @@ function exportData(){
   a.download='groundwork-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
   toast('Exported');
 }
-function wipe(){ if(confirm('Erase all sessions, streaks and settings? This cannot be undone.')){ localStorage.removeItem(KEY); location.reload(); } }
+function wipe(){ ask('Erase all sessions, streaks and settings? This cannot be undone.',
+  ()=>{ localStorage.removeItem(KEY); location.reload(); }, 'Erase everything', true); }
 
 /* ============================== SESSION PLAYER ============================== */
 let run=null;
@@ -2256,7 +3030,7 @@ function drawStep(){
   const stepUp = S.ready[en.exId] && en.level < e.ladder.length-1;
   document.getElementById('pbody').innerHTML=`
   <div class="topbar" style="margin-bottom:16px">
-    <div><div class="tiny muted">${SESSIONS[run.key].name} · ${run.i+1} of ${total}</div><h1 style="font-size:21px;margin-top:2px">${lv.n}</h1></div>
+    <div><div class="tiny muted">${SESSIONS[run.key].name} ${SESSIONS[run.key].letter} · ${run.i+1} of ${total}</div><h1 style="font-size:21px;margin-top:2px">${lv.n}</h1></div>
     <button class="tiny muted" onclick="quitSession()" style="text-decoration:underline">Quit</button>
   </div>
   <div onclick="figPlay(byId('${en.exId}'),'pf')" style="cursor:pointer">${figure(e,'pf')}</div>
@@ -2483,15 +3257,25 @@ function coolNext(){
   else finishSession();
 }
 function quitSession(){
-  if(!confirm('Quit without saving this session?')) return;
-  clearInterval(st_t); if(hs_t){clearInterval(hs_t.t);hs_t=null;} stopAll(); skipRest();
-  document.getElementById('player').classList.remove('on');
-  document.body.style.overflow=''; run=null; render();
+  ask('Quit without saving this workout?', ()=>{
+    clearInterval(st_t); if(hs_t){clearInterval(hs_t.t);hs_t=null;} stopAll(); skipRest();
+    document.getElementById('player').classList.remove('on');
+    document.body.style.overflow=''; run=null; render();
+  }, 'Quit', true);
 }
 function finishSession(){
   clearInterval(st_t); if(hs_t){clearInterval(hs_t.t);hs_t=null;} stopAll();
   const entries=run.entries.map(en=>({exId:en.exId,level:en.level,sets:en.sets.filter(s=>s.done)})).filter(en=>en.sets.length);
-  if(!entries.length){ quitSession(); return; }
+  if(!entries.length){
+    // nothing was ticked off, so there is nothing to save — say so rather than
+    // dropping the person into a quit dialog they did not ask for
+    ask('No sets were ticked off, so there is nothing to save. Tick the circle beside a set as you finish it.',
+      ()=>{ clearInterval(st_t); if(hs_t){clearInterval(hs_t.t);hs_t=null;} stopAll(); skipRest();
+        document.getElementById('player').classList.remove('on');
+        document.body.style.overflow=''; run=null; render(); },
+      'Discard the workout', true);
+    return;
+  }
   const before=stats(), beforeMedals=medalsEarned(before), beforeLevel=levelNow().n;
   const newLog={date:new Date().toISOString(), session:run.key, entries,
     extra: !!run.extra,
@@ -2717,18 +3501,37 @@ function amberIntentUrl(type, payload, extraFields){
     + '#Intent;scheme=' + SIGNER_SCHEME + ';' + S + ';end';
 }
 
-let waiting=null;
+let waiting=null, wasHidden=false;
 function amberSettle(v){ try{ sessionStorage.removeItem(AMB_KEY); }catch(e){}
   const w=waiting; if(!w) return; waiting=null; w.resolve(String(v).trim()); }
 function amberFail(m){ try{ sessionStorage.removeItem(AMB_KEY); }catch(e){}
   const w=waiting; if(!w) return; waiting=null; w.reject(new Error(m)); }
 function askPaste(){
-  const v=prompt('Amber has copied the result. Paste it here:');
-  if(v && v.trim()) amberSettle(v); else amberFail('Nothing pasted');
+  askText('Amber has copied the result. Paste it here:', '',
+    v=>{ if(v && v.trim()) amberSettle(v); else amberFail('Nothing pasted'); },
+    {placeholder:'Paste', ok:'Continue'});
 }
 
 document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState!=='visible' || !waiting) return;
+  if(document.visibilityState!=='visible'){ if(waiting) wasHidden=true; return; }
+  if(!waiting || !wasHidden) return;          // ignore the hop out to Amber
+  wasHidden=false;
+  setTimeout(()=>{
+    if(!waiting) return;
+    // The clipboard API needs a secure context. Opened from a file:// or
+    // content:// URL there is no navigator.clipboard at all, so go straight
+    // to asking rather than failing silently.
+    if(!navigator.clipboard || !navigator.clipboard.readText){ askPaste(); return; }
+    navigator.clipboard.readText()
+      .then(t=>{ if(t && t.trim()) amberSettle(t); else askPaste(); })
+      .catch(()=>askPaste());
+  },250);
+});
+/* Belt and braces: if the browser froze the page hard enough to miss the
+   visibility event, pick it up on focus instead. */
+window.addEventListener('focus',()=>{
+  if(!waiting || !wasHidden) return;
+  wasHidden=false;
   setTimeout(()=>{
     if(!waiting) return;
     if(!navigator.clipboard || !navigator.clipboard.readText){ askPaste(); return; }
@@ -2737,6 +3540,28 @@ document.addEventListener('visibilitychange',()=>{
       .catch(()=>askPaste());
   },250);
 });
+
+/* Whether the clipboard can be read at all. Needs https (or localhost) — from
+   a downloaded file the API simply is not there. */
+const CAN_CLIP = !!(window.isSecureContext && navigator.clipboard && navigator.clipboard.readText);
+
+/* A door that is always open. Every automatic route — clipboard, visibility,
+   focus, sessionStorage — depends on the page surviving the trip to Amber and
+   on APIs a file:// page does not get. This one depends on nothing: Amber has
+   already copied the answer, so the person can paste it themselves. */
+function pasteSignIn(){
+  askText('Paste what Amber copied. It will start with npub1, or be a long string of letters and numbers.', '', v=>{
+    const t=String(v||'').trim();
+    if(!t){ toast('Nothing pasted'); return; }
+    const pk = t.indexOf('npub1')===0 ? npubDecode(t) : t.toLowerCase();
+    if(!pk || !/^[0-9a-f]{64}$/.test(pk)){ toast('That does not look like a key'); return; }
+    S.nostr={mode:'amber', pk,
+      relays:(S.nostr&&S.nostr.relays)||RELAYS_DEFAULT.slice(),
+      autoBackup:true, publishWorkouts:false};
+    save(); render(); toast('Signed in as '+shortNpub(pk));
+    fetchOwnProfile();
+  }, {placeholder:'npub1…', ok:'Sign in'});
+}
 
 const AMB_KEY='gw.amber';
 function amberCall(type, payload, extraFields){
@@ -2753,11 +3578,13 @@ function amberCall(type, payload, extraFields){
       document.body.appendChild(a); a.click();
       setTimeout(()=>{ try{ a.remove(); }catch(e){} },1000);
     }catch(e){ return reject(new Error('Could not open Amber')); }
-    // visibilitychange fires the moment Amber opens, so arm after it
-    setTimeout(()=>{
-      waiting={resolve,reject};
-      setTimeout(()=>{ if(waiting&&waiting.resolve===resolve) amberFail('Amber did not answer. Is it installed?'); },120000);
-    },500);
+    // Arm synchronously. Delaying this was a bug: the page is backgrounded the
+    // moment Amber opens, timers are throttled while hidden, and on the way
+    // back the visibility event fired before the timer had armed anything.
+    // Instead of a delay, wait until we have actually been hidden once.
+    wasHidden=false;
+    waiting={resolve,reject};
+    setTimeout(()=>{ if(waiting&&waiting.resolve===resolve) amberFail('Amber did not answer. Is it installed?'); },120000);
   });
 }
 
@@ -2780,9 +3607,9 @@ function amberResume(){
     if(navigator.clipboard && navigator.clipboard.readText){
       navigator.clipboard.readText().then(t=>{
         if(t&&t.trim()) finish(t);
-        else { const v=prompt('Paste what Amber copied:'); if(v) finish(v); }
-      }).catch(()=>{ const v=prompt('Paste what Amber copied:'); if(v) finish(v); });
-    }else{ const v=prompt('Paste what Amber copied:'); if(v) finish(v); }
+        else askText('Paste what Amber copied:', '', v=>{ if(v) finish(v); }, {ok:'Sign in'});
+      }).catch(()=>askText('Paste what Amber copied:', '', v=>{ if(v) finish(v); }, {ok:'Sign in'}));
+    }else askText('Paste what Amber copied:', '', v=>{ if(v) finish(v); }, {ok:'Sign in'});
   },400);
 }
 
@@ -2842,18 +3669,19 @@ async function nostrLogin(mode){
     S.nostr={mode, pk, relays:(S.nostr&&S.nostr.relays)||RELAYS_DEFAULT.slice(),
       autoBackup:Native.on||mode==='nip07', publishWorkouts:false};
     save(); render(); toast('Signed in as '+shortNpub(pk));
+    fetchOwnProfile();
   }catch(e){ toast(e.message||'Sign-in failed'); }
 }
 function nostrLoginNpub(){
-  const v=prompt('Paste your npub. This signs you in read-only \u2014 you can restore a backup but not make one.');
-  if(!v) return;
-  const pk=npubDecode(v);
-  if(!pk){ toast('That is not a valid npub'); return; }
-  S.nostr={mode:'npub', pk, relays:(S.nostr&&S.nostr.relays)||RELAYS_DEFAULT.slice(), autoBackup:false, publishWorkouts:false};
-  save(); render(); toast('Read-only as '+shortNpub(pk));
+  askText('Paste your npub. This signs you in read-only \u2014 you can restore a backup but not make one.', '', v=>{
+    const pk=npubDecode(v||'');
+    if(!pk){ toast('That is not a valid npub'); return; }
+    S.nostr={mode:'npub', pk, relays:(S.nostr&&S.nostr.relays)||RELAYS_DEFAULT.slice(), autoBackup:false, publishWorkouts:false};
+    save(); render(); toast('Read-only as '+shortNpub(pk));
+  }, {placeholder:'npub1…', ok:'Sign in'});
 }
-function nostrLogout(){ if(!confirm('Sign out? Your workout history stays on this device.')) return;
-  S.nostr=null; save(); render(); toast('Signed out'); }
+function nostrLogout(){ ask('Sign out? Your workout history stays on this device.',
+  ()=>{ S.nostr=null; save(); render(); toast('Signed out'); }, 'Sign out'); }
 
 /* --- relays --- */
 function relayPublish(ev, relays){
@@ -2949,7 +3777,10 @@ function importData(input){
 
 async function nostrRestore(){
   if(!S.nostr||!S.nostr.pk) return;
-  if(!confirm('Restore from your last backup? Sessions already on this device are kept \u2014 anything the backup has that this device does not is added.')) return;
+  ask('Restore from your last backup? Sessions already on this device are kept \u2014 anything the backup has that this device does not is added.',
+    ()=>nostrRestoreGo(), 'Restore');
+}
+async function nostrRestoreGo(){
   try{
     toast('Looking for a backup\u2026');
     const evs=await relayFetch({kinds:[30078], authors:[S.nostr.pk], '#d':[BACKUP_D], limit:5});
@@ -2968,7 +3799,7 @@ async function nostrPublishWorkout(log){
   try{
     const start=Math.floor(new Date(log.date).getTime()/1000);
     const mins=log.mins||25;
-    const tags=[['d','gw-'+start],['title',SESSIONS[log.session].name],['type','strength'],
+    const tags=[['d','gw-'+start],['title','Groundwork '+(SESSIONS[log.session]?SESSIONS[log.session].name+' '+SESSIONS[log.session].letter:log.session)],['type','strength'],
       ['start',String(start-mins*60)],['end',String(start)],['completed','true'],['client','groundwork']];
     log.entries.forEach(en=>{ const e=byId(en.exId);
       en.sets.forEach(s=>tags.push(['exercise', e.ladder[en.level].n, '', String(s.weight||0), String(s.reps)])); });
@@ -2978,8 +3809,10 @@ async function nostrPublishWorkout(log){
 }
 async function nostrShareMilestone(name){
   if(!Signer.canWrite){ toast('Read-only sign-in cannot post'); return; }
-  const txt=prompt('Post to nostr:', name+' \u2014 training at home, three sessions a week. #groundwork');
-  if(!txt) return;
+  askText('Post to nostr:', name+' \u2014 training at home, three sessions a week. #groundwork',
+    txt=>{ if(txt&&txt.trim()) nostrPost(txt); }, {multiline:true, ok:'Post'});
+}
+async function nostrPost(txt){
   try{
     const ev=await Signer.signEvent({kind:1, created_at:Math.floor(Date.now()/1000),
       tags:[['t','groundwork']], content:txt, pubkey:Signer.pk});
@@ -2988,11 +3821,11 @@ async function nostrShareMilestone(name){
   }catch(e){ toast('Could not post'); }
 }
 function relayEdit(){
-  const v=prompt('One relay per line:', (S.nostr.relays||RELAYS_DEFAULT).join('\n'));
-  if(v===null) return;
-  const list=v.split('\n').map(s=>s.trim()).filter(s=>s.indexOf('wss://')===0||s.indexOf('ws://')===0);
-  if(!list.length){ toast('Need at least one wss:// relay'); return; }
-  S.nostr.relays=list; save(); render(); toast(list.length+' relays saved');
+  askText('One relay per line:', (S.nostr.relays||RELAYS_DEFAULT).join('\n'), v=>{
+    const list=(v||'').split('\n').map(x=>x.trim()).filter(x=>x.indexOf('wss://')===0||x.indexOf('ws://')===0);
+    if(!list.length){ toast('Need at least one wss:// relay'); return; }
+    S.nostr.relays=list; save(); render(); toast(list.length+' relays saved');
+  }, {multiline:true, ok:'Save'});
 }
 
 /* ============================== SOCIAL ==============================
@@ -3008,13 +3841,49 @@ function esc(v){ return String(v==null?'':v)
   .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
   .replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-function socialInit(){ if(!S.social) S.social={crew:[],profiles:{},cache:{},challenges:[],joins:[],lastSync:0}; }
+function socialInit(){
+  if(!S.social) S.social={crew:[],profiles:{},cache:{},challenges:[],joins:[],lastSync:0};
+  const d=S.social;
+  if(!d.pledges) d.pledges=[];
+  if(!d.dropped) d.dropped=[];
+  if(d.partner===undefined) d.partner=null;
+}
 function crewList(){ socialInit(); return S.social.crew; }
 function profOf(pk){ socialInit(); return S.social.profiles[pk]||{}; }
 function nameOf(pk){ const p=profOf(pk);
   const raw=p.display_name||p.name||(pk===Signer.pk?'You':shortNpub(pk).slice(0,12));
   return esc(String(raw).slice(0,40)); }
 function initialOf(pk){ const n=nameOf(pk).replace(/&[a-z#0-9]+;/gi,''); return (n[0]||'?').toUpperCase(); }
+
+/* A picture URL from a relay is a stranger's string: only https, no quotes or
+   spaces, nothing that could break out of the attribute. Anything else falls
+   back to the letter, as does a URL that fails to load. */
+function safePic(pk){
+  if(S.avatars!==true) return '';          // off unless asked for
+  const u=String((profOf(pk)||{}).picture||'').trim();
+  if(!/^https:\/\/[^\s"'<>\\]+$/i.test(u)) return '';
+  if(u.length>400) return '';
+  return u;
+}
+function avatarHtml(pk, cls, extraStyle){
+  const letter = (S.nostr && pk===S.nostr.pk) ? avatarLetter() : initialOf(pk);
+  const u = pk ? safePic(pk) : '';
+  return `<div class="${cls}" ${extraStyle?`style="${extraStyle}"`:''}><span>${letter}</span>${
+    u?`<img src="${esc(u)}" alt="" loading="lazy" onerror="this.remove()">`:''}</div>`;
+}
+
+/* Our own kind 0, so the profile page has a picture without opening Social */
+async function fetchOwnProfile(){
+  if(!S.nostr||!S.nostr.pk) return;
+  socialInit();
+  try{
+    const evs=await relayFetch({kinds:[0], authors:[S.nostr.pk], limit:3});
+    if(!evs.length) return;
+    evs.sort((a,b)=>a.created_at-b.created_at);
+    evs.forEach(m=>{ try{ S.social.profiles[m.pubkey]=JSON.parse(m.content); }catch(e){} });
+    save(); render();
+  }catch(e){}
+}
 
 /* --- who is in your friends list --- */
 async function crewImportFollows(){
@@ -3033,26 +3902,28 @@ async function crewImportFollows(){
   socialSync(true);
 }
 function crewAdd(){
-  const v=prompt('Paste their npub:');
-  if(!v) return;
-  const pk=npubDecode(v);
-  if(!pk){ toast('That is not a valid npub'); return; }
-  socialInit();
-  if(S.social.crew.indexOf(pk)>=0){ toast('Already added'); return; }
-  S.social.crew.push(pk); save(); toast('Added'); socialSync(true);
+  askText('Paste their npub:', '', v=>{
+    const pk=npubDecode(v||'');
+    if(!pk){ toast('That is not a valid npub'); return; }
+    socialInit();
+    if(S.social.crew.indexOf(pk)>=0){ toast('Already added'); return; }
+    S.social.crew.push(pk); save(); toast('Added'); socialSync(true);
+  }, {placeholder:'npub1…', ok:'Add'});
 }
 function crewRemove(pk){
-  if(!confirm('Remove '+nameOf(pk)+' from your friends?')) return;
-  S.social.crew=S.social.crew.filter(x=>x!==pk); save(); render();
+  ask('Remove '+nameOf(pk)+' from your people?', ()=>{
+    S.social.crew=S.social.crew.filter(x=>x!==pk); save(); render();
+  }, 'Remove', true);
 }
 
 /* --- pull everything the screen needs --- */
-let syncing=false;
+let syncing=false, syncFailed=false;
 async function socialSync(force){
   if(!S.nostr||syncing) return;
   socialInit();
   if(!force && Date.now()-S.social.lastSync<120000) return;
-  syncing=true; paintSyncing(true);
+  if(navigator.onLine===false){ if(force) toast('No connection'); return; }
+  syncing=true; syncFailed=false; paintSyncing(true);
   try{
     const crew=crewList(), all=[S.nostr.pk].concat(crew);
     if(all.length){
@@ -3067,10 +3938,11 @@ async function socialSync(force){
       Object.keys(byPk).forEach(k=>byPk[k].sort((a,b)=>b.at-a.at));
       S.social.cache=byPk;
     }
-    const [c1,c2,joins]=await Promise.all([
+    const [c1,c2,joins,pls]=await Promise.all([
       relayFetch({kinds:[30078], '#t':[CH_TAG], limit:60}),
       relayFetch({kinds:[30078], '#t':[CH_TAG], '#p':[S.nostr.pk], limit:60}),
-      relayFetch({kinds:[30078], '#t':[JOIN_TAG], limit:300})
+      relayFetch({kinds:[30078], '#t':[JOIN_TAG], limit:300}),
+      relayFetch({kinds:[30078], '#t':[PL_TAG], authors:[S.nostr.pk].concat(crewList()), limit:200})
     ]);
     const seen={}; const chs=[];
     c1.concat(c2).forEach(e=>{
@@ -3082,11 +3954,27 @@ async function socialSync(force){
           invited:e.tags.filter(t=>t[0]==='p').map(t=>t[1]), ...body}); }catch(e2){}
     });
     S.social.challenges=chs.filter((c,i,a)=>a.findIndex(x=>x.d===c.d)===i);
-    S.social.joins=joins.map(e=>({pk:e.pubkey, d:(e.tags.find(t=>t[0]==='d')||[])[1]||''}));
+    S.social.joins=joins.map(e=>({pk:e.pubkey, at:e.created_at, d:(e.tags.find(t=>t[0]==='d')||[])[1]||''}));
+    const pseen={}, pl=[];
+    (pls||[]).forEach(e=>{
+      const d=(e.tags.find(t=>t[0]==='d')||[])[1]; if(!d) return;
+      if((S.social.dropped||[]).indexOf(d)>=0) return;
+      if(pseen[d] && pseen[d]>=e.created_at) return;
+      pseen[d]=e.created_at;
+      try{ const b=JSON.parse(e.content);
+        const perWeek=Math.max(1,Math.min(14,parseInt(b.perWeek)||0));
+        const weeks=Math.max(1,Math.min(52,parseInt(b.weeks)||0));
+        const start=parseInt(b.start)||0;
+        if(perWeek && weeks && start)
+          pl.push({d, id:d.split(':').pop(), pk:e.pubkey, at:e.created_at, perWeek, weeks, start});
+      }catch(e2){}
+    });
+    S.social.pledges=pl.filter((c,i,a)=>a.findIndex(x=>x.d===c.d)===i);
     S.social.lastSync=Date.now(); save();
-  }catch(e){}
-  syncing=false;
-  if(tab==='crew') viewCrew();
+  }catch(e){ syncFailed=true; }
+  syncing=false; paintSyncing(false);
+  if(force) toast(syncFailed?'Could not reach the relays':'Up to date');
+  if(tab==='social') viewSocial();
 }
 function paintSyncing(on){ const el=document.getElementById('syncdot'); if(el) el.style.opacity=on?1:0; }
 
@@ -3117,15 +4005,205 @@ function agoText(ts){
   const d=Math.floor((Date.now()/1000-ts)/86400);
   return d<=0?'trained today':d===1?'trained yesterday':d<14?`trained ${d} days ago`:'quiet lately';
 }
-async function cheer(pk){
-  const st=friendStats(pk);
-  if(!st.topId){ toast('Nothing to cheer yet'); return; }
+async function cheer(pk, evId, mark){
+  const id = evId || friendStats(pk).topId;
+  if(!id){ toast('Nothing to cheer yet'); return; }
   if(!Signer.canWrite){ toast('Read-only sign-in cannot post'); return; }
+  if(pk===S.nostr.pk){ toast('Cheer someone else'); return; }
+  socialInit();
+  const key=id+':'+(mark||'cheer');
+  if((S.social.cheered||[]).indexOf(key)>=0){ toast('Already sent'); return; }
   try{
     const ev=await Signer.signEvent({kind:7, created_at:Math.floor(Date.now()/1000),
-      tags:[['e',st.topId],['p',pk]], content:'\u{1F525}', pubkey:Signer.pk});
-    await relayPublish(ev); toast('Cheered '+nameOf(pk));
+      tags:[['e',id],['p',pk]], content: mark==='nudge'?'\u{1F44B}':'\u{1F525}', pubkey:Signer.pk});
+    await relayPublish(ev);
+    S.social.cheered=(S.social.cheered||[]).concat([key]).slice(-400); save();
+    toast((mark==='nudge'?'Nudged ':'Cheered ')+nameOf(pk)); render();
   }catch(e){ toast('Could not send that'); }
+}
+function cheered(evId, mark){
+  socialInit();
+  return (S.social.cheered||[]).indexOf(evId+':'+(mark||'cheer'))>=0;
+}
+
+/* --- the activity feed ---
+   Assembled from what is already cached: published sessions, challenge joins
+   and pledges. No new relay traffic, so it costs nothing to show. */
+function sessionsOf(pk){
+  socialInit();
+  return pk===S.nostr.pk
+    ? S.logs.map(l=>({at:Math.floor(new Date(l.date).getTime()/1000)}))
+    : (S.social.cache[pk]||[]);
+}
+function weekCountFor(pk, wk){
+  return sessionsOf(pk).filter(e=>weekKey(new Date(e.at*1000))===wk).length;
+}
+function socialFeed(days){
+  socialInit();
+  days=days||14;
+  const me=S.nostr.pk, all=[me].concat(crewList());
+  const cut=Date.now()/1000-days*86400;
+  const out=[];
+
+  all.forEach(pk=>{
+    /* one row per person per day, however many sessions they logged */
+    const byDay={};
+    sessionsOf(pk).forEach(e=>{ if(e.at<cut) return;
+      const k=dayKey(new Date(e.at*1000));
+      if(!byDay[k] || e.at>byDay[k].at) byDay[k]={at:e.at, id:e.id, n:0};
+    });
+    sessionsOf(pk).forEach(e=>{ if(e.at<cut) return;
+      const k=dayKey(new Date(e.at*1000)); if(byDay[k]) byDay[k].n++; });
+    Object.keys(byDay).forEach(k=>{
+      const d=byDay[k];
+      out.push({t:'train', pk, at:d.at, id:d.id, n:d.n});
+    });
+    /* hitting the weekly target is the thing worth noticing */
+    for(let i=0;i<Math.ceil(days/7)+1;i++){
+      const wd=new Date(mondayOf(new Date()).getTime()-i*7*864e5), wk=weekKey(wd);
+      const evs=sessionsOf(pk).filter(e=>weekKey(new Date(e.at*1000))===wk)
+        .sort((a,b)=>a.at-b.at);
+      if(evs.length>=S.target){
+        const hitAt=evs[S.target-1].at;
+        if(hitAt>=cut) out.push({t:'week', pk, at:hitAt, n:evs.length});
+      }
+    }
+  });
+
+  (S.social.joins||[]).forEach(j=>{
+    if(!j.at || j.at<cut) return;
+    const id=String(j.d||'').split(':').pop();
+    const c=(S.social.challenges||[]).find(x=>x.id===id);
+    if(c && all.indexOf(j.pk)>=0) out.push({t:'join', pk:j.pk, at:j.at, title:c.title});
+  });
+  (S.social.pledges||[]).forEach(p=>{
+    if(all.indexOf(p.pk)<0 || p.at<cut) return;
+    out.push({t:'pledge', pk:p.pk, at:p.at, perWeek:p.perWeek, weeks:p.weeks});
+  });
+
+  return out.sort((a,b)=>b.at-a.at).slice(0,80);
+}
+function feedText(f){
+  const who = f.pk===S.nostr.pk ? 'You' : nameOf(f.pk);
+  if(f.t==='train') return `<span class="fw">${who}</span> trained${f.n>1?` — ${f.n} sessions`:''}`;
+  if(f.t==='week')  return `<span class="fw">${who}</span> hit the week — ${f.n} session${f.n===1?'':'s'}`;
+  if(f.t==='join')  return `<span class="fw">${who}</span> joined ${esc(String(f.title||'a challenge').slice(0,60))}`;
+  if(f.t==='pledge')return `<span class="fw">${who}</span> pledged ${f.perWeek} a week for ${f.weeks} week${f.weeks===1?'':'s'}`;
+  return '';
+}
+function whenText(ts){
+  const mins=Math.floor((Date.now()/1000-ts)/60);
+  if(mins<60) return mins<2?'just now':mins+' min ago';
+  const h=Math.floor(mins/60); if(h<24) return h+'h ago';
+  const d=Math.floor(h/24); return d===1?'yesterday':d+' days ago';
+}
+function dayHeading(ts){
+  const k=dayKey(new Date(ts*1000)), today=dayKey(new Date());
+  if(k===today) return 'Today';
+  if(k===dayKey(new Date(Date.now()-864e5))) return 'Yesterday';
+  return new Date(ts*1000).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'});
+}
+
+/* --- quiet lately: who has dropped off --- */
+function quietList(){
+  const cut=Date.now()/1000-7*86400;
+  return crewList().map(pk=>({pk, st:friendStats(pk)}))
+    .filter(r=>r.st.last && r.st.last<cut)
+    .sort((a,b)=>a.st.last-b.st.last);
+}
+
+/* --- training partner ---
+   One person, not a leaderboard. Somebody noticing is the whole mechanism. */
+function partnerPk(){ socialInit(); const p=S.social.partner;
+  return (p && crewList().indexOf(p)>=0) ? p : null; }
+function setPartner(pk){
+  socialInit();
+  S.social.partner = (S.social.partner===pk) ? null : pk;
+  save(); render();
+  toast(S.social.partner?('Partnered with '+nameOf(pk)):'Partner cleared');
+}
+function partnerLine(){
+  const pk=partnerPk(); if(!pk) return null;
+  const st=friendStats(pk);
+  return {pk, st, text:`${st.thisWeek} this week \u00b7 ${agoText(st.last)}`};
+}
+
+/* --- pledges ---
+   A public commitment with nothing staked but your word. This exists to find
+   out whether being on the hook in front of people changes what you do,
+   before anything with money in it gets built. */
+const PL_TAG='groundwork-pledge';
+
+function pledgeWindow(p){
+  const start=p.start*1000, end=(p.start+p.weeks*7*86400)*1000;
+  return {start, end, live:Date.now()>=start&&Date.now()<end, done:Date.now()>=end,
+    weeksLeft:Math.max(0,Math.ceil((end-Date.now())/(7*864e5)))};
+}
+function pledgeWeeks(p){
+  const out=[];
+  for(let i=0;i<p.weeks;i++){
+    const ws=new Date(p.start*1000+i*7*864e5);
+    const wk=weekKey(ws);
+    const n=weekCountFor(p.pk, wk);
+    const open = weekKey(new Date())===wk;
+    const future = ws.getTime()>Date.now();
+    out.push({wk, n, hit:n>=p.perWeek, open, future});
+  }
+  return out;
+}
+function pledgeScore(p){
+  const ws=pledgeWeeks(p);
+  const closed=ws.filter(w=>!w.open&&!w.future);
+  return {kept:closed.filter(w=>w.hit).length, closed:closed.length, weeks:ws,
+    onTrack: ws.filter(w=>w.hit).length};
+}
+function myPledge(){
+  socialInit();
+  return (S.social.pledges||[]).filter(p=>p.pk===S.nostr.pk&&!pledgeWindow(p).done)
+    .sort((a,b)=>b.at-a.at)[0]||null;
+}
+function pledgeCreate(){
+  if(!Signer.canWrite){ toast('Read-only sign-in cannot pledge'); return; }
+  if(myPledge()){ toast('You already have one running'); return; }
+  askText('Sessions a week?', String(S.target), pw=>{
+    askText('For how many weeks?','4', wk=>{
+      const perWeek=Math.max(1,Math.min(14,parseInt(pw)||S.target));
+      const weeks=Math.max(1,Math.min(52,parseInt(wk)||4));
+      ask(`Publish that you are training ${perWeek} times a week for ${weeks} weeks? Anyone following you can see it, and can see if you miss.`,
+        ()=>pledgeGo(perWeek,weeks), 'Publish');
+    }, {numeric:true, ok:'Next'});
+  }, {numeric:true, ok:'Next'});
+}
+async function pledgeGo(perWeek, weeks){
+  const id=Math.random().toString(36).slice(2,10);
+  const start=Math.floor(mondayOf(new Date()).getTime()/1000);
+  try{
+    const ev=await Signer.signEvent({kind:30078, created_at:Math.floor(Date.now()/1000),
+      tags:[['d','groundwork:pledge:'+id],['t',PL_TAG],['client','groundwork']],
+      content:JSON.stringify({perWeek, weeks, start}), pubkey:Signer.pk});
+    await relayPublish(ev);
+    toast('Pledged'); socialSync(true);
+  }catch(e){ toast('Could not publish that'); }
+}
+/* Honest either way — the result posts whether it was kept or not. */
+async function pledgeReport(p){
+  if(!Signer.canWrite){ toast('Read-only sign-in cannot post'); return; }
+  const sc=pledgeScore(p);
+  const body=`Pledged ${p.perWeek} sessions a week for ${p.weeks} weeks. Kept ${sc.kept} of ${sc.closed}.`;
+  ask('Post this result publicly?\n\n'+body, async ()=>{
+    try{
+      const ev=await Signer.signEvent({kind:1, created_at:Math.floor(Date.now()/1000),
+        tags:[['t','groundwork'],['client','groundwork']], content:body, pubkey:Signer.pk});
+      await relayPublish(ev); toast('Posted');
+    }catch(e){ toast('Could not post'); }
+  }, 'Post');
+}
+function pledgeDrop(p){
+  ask('Drop this pledge? It stays published — dropping it only hides it here.', ()=>{
+    S.social.pledges=(S.social.pledges||[]).filter(x=>x.d!==p.d);
+    S.social.dropped=(S.social.dropped||[]).concat([p.d]);
+    save(); render();
+  }, 'Drop', true);
 }
 
 /* --- challenges --- */
@@ -3149,11 +4227,18 @@ function chScore(c,pk){
 }
 async function chCreate(){
   if(!Signer.canWrite){ toast('Read-only sign-in cannot create challenges'); return; }
-  const title=prompt('Name the challenge:','Twelve sessions in four weeks');
-  if(!title) return;
-  const days=parseInt(prompt('How many days does it run for?','28')||'28');
-  const target=parseInt(prompt('How many sessions each, to finish it?','12')||'12');
-  if(!days||!target){ toast('Need a length and a target'); return; }
+  askText('Name the challenge:','Twelve sessions in four weeks', title=>{
+    if(!title||!title.trim()) return;
+    askText('How many days does it run for?','28', d=>{
+      askText('How many sessions each, to finish it?','12', t=>{
+        const days=parseInt(d)||28, target=parseInt(t)||12;
+        if(!days||!target){ toast('Need a length and a target'); return; }
+        chCreateGo(title.trim(), days, target);
+      }, {numeric:true, ok:'Create'});
+    }, {numeric:true, ok:'Next'});
+  }, {ok:'Next'});
+}
+async function chCreateGo(title, days, target){
   const id=Math.random().toString(36).slice(2,10);
   const start=Math.floor(new Date().setHours(0,0,0,0)/1000);
   try{
@@ -3271,11 +4356,107 @@ function paintRest(){
 }
 function skipRest(){ clearInterval(rt); document.getElementById('rest').classList.remove('on'); }
 
+/* In-app dialogs.
+
+   window.confirm and window.prompt are blocked outright in sandboxed frames
+   and in some webviews, which makes every button that used them silently do
+   nothing. These are plain DOM, so they work everywhere the app does. */
+let modalYes=null, modalText=null, modalPrev=null;
+
+function modalIsOpen(){ const m=document.getElementById('modal'); return !!(m && m.classList.contains('on')); }
+function modalClose(){
+  const m=document.getElementById('modal');
+  if(m){ m.classList.remove('on'); m.innerHTML=''; }
+  if(!run) document.body.style.overflow='';
+  modalYes=null; modalText=null;
+  const back=modalPrev; modalPrev=null;
+  if(back && back.focus) { try{ back.focus({preventScroll:true}); }catch(e){} }
+}
+function modalOpen(inner){
+  let m=document.getElementById('modal');
+  if(!m){ m=document.createElement('div'); m.id='modal'; document.body.appendChild(m); }
+  modalPrev=document.activeElement;
+  m.innerHTML=`<div class="modalback" onclick="modalClose()"></div>
+    <div class="modalcard" role="dialog" aria-modal="true">${inner}</div>`;
+  m.classList.add('on');
+  document.body.style.overflow='hidden';   /* the page behind should not scroll */
+  setTimeout(()=>{ const f=m.querySelector('.modalcard button'); if(f) try{ f.focus({preventScroll:true}); }catch(e){} },40);
+}
+function modalConfirm(){ const f=modalYes; modalClose(); if(f) f(); }
+function modalSubmit(){
+  const f=modalText, i=document.getElementById('modalinput');
+  const v=i?i.value:''; modalClose(); if(f) f(v);
+}
+
+/* Messages can carry line breaks, so they are rendered pre-line rather than
+   collapsed the way HTML would normally do it. */
+function ask(msg, onYes, yesLabel, danger){
+  modalYes=onYes;
+  modalOpen(`
+    <p class="small" style="margin:0;line-height:1.55;white-space:pre-line">${msg}</p>
+    <button class="btn sm" style="${danger?'background:#b4442e;color:#fff':'background:var(--pine);color:var(--surface)'}"
+      onclick="modalConfirm()">${yesLabel||'Yes'}</button>
+    <button class="btn ghost sm" onclick="modalClose()">Cancel</button>`);
+}
+
+function askText(msg, def, onOk, opts){
+  opts=opts||{};
+  modalText=onOk;
+  const field = opts.multiline
+    ? `<textarea id="modalinput" rows="6" class="modalinput">${esc(def||'')}</textarea>`
+    : `<input id="modalinput" class="modalinput" value="${esc(def||'')}" placeholder="${esc(opts.placeholder||'')}"
+         enterkeyhint="done" ${opts.numeric?'type="number" inputmode="numeric"':'type="text" autocapitalize="sentences"'}>`;
+  modalOpen(`
+    <p class="small" style="margin:0 0 12px;line-height:1.55;white-space:pre-line">${msg}</p>
+    ${field}
+    <button class="btn pine sm" onclick="modalSubmit()">${opts.ok||'Done'}</button>
+    <button class="btn ghost sm" onclick="modalClose()">Cancel</button>`);
+  setTimeout(()=>{
+    const el=document.getElementById('modalinput'); if(!el) return;
+    el.focus(); if(el.select) el.select();
+    /* the keyboard's Go key should submit, rather than doing nothing */
+    if(!opts.multiline) el.addEventListener('keydown', e=>{
+      if(e.key==='Enter'){ e.preventDefault(); modalSubmit(); } });
+  },60);
+}
+
+/* --- going back ---
+   One ladder for the Escape key and for Android's hardware back, so neither
+   drops out of the app from halfway down a screen. */
+function goBack(){
+  if(modalIsOpen()){ modalClose(); return true; }
+  const rest=document.getElementById('rest');
+  if(rest && rest.classList.contains('on')){ skipRest(); return true; }
+  if(run){ quitSession(); return true; }
+  if(asq){ asq=null; render(); return true; }
+  if(sub){ closeSub(); return true; }
+  if(tab!=='today'){ go('today'); return true; }
+  return false;
+}
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape' && goBack()) e.preventDefault();
+});
+
 function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('on');
   clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),2200); }
 
 /* ============================== BOOT ============================== */
 /* Platform: native shell, iOS home-screen app, or a plain browser tab */
+/* Only ever called if the person turns web fonts on */
+function loadWebFonts(){
+  if(document.getElementById('webfont')) return;
+  const l=document.createElement('link');
+  l.id='webfont'; l.rel='stylesheet';
+  l.href='https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=Public+Sans:wght@400;500;600&display=swap';
+  document.head.appendChild(l);
+}
+function setWebFonts(on){
+  S.webfonts=!!on; save();
+  if(on) loadWebFonts();
+  else { const l=document.getElementById('webfont'); if(l) l.remove(); }
+  render();
+}
+
 const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent||'') ||
   (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
 const STANDALONE = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone===true;
@@ -3285,12 +4466,25 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 
 load();
 amberResume();
+if(S.nostr && S.nostr.pk) setTimeout(fetchOwnProfile, 1200);
 figNormalise([...EX,...STR,...MOB]);
 if(S.theme && S.theme!=='auto') document.documentElement.setAttribute('data-theme',S.theme);
+if(S.webfonts) loadWebFonts();
 renderTabs();
 if(!S.setup){ document.getElementById('tabs').classList.add('hidden'); document.body.style.paddingBottom='24px'; }
 render();
 notifInit();
+
+/* Android's back button should walk back through the app, and only leave
+   from the Today screen. */
+try{
+  const A=window.Capacitor?.Plugins?.App;
+  if(A && A.addListener) A.addListener('backButton', ()=>{ if(!goBack()) A.exitApp(); });
+}catch(e){}
+
+/* The social screen is the only part that needs the network. */
+window.addEventListener('online',  ()=>{ if(tab==='social') render(); });
+window.addEventListener('offline', ()=>{ if(tab==='social') render(); });
 </script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 /* Offline support. The app is one file with no network calls of its own, so
    a plain cache-first strategy is enough. Bump CACHE to ship an update. */
-const CACHE = 'groundwork-v1';
+const CACHE = 'groundwork-v5';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
