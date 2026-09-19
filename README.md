@@ -139,7 +139,6 @@ www/sw.js                         offline support
 www/icon-*.png                    app icons
 scripts/patch-android.py          permissions, deep link, signer visibility
 .github/workflows/android.yml     builds the APK
-.github/workflows/ios.yml         builds an unsigned .ipa on a Mac runner
 .github/workflows/pages.yml       publishes www/ to GitHub Pages
 ```
 
@@ -262,36 +261,26 @@ This needs **Settings → Pages → Source** set to **GitHub Actions**. Left on 
 
 A `.nojekyll` file is added during the build so nothing gets filtered on the way out.
 
-## iOS
+**One workflow, deliberately.** GitHub offers a "Deploy static content to Pages" starter that publishes the whole repo, and for a while this repo had both it and `pages.yml`. They share a concurrency group and trigger on the same push, so every deploy was a race between serving the app at the site root and serving it under `/www/` — which changes the service worker's scope and the manifest's `start_url`, and quietly breaks installed copies. If Pages ever starts behaving strangely, check there is still only one workflow deploying it.
 
-Three ways to run this on an iPhone, in order of effort.
+## iPhone
 
-### 1. Add to Home Screen — works today, no Mac, no account
+There is no iOS build and there is not going to be one. Two targets get looked after: the **Android APK** and the **web app**. On an iPhone, the web app is the answer.
 
-Open the page in Safari, tap Share, then **Add to Home Screen**. It installs as a proper app: own icon, no browser chrome, works offline, data kept separately from Safari.
+Open the page in Safari, tap Share, then **Add to Home Screen**. It installs as a proper app — own icon, no browser chrome, works offline, storage kept separately from Safari's.
 
-Everything works except the daily reminder. iOS does not let home-screen web apps schedule their own local notifications, and no amount of code gets around it. The reminder screen says so rather than pretending, and suggests a repeating phone alarm at the same time, which does the same job.
+### Why no native iOS
 
-Amber is Android-only, so nostr sign-in on iOS is limited to pasting an npub (read-only). A NIP-46 remote signer would fix that properly and is the right long-term answer.
+The native build never earned its keep. It bought exactly one thing the web app does not have — local notifications — and cost a macOS runner at ten times Linux rates for an unsigned `.ipa` that Apple expires after seven days when re-signed with a free account. That is not a distribution channel, it is a weekly chore.
 
-### 2. Native build, sideloaded
+Bunker sign-in closed the other gap. Nostr on iOS used to mean pasting an npub and living read-only, because Amber is Android-only. A NIP-46 bunker works anywhere there is a relay, so an iPhone on the web app now gets the whole thing: encrypted backup, publishing, the board, zaps.
 
-`.github/workflows/ios.yml` builds an unsigned `.ipa` on a macOS runner. Run it from the Actions tab — it is deliberately not on the push trigger, because macOS minutes cost roughly ten times what Linux ones do on private repos.
+### What an iPhone still misses
 
-The output is unsigned, so it will not install by itself. Tools like AltStore or Sideloadly re-sign it with a free Apple ID and install it over USB. Apps signed with a free account expire after seven days and need refreshing.
+- **The daily reminder.** iOS does not let home-screen web apps schedule local notifications, and no amount of code gets around it. The reminder screen says so and suggests a repeating phone alarm, which does the same job.
+- **Durable storage.** This is the one that bites. Safari clears web app storage after about seven days without opening it. Your history, your streak and — if you set one up — your wallet all live in that storage.
 
-This version does get local notifications, because it is a real app rather than a web page.
-
-### 3. App Store
-
-Needs an Apple Developer account at £79 a year, a signing certificate and provisioning profile stored as repo secrets, and review. Only worth it if other people are going to use this.
-
-### What differs on iOS
-
-- **Reminders**: home-screen app no, native build yes
-- **Amber sign-in**: no — Android only. npub read-only works, NIP-46 would be the fix
-- **Relay connections**: fine in both
-- **Storage**: iOS clears web app storage after about seven days of not opening it, so export or sign in for backup matters more here than on Android
+  So on an iPhone, signing in for the encrypted backup is not a nice-to-have. Open the app once a week and it never comes up; leave it a fortnight without a backup and you may come back to an empty app.
 
 ## Releasing properly
 
