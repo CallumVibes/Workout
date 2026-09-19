@@ -57,6 +57,50 @@ The global scope is the only query in the app with no `authors` filter — `kind
 
 What it cannot do, and says on the screen rather than implying otherwise: none of it is verified. Anyone can publish a workout record they did not earn. It only ever sees people who have public publishing switched on, which most people leave off, and it is whatever your relays hold rather than the whole world. It is a nudge, not a record.
 
+### Zaps
+
+You can send someone sats from the Social tab — feed rows, the People list, your partner, and the board. It follows NIP-57, so the zap shows up in every other nostr client too, not only here.
+
+Each zap is three steps, and the sheet says so rather than appearing to hang: the recipient's lightning address is fetched for an invoice, Amber signs the `kind 9734` request, and Spark pays it.
+
+It degrades rather than failing silently. No lightning address in their profile and it says so. An old-style `lud06` LNURL and it says it cannot read one. A server that does not do nostr and it still pays, labelled a tip rather than a public zap — and Amber is not asked for a signature that would only be thrown away.
+
+**The invoice amount is checked against what you agreed before anything is paid.** If their server returns an invoice for a different number, nothing is sent and the screen says what happened.
+
+This is the first thing in the app that makes an HTTPS request. Everything else is a WebSocket to a relay you chose; a zap fetches a URL built out of a stranger's profile. So it will only fetch an ordinary public https host — no bare IP addresses, no ports or credentials, nothing resolving inside whatever network the phone is on — with a timeout and a ceiling on how much it will read. Routing fees are capped, and anything over 5,000 sats asks twice.
+
+### The wallet
+
+**You → Wallet** sets up a [Spark](https://spark.money) wallet on the device. Balance, receive by invoice, a default zap amount, and the twelve words.
+
+It is a tips wallet and the app says so everywhere it can. The keys live in this app's storage, which Android may clear when space runs short.
+
+That is survivable because of the backup, and only because of it: the recovery phrase is NIP-44 encrypted to your own nostr key by Amber and published as a `kind 30078` event with the `d` tag `groundwork-wallet-v1` — the same mechanism as the workout backup. Reinstall, sign in with Amber, and the wallet comes back with nothing to write down.
+
+The honest costs, which the screen states rather than buries:
+
+- Your sats now ride on your nostr key. Whoever gets your nsec gets the wallet.
+- And on a relay keeping one event. If every relay drops it and the device is wiped, it is gone.
+- A read-only npub sign-in cannot decrypt, so it cannot spend.
+
+So the twelve words are also shown, for anyone who wants paper. They are **excluded from the file export**, which is plain JSON headed for the Downloads folder, and an imported file can never install a wallet.
+
+Worth knowing: `SparkWallet.initialize()` authenticates with Spark's operators, so the wallet needs a connection every time it opens. There is no offline balance.
+
+#### The one generated file
+
+`www/spark.js` is the Spark SDK, bundled — about 6 MB, which is roughly twenty times the size of the rest of the app, because two WASM blobs are inlined. It is the only generated file in the repo and the only reason `scripts/` contains a build step.
+
+It is **not** precached by the service worker and **not** loaded at startup. It is fetched the first time somebody opens the wallet, and cached from then on, so anyone who never zaps never downloads it.
+
+To move to a newer SDK:
+
+```
+./scripts/build-spark.sh              # or: SPARK_VERSION=0.13.0 ./scripts/build-spark.sh
+```
+
+Then bump `CACHE` in `www/sw.js` and commit the result. Editing `index.html` by hand still needs no build step of any kind.
+
 ### Relays
 
 Four defaults, editable under **You → Nostr account → Relays**. One `wss://` relay is the minimum.
@@ -72,6 +116,8 @@ www/index.html                    the entire app
 capacitor.config.json             app id, name, notification icon
 package.json                      Capacitor + plugins
 www/manifest.webmanifest          makes it installable from a browser
+www/spark.js                      the Spark SDK, bundled — the only generated file
+scripts/build-spark.sh            regenerates it, and nothing else needs a build
 www/sw.js                         offline support
 www/icon-*.png                    app icons
 scripts/patch-android.py          permissions, deep link, signer visibility
