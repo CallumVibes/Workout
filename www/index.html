@@ -392,7 +392,7 @@ const P = {
 };
 const EX = [
   {
-    id:'squat', kit:'none', alt:['split','bridge'], name:'Goblet squat', trains:'Thighs, glutes, core', reps:[8,14], sets:3, load:true,
+    id:'squat', kit:'none', pat:'squat', mus:'legs', alt:['split','bridge'], name:'Goblet squat', trains:'Thighs, glutes, core', reps:[8,14], sets:3, load:true,
     ladder:[
       {n:'Bodyweight squat', nw:1, h:'Arms straight out in front to balance.'},
       {n:'Goblet squat', h:'Hold one weight against your chest.'},
@@ -408,7 +408,7 @@ const EX = [
     }
   },
   {
-    id:'pushup', kit:'none', alt:['press','ohp'], name:'Push-up', trains:'Chest, shoulders, triceps', reps:[5,12], sets:3, load:false,
+    id:'pushup', kit:'none', pat:'push', mus:'chest', alt:['press','ohp'], name:'Push-up', trains:'Chest, shoulders, triceps', reps:[5,12], sets:3, load:false,
     ladder:[
       {n:'Wall push-up', h:'Hands on a wall, feet a step back.'},
       {n:'Counter push-up', h:'Hands on a kitchen worktop or windowsill.'},
@@ -426,7 +426,7 @@ const EX = [
     }
   },
   {
-    id:'row', kit:'db', alt:['curl','rdl'], name:'One-arm row', trains:'Upper back, biceps', reps:[8,14], sets:3, load:true,
+    id:'row', kit:'db', pat:'pull', mus:'back', alt:['curl','rdl'], name:'One-arm row', trains:'Upper back, biceps', reps:[8,14], sets:3, load:true,
     ladder:[
       {n:'One-arm row', h:'Free hand on a chair, one weight in the other.'},
       {n:'Paused row', h:'Hold 2 seconds with the weight at your ribs.'},
@@ -442,7 +442,7 @@ const EX = [
     }
   },
   {
-    id:'bridge', kit:'none', alt:['rdl','squat'], name:'Glute bridge', trains:'Glutes, hamstrings', reps:[10,20], sets:3, load:true,
+    id:'bridge', kit:'none', pat:'hinge', mus:'hips', alt:['rdl','squat'], name:'Glute bridge', trains:'Glutes, hamstrings', reps:[10,20], sets:3, load:true,
     ladder:[
       {n:'Glute bridge', nw:1, h:'Both feet on the floor, arms by your sides.'},
       {n:'Paused glute bridge', nw:1, h:'Squeeze hard for 3 seconds at the top of each rep.'},
@@ -458,7 +458,7 @@ const EX = [
     }
   },
   {
-    id:'plank', kit:'none', alt:['bridge','deadbug'], name:'Plank', trains:'Whole midsection', reps:[20,60], sets:3, load:false, unit:'sec', hold:true,
+    id:'plank', kit:'none', pat:'core', mus:'core', alt:['bridge','deadbug'], name:'Plank', trains:'Whole midsection', reps:[20,60], sets:3, load:false, unit:'sec', hold:true,
     ladder:[
       {n:'Wall plank', h:'Forearms on a wall, feet a step back.'},
       {n:'Knee plank', h:'Forearms and knees on the floor.'},
@@ -474,7 +474,7 @@ const EX = [
     }
   },
   {
-    id:'split', kit:'none', alt:['squat','bridge'], name:'Split squat', trains:'One leg at a time — thighs, glutes', reps:[6,12], sets:3, load:true,
+    id:'split', kit:'none', pat:'lunge', mus:'legs', alt:['squat','bridge'], name:'Split squat', trains:'One leg at a time — thighs, glutes', reps:[6,12], sets:3, load:true,
     ladder:[
       {n:'Supported split squat', nw:1, h:'Hold a chair or doorframe for balance.'},
       {n:'Split squat', nw:1, h:'No hands. Feet in a long stride.'},
@@ -490,7 +490,7 @@ const EX = [
     }
   },
   {
-    id:'press', kit:'db', alt:['pushup','ohp'], name:'Floor press', trains:'Chest, triceps, shoulders', reps:[8,14], sets:3, load:true,
+    id:'press', kit:'db', pat:'push', mus:'chest', alt:['pushup','ohp'], name:'Floor press', trains:'Chest, triceps, shoulders', reps:[8,14], sets:3, load:true,
     ladder:[
       {n:'Floor press', h:'Lie on your back, knees bent, press both weights up.'},
       {n:'Slow floor press', h:'4 seconds lowering, press up normally.'},
@@ -506,7 +506,7 @@ const EX = [
     }
   },
   {
-    id:'rdl', kit:'db', alt:['bridge','split'], name:'Romanian deadlift', trains:'Hamstrings, glutes, lower back', reps:[8,14], sets:3, load:true,
+    id:'rdl', kit:'db', pat:'hinge', mus:'hips', alt:['bridge','split'], name:'Romanian deadlift', trains:'Hamstrings, glutes, lower back', reps:[8,14], sets:3, load:true,
     ladder:[
       {n:'Hip hinge, hands on hips', nw:1, h:'Learn the movement with no weight first.'},
       {n:'Weighted RDL', h:'A weight in each hand, sliding down your thighs.'},
@@ -522,7 +522,7 @@ const EX = [
     }
   },
   {
-    id:'ohp', kit:'db', alt:['press','pushup'], name:'Overhead press', trains:'Shoulders, triceps', reps:[6,12], sets:3, load:true,
+    id:'ohp', kit:'db', pat:'shoulder', mus:'shoulders', alt:['press','pushup'], name:'Overhead press', trains:'Shoulders, triceps', reps:[6,12], sets:3, load:true,
     ladder:[
       {n:'Seated overhead press', h:'Sit upright on a chair, press both weights overhead.'},
       {n:'Standing overhead press', h:'Stand tall, no leg help.'},
@@ -538,7 +538,7 @@ const EX = [
     }
   },
   {
-    id:'curl', kit:'db', alt:['row','pushup'], name:'Curl', trains:'Biceps, forearms', reps:[8,15], sets:3, load:true,
+    id:'curl', kit:'db', pat:'arms', mus:'arms', alt:['row','pushup'], name:'Curl', trains:'Biceps, forearms', reps:[8,15], sets:3, load:true,
     ladder:[
       {n:'Standing curl', h:'Both weights, palms facing forward.'},
       {n:'Slow-lowering curl', h:'Curl up in 1 second, lower over 4.'},
@@ -555,7 +555,7 @@ const EX = [
   }
 ];
 EX.push({
-  id:'deadbug', kit:'none', alt:['plank','bridge'], name:'Dead bug', trains:'Deep midsection', reps:[6,12], sets:3, load:false,
+  id:'deadbug', kit:'none', pat:'core', mus:'core', alt:['plank','bridge'], name:'Dead bug', trains:'Deep midsection', reps:[6,12], sets:3, load:false,
   ladder:[
     {n:'Dead bug, arms only', h:'Lie on your back, knees up, lower one arm at a time.'},
     {n:'Dead bug, legs only', h:'Knees up, straighten one leg towards the floor at a time.'},
@@ -585,7 +585,7 @@ const SESSIONS = {
    nothing for the back at all, which is how people end up round-shouldered. */
 EX.push(
 {
-  id:'tablerow', kit:'none', pat:'pull', alt:['pushup','plank'], name:'Under-table row', trains:'Upper back, biceps', reps:[5,12], sets:3, load:false,
+  id:'tablerow', kit:'none', pat:'pull', mus:'back', alt:['pushup','plank'], name:'Under-table row', trains:'Upper back, biceps', reps:[5,12], sets:3, load:false,
   ladder:[
     {n:'Standing doorframe row', h:'Hold a doorframe, lean back with straight arms, pull yourself upright.'},
     {n:'High under-table row', h:'Lie under a sturdy table, knees bent, feet flat.'},
@@ -600,7 +600,7 @@ EX.push(
     b:{h:[78,47],n:[70,51],p:[48,63],ka:[34,73],fa:[20,85],kb:[34,73],fb:[20,85],ea:[62,44],wa:[74,36],eb:[62,44],wb:[74,36],floor:90}}
 },
 {
-  id:'pikepush', kit:'none', pat:'shoulder', alt:['pushup','plank'], name:'Pike push-up', trains:'Shoulders, triceps', reps:[4,10], sets:3, load:false,
+  id:'pikepush', kit:'none', pat:'shoulder', mus:'shoulders', alt:['pushup','plank'], name:'Pike push-up', trains:'Shoulders, triceps', reps:[4,10], sets:3, load:false,
   ladder:[
     {n:'Wall pike push-up', h:'Hands on a wall at hip height, hips bent, press your head towards the wall.'},
     {n:'Floor pike push-up', h:'Hands and feet on the floor, hips high like an upside-down V.'},
@@ -615,7 +615,7 @@ EX.push(
     b:{h:[22,63],n:[33,54],p:[57,28],ka:[73,46],fa:[89,65],kb:[73,46],fb:[89,65],ea:[37,61],wa:[22,65],eb:[37,61],wb:[22,65],floor:67}}
 },
 {
-  id:'pullup', kit:'bar', pat:'pull', alt:['tablerow','row'], name:'Pull-up', trains:'Upper back, biceps', reps:[3,10], sets:3, load:false,
+  id:'pullup', kit:'bar', pat:'pull', mus:'back', alt:['tablerow','row'], name:'Pull-up', trains:'Upper back, biceps', reps:[3,10], sets:3, load:false,
   ladder:[
     {n:'Dead hang', h:'Just hang from the bar for time. Builds the grip everything else needs.'},
     {n:'Jumping pull-up', h:'Jump to the top, then lower yourself as slowly as you can.'},
@@ -630,7 +630,7 @@ EX.push(
     b:{h:[50,17],n:[50,23],p:[50,47],ka:[50,64],fa:[50,78],kb:[50,64],fb:[50,78],ea:[39,21],wa:[47,11],eb:[61,21],wb:[53,11],floor:90}}
 },
 {
-  id:'bandrow', kit:'band', pat:'pull', alt:['tablerow','row'], name:'Band row', trains:'Upper back, biceps', reps:[8,15], sets:3, load:false,
+  id:'bandrow', kit:'band', pat:'pull', mus:'back', alt:['tablerow','row'], name:'Band row', trains:'Upper back, biceps', reps:[8,15], sets:3, load:false,
   ladder:[
     {n:'Seated band row', h:'Sit down, band round your feet, pull to your stomach.'},
     {n:'Standing band row', h:'Band anchored at chest height, step back for tension.'},
@@ -645,7 +645,7 @@ EX.push(
     b:{h:[50,19],n:[50,31],p:[50,58],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[40,36],wa:[54,40],eb:[40,36],wb:[54,40],floor:95}}
 },
 {
-  id:'bandcurl', kit:'band', pat:'arms', alt:['tablerow','curl'], name:'Band curl', trains:'Biceps, forearms', reps:[10,18], sets:3, load:false,
+  id:'bandcurl', kit:'band', pat:'arms', mus:'arms', alt:['tablerow','curl'], name:'Band curl', trains:'Biceps, forearms', reps:[10,18], sets:3, load:false,
   ladder:[
     {n:'Two-hand band curl', h:'Stand on the band, curl both hands up together.'},
     {n:'Slow band curl', h:'Up in one second, four seconds down.'},
@@ -660,6 +660,193 @@ EX.push(
     b:{h:[50,19],n:[50,31],p:[50,58],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[45,45],wa:[48,34],eb:[55,45],wb:[52,34],floor:95}}
 });
 
+/* Twelve more movements, added so the rotation engine has somewhere to go.
+   Without them a bodyweight-only user has exactly one candidate for most
+   patterns, and "variety" would mean nothing. These deliberately fill the
+   thin ones: hinge had no kitless option beyond the bridge, core had two,
+   and there was no calf, carry or single-leg pressing work at all. */
+EX.push(
+{
+  id:'revlunge', kit:'none', pat:'lunge', mus:'legs', alt:['split','squat'], name:'Reverse lunge', trains:'Thighs, glutes, balance', reps:[6,12], sets:3, load:true,
+  ladder:[
+    {n:'Supported reverse lunge', nw:1, h:'Fingertips on a wall or chair for balance.'},
+    {n:'Reverse lunge', nw:1, h:'Step back, drop the back knee, step forward again.'},
+    {n:'Slow reverse lunge', nw:1, h:'Four seconds to lower, stand up normally.'},
+    {n:'Weighted reverse lunge', h:'A weight in each hand, hanging by your sides.'},
+    {n:'Deficit reverse lunge', h:'Front foot on a book so the back knee travels further.'}
+  ],
+  cues:['Stand tall, then take a long step backwards with one foot.','Lower until your back knee is an inch off the floor, front shin near vertical.','Push through the front heel to bring the back foot home.','Alternate sides. Left and right together is one rep.'],
+  wrong:'Stepping back too short, so the front knee shoots way past the toes. Longer step, more glute.',
+  pose:{
+    a:{h:[50,17],n:[50,29],p:[50,57],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[44,43],wa:[44,57],eb:[56,43],wb:[56,57],floor:95,load:[44,59]},
+    b:{h:[50,38],n:[50,50],p:[50,66],ka:[54,78],fa:[56,94],kb:[36,84],fb:[30,94],ea:[44,52],wa:[44,66],eb:[56,52],wb:[56,66],floor:95,load:[44,68]}}
+},
+{
+  id:'stepup', kit:'none', pat:'lunge', mus:'legs', alt:['split','revlunge'], name:'Step-up', trains:'Thighs, glutes, one leg at a time', reps:[8,14], sets:3, load:true,
+  ladder:[
+    {n:'Low step-up', nw:1, h:'A bottom stair, or a sturdy low box.'},
+    {n:'Step-up', nw:1, h:'A chair-height step. Knee-height is the target.'},
+    {n:'Slow step-down', nw:1, h:'Up normally, four seconds to lower yourself back.'},
+    {n:'Weighted step-up', h:'A weight in each hand.'},
+    {n:'Step-up with a knee drive', nw:1, h:'Drive the trailing knee up hard at the top, pause, lower.'}
+  ],
+  cues:['Put one whole foot on the step — heel included, not just the toes.','Push through that heel and stand all the way up on the step.','Do not push off the floor with the back foot. It should feel like the front leg alone.','Lower under control. All reps on one leg, then swap.'],
+  wrong:'Bouncing off the back foot to get up. If you cannot do it without the bounce, use a lower step.',
+  pose:{
+    a:{h:[50,17],n:[50,29],p:[50,57],ka:[60,72],fa:[66,82],kb:[42,76],fb:[40,94],ea:[44,43],wa:[44,57],eb:[56,43],wb:[56,57],floor:95,load:[44,59]},
+    b:{h:[52,7],n:[52,19],p:[52,47],ka:[58,64],fa:[64,82],kb:[46,60],fb:[44,74],ea:[46,33],wa:[46,47],eb:[58,33],wb:[58,47],floor:95,load:[46,49]}}
+},
+{
+  id:'wallsit', kit:'none', pat:'squat', mus:'legs', alt:['squat','split'], name:'Wall sit', trains:'Thighs, and a stubborn streak', reps:[20,60], sets:3, load:false, unit:'sec', hold:true,
+  ladder:[
+    {n:'High wall sit', h:'Slide down a little way, thighs well above level.'},
+    {n:'Wall sit', h:'Thighs level with the floor, knees over ankles.'},
+    {n:'Wall sit, arms out', h:'Arms straight out in front, nothing resting on your legs.'},
+    {n:'Wall sit with a raised heel', h:'Lift one heel off the floor, swap halfway.'},
+    {n:'Single-leg wall sit', h:'One foot off the floor entirely. Swap halfway.'}
+  ],
+  cues:['Stand with your back flat against a wall and walk your feet out a step.','Slide down until your thighs are level with the floor.','Knees straight over your ankles, not past your toes.','Hands off your thighs. Breathe normally — do not hold your breath.'],
+  wrong:'Resting your hands on your knees to take the load off. If you need to, come higher up the wall instead.',
+  pose:{
+    a:{h:[38,17],n:[38,29],p:[38,57],ka:[42,76],fa:[44,94],kb:[36,76],fb:[34,94],ea:[32,43],wa:[32,57],eb:[44,43],wb:[44,57],floor:95},
+    b:{h:[38,39],n:[38,51],p:[38,72],ka:[62,72],fa:[64,94],kb:[58,73],fb:[60,94],ea:[46,60],wa:[56,58],eb:[44,62],wb:[54,60],floor:95}}
+},
+{
+  id:'calf', kit:'none', pat:'calf', mus:'legs', alt:['squat','stepup'], name:'Calf raise', trains:'Calves, ankles', reps:[10,20], sets:3, load:true,
+  ladder:[
+    {n:'Two-leg calf raise', nw:1, h:'Flat floor, rise onto your toes, lower slowly.'},
+    {n:'Stair calf raise', nw:1, h:'Toes on a step, heels hanging, drop below the step each rep.'},
+    {n:'Paused calf raise', nw:1, h:'Two seconds squeezed at the top of every rep.'},
+    {n:'Single-leg calf raise', nw:1, h:'One leg at a time, fingertips on a wall for balance.'},
+    {n:'Weighted single-leg raise', h:'One leg, a weight in the free hand.'}
+  ],
+  cues:['Stand tall, feet under your hips, weight over the balls of your feet.','Rise as high as you can and squeeze the calf hard at the top.','Lower slowly until the heel is fully down, or below the step.','Full range beats fast reps. Take three seconds per rep and it will feel like a different exercise.'],
+  wrong:'Bouncing up and down on the tendon. The tendon does not grow, the muscle does — slow it down.',
+  pose:{
+    a:{h:[50,19],n:[50,31],p:[50,58],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[44,45],wa:[44,59],eb:[56,45],wb:[56,59],floor:95,load:[44,61]},
+    b:{h:[50,12],n:[50,24],p:[50,51],ka:[50,70],fa:[50,92],kb:[50,70],fb:[50,92],ea:[44,38],wa:[44,52],eb:[56,38],wb:[56,52],floor:95,load:[44,54]}}
+},
+{
+  id:'goodmorning', kit:'none', pat:'hinge', mus:'hips', alt:['bridge','rdl'], name:'Good morning', trains:'Hamstrings, glutes, lower back', reps:[8,15], sets:3, load:false,
+  ladder:[
+    {n:'Hands-on-hips hinge', h:'Learn the hinge. Hands on your hip creases, push them back.'},
+    {n:'Good morning', h:'Hands behind your head, elbows wide.'},
+    {n:'Slow good morning', h:'Four seconds to fold forward.'},
+    {n:'Arms-overhead good morning', h:'Arms straight past your ears. Much harder on the upper back.'},
+    {n:'Single-leg good morning', h:'One leg, the other straight out behind as a counterweight.'}
+  ],
+  cues:['Stand tall with a soft bend in the knees, hands behind your head.','Push your hips straight back — the fold happens at the hip, not the waist.','Keep your back flat and go until you feel a strong stretch behind your thighs.','Drive your hips forward to stand, and squeeze your glutes at the top.'],
+  wrong:'Bending the knees more and more until it turns into a squat. The shins should stay roughly still.',
+  pose:{
+    a:{h:[50,17],n:[50,29],p:[50,57],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[40,34],wa:[46,22],eb:[60,34],wb:[54,22],floor:95},
+    b:{h:[28,38],n:[37,46],p:[58,57],ka:[57,76],fa:[53,94],kb:[57,76],fb:[53,94],ea:[29,54],wa:[33,42],eb:[37,52],wb:[33,42],floor:95}}
+},
+{
+  id:'hamcurl', kit:'none', pat:'hinge', mus:'hips', alt:['bridge','goodmorning'], name:'Sliding hamstring curl', trains:'Hamstrings — the hard way', reps:[5,12], sets:3, load:false,
+  ladder:[
+    {n:'Bridge with a slide-out', h:'Hips up, slide both heels a short way out and back.'},
+    {n:'Two-leg hamstring curl', h:'Hips up throughout, slide both heels all the way out.'},
+    {n:'Slow hamstring curl', h:'Four seconds to slide out, pull back normally.'},
+    {n:'One-and-a-half curl', h:'All the way out, half way back, all the way out, then home.'},
+    {n:'Single-leg hamstring curl', h:'One heel on the towel, the other foot in the air.'}
+  ],
+  cues:['Lie on your back with your heels on a towel, a tea tray, or socks on a smooth floor.','Push your hips up and keep them up for the whole set — that is the point.','Slide your heels away until your legs are nearly straight.','Pull them back in by squeezing the back of your thighs.'],
+  wrong:'Letting the hips drop as the legs go out. When the hips drop, the set is over — that is your rep count.',
+  pose:{
+    a:{h:[18,62],n:[27,64],p:[52,54],ka:[72,56],fa:[76,72],kb:[72,56],fb:[76,72],ea:[30,68],wa:[40,71],eb:[30,68],wb:[40,71],floor:73},
+    b:{h:[18,62],n:[27,64],p:[52,58],ka:[74,62],fa:[96,70],kb:[74,62],fb:[96,70],ea:[30,68],wa:[40,71],eb:[30,68],wb:[40,71],floor:73}}
+},
+{
+  id:'sideplank', kit:'none', pat:'core', mus:'core', alt:['plank','deadbug'], name:'Side plank', trains:'Sides of the midsection', reps:[15,45], sets:3, load:false, unit:'sec', hold:true,
+  ladder:[
+    {n:'Side plank on knees', h:'Forearm and knees down, hips lifted.'},
+    {n:'Side plank', h:'Forearm and the side of your bottom foot.'},
+    {n:'Side plank, top arm up', h:'Reach the top hand at the ceiling.'},
+    {n:'Side plank with a hip dip', h:'Lower the hip an inch and lift it again, slowly, for the whole hold.'},
+    {n:'Star side plank', h:'Top leg lifted and held away from the bottom one.'}
+  ],
+  cues:['Lie on your side, elbow directly under your shoulder, forearm flat.','Stack your feet and push your hips up until your body is one straight line.','Do not let your chest roll towards the floor — keep it facing the wall.','Hold, then do the same on the other side. Both sides is one set.'],
+  wrong:'Letting the hips sink towards the floor. Twenty honest seconds beats a minute of sagging.',
+  pose:{
+    a:{h:[20,44],n:[29,49],p:[55,60],ka:[72,66],fa:[88,74],kb:[72,66],fb:[88,74],ea:[27,68],wa:[40,73],eb:[29,42],wb:[29,32],floor:76},
+    b:{h:[20,36],n:[29,41],p:[55,52],ka:[72,62],fa:[88,73],kb:[72,62],fb:[88,73],ea:[27,64],wa:[40,73],eb:[29,34],wb:[29,22],floor:76}}
+},
+{
+  id:'hollow', kit:'none', pat:'core', mus:'core', alt:['deadbug','plank'], name:'Hollow hold', trains:'The front of the midsection', reps:[15,45], sets:3, load:false, unit:'sec', hold:true,
+  ladder:[
+    {n:'Tucked hollow hold', h:'Knees tucked in, shoulders just off the floor.'},
+    {n:'Hollow hold, arms by your sides', h:'Legs straight and low, hands beside your hips.'},
+    {n:'Hollow hold', h:'Arms overhead, legs straight, everything a few inches off the floor.'},
+    {n:'Hollow rock', h:'Same shape, rocking gently like the bottom of a boat.'},
+    {n:'Hollow hold with a pause', h:'Rock out to the longest shape you can hold and stay there.'}
+  ],
+  cues:['Lie on your back and press your lower back flat into the floor.','Lift your shoulders and your legs a few inches, arms reaching past your ears.','The lower back stays glued down — that is the whole exercise.','The moment it lifts, bend your knees a little or stop the set.'],
+  wrong:'Going for a longer hold by letting the back arch. A shorter hold with a flat back does far more.',
+  pose:{
+    a:{h:[24,64],n:[33,66],p:[58,68],ka:[74,58],fa:[82,68],kb:[74,58],fb:[82,68],ea:[26,60],wa:[16,56],eb:[26,60],wb:[16,56],floor:72},
+    b:{h:[26,58],n:[34,62],p:[58,68],ka:[78,58],fa:[94,52],kb:[78,58],fb:[94,52],ea:[26,52],wa:[14,46],eb:[26,52],wb:[14,46],floor:72}}
+},
+{
+  id:'climber', kit:'none', pat:'core', mus:'core', alt:['plank','deadbug'], name:'Mountain climber', trains:'Midsection, shoulders, lungs', reps:[10,20], sets:3, load:false,
+  ladder:[
+    {n:'Slow climber on a worktop', h:'Hands raised on a worktop, one knee in at a time.'},
+    {n:'Slow floor climber', h:'Hands on the floor, one knee in, hold a beat, swap.'},
+    {n:'Mountain climber', h:'Steady pace, hips low, no bouncing.'},
+    {n:'Cross-body climber', h:'Drive the knee towards the opposite elbow.'},
+    {n:'Fast climber', h:'As quick as you can keep the hips still.'}
+  ],
+  cues:['Start in the top of a push-up, hands under your shoulders.','Squeeze your glutes so your hips stay level with your shoulders.','Drive one knee towards your chest without letting the hips rise.','Swap legs under control. Left and right together is one rep.'],
+  wrong:'Hips bouncing up and down like a pump. If they bounce, slow right down — the midsection is meant to stop that.',
+  pose:{
+    a:{h:[81,33],n:[73,39],p:[46,49],ka:[31,56],fa:[18,63],kb:[31,56],fb:[18,63],ea:[73,52],wa:[73,66],eb:[73,52],wb:[73,66],floor:67},
+    b:{h:[81,33],n:[73,39],p:[46,49],ka:[52,48],fa:[62,54],kb:[31,56],fb:[18,63],ea:[73,52],wa:[73,66],eb:[73,52],wb:[73,66],floor:67}}
+},
+{
+  id:'dip', kit:'none', pat:'arms', mus:'arms', alt:['pushup','curl'], name:'Chair dip', trains:'Triceps, front of the shoulders', reps:[5,12], sets:3, load:false,
+  ladder:[
+    {n:'Bent-knee chair dip', h:'Hands on a chair behind you, feet close in, knees bent.'},
+    {n:'Chair dip', h:'Same, feet a step further out.'},
+    {n:'Straight-leg dip', h:'Legs straight out, heels on the floor.'},
+    {n:'Slow dip', h:'Four seconds to lower.'},
+    {n:'Feet-raised dip', h:'Heels up on a second chair.'}
+  ],
+  cues:['Sit on the edge of a sturdy chair and grip the front edge beside your hips.','Shuffle your hips forward off the seat, arms straight.','Bend your elbows straight back and lower until your upper arms are about level.','Press back up through your palms until your arms are long again.'],
+  wrong:'Elbows flaring out sideways, or dropping so low the shoulders take it. Stop at about a right angle.',
+  pose:{
+    a:{h:[30,42],n:[36,48],p:[52,60],ka:[72,60],fa:[88,72],kb:[72,60],fb:[88,72],ea:[32,58],wa:[30,70],eb:[32,58],wb:[30,70],floor:74},
+    b:{h:[30,52],n:[36,58],p:[54,68],ka:[72,66],fa:[88,72],kb:[72,66],fb:[88,72],ea:[25,60],wa:[30,70],eb:[25,60],wb:[30,70],floor:74}}
+},
+{
+  id:'pullapart', kit:'band', pat:'shoulder', mus:'shoulders', alt:['bandrow','pikepush'], name:'Band pull-apart', trains:'Rear shoulders, upper back', reps:[10,20], sets:3, load:false,
+  ladder:[
+    {n:'Wide-grip pull-apart', h:'Hands far apart on the band so it is easy.'},
+    {n:'Band pull-apart', h:'Hands about shoulder width, band at chest height.'},
+    {n:'Paused pull-apart', h:'Two seconds held wide on every rep.'},
+    {n:'Overhead pull-apart', h:'Arms up at an angle, like the top of a Y.'},
+    {n:'Narrow-grip pull-apart', h:'Hands close together. Much harder.'}
+  ],
+  cues:['Hold the band in both hands, arms straight out in front at chest height.','Pull your hands apart by squeezing your shoulder blades together.','Stop when the band touches your chest, or as far as you can go with straight arms.','Let it back slowly. Do not let it snap your arms in.'],
+  wrong:'Bending the elbows to get further. Straight arms, and let the back do it — this is the one that undoes a desk.',
+  pose:{
+    a:{h:[50,19],n:[50,31],p:[50,58],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[44,40],wa:[47,32],eb:[56,40],wb:[53,32],floor:95},
+    b:{h:[50,19],n:[50,31],p:[50,58],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[38,36],wa:[26,30],eb:[62,36],wb:[74,30],floor:95}}
+},
+{
+  id:'carry', kit:'db', pat:'carry', mus:'core', alt:['plank','row'], name:'Suitcase carry', trains:'Grip, midsection, everything standing', reps:[20,45], sets:3, load:true, unit:'sec', hold:true,
+  ladder:[
+    {n:'Suitcase hold', h:'Stand still with one weight, do not lean. Swap halfway.'},
+    {n:'Suitcase carry', h:'Walk slowly with one weight, shoulders level.'},
+    {n:'Two-weight carry', h:'One in each hand. Heavier, but easier to stay level.'},
+    {n:'Front-rack carry', h:'Weights held at your shoulders. Brutal on the midsection.'},
+    {n:'Overhead carry', h:'One weight locked out overhead, arm by your ear. Swap halfway.'}
+  ],
+  cues:['Pick up one weight, stand tall, and let it hang by your side.','Pull your shoulders back and level — do not let the loaded side dip.','Walk slowly and quietly. Short steps, ribs down, no leaning away from the weight.','Swap hands halfway. Both sides is one set.'],
+  wrong:'Leaning away from the weight to make it feel lighter. If you are leaning, go lighter — staying straight is the exercise.',
+  pose:{
+    a:{h:[50,17],n:[50,29],p:[50,57],ka:[54,76],fa:[58,94],kb:[46,76],fb:[42,94],ea:[44,44],wa:[44,60],eb:[57,44],wb:[57,58],floor:95,load:[44,64]},
+    b:{h:[50,15],n:[50,27],p:[50,55],ka:[58,74],fa:[66,92],kb:[44,78],fb:[36,94],ea:[44,42],wa:[44,58],eb:[57,42],wb:[57,56],floor:95,load:[44,62]}}
+});
+
 /* What the person actually owns */
 const KIT=[
   {id:'none', n:'Just me and the floor', d:'Plus a chair, a table and a doorway'},
@@ -671,22 +858,12 @@ function hasKit(k){ return k==='none' || (S.kit||['none']).indexOf(k)>=0; }
 function kitList(){ return S.kit&&S.kit.length?S.kit:['none']; }
 
 /* Slots are movement patterns, not fixed exercises, so the session rebuilds
-   itself from whatever is to hand. First available candidate wins. */
-const PLAN={
-  A:[['squat'],['pushup','press'],['pullup','row','bandrow','tablerow'],['bridge','rdl'],['plank','deadbug']],
-  B:[['split','squat'],['press','pushup'],['rdl','bridge'],['ohp','pikepush'],['curl','bandcurl','tablerow']]
-};
-function sessionFor(key){
-  const base=SESSIONS[key];
-  const picked=[], used=new Set();
-  PLAN[key].forEach(cands=>{
-    let pick=cands.find(id=>{ const e=byId(id); return e&&hasKit(e.kit||'db')&&!used.has(id); })
-          || cands.find(id=>{ const e=byId(id); return e&&hasKit(e.kit||'db'); });
-    if(pick){ picked.push(pick); used.add(pick); }
-  });
-  return {name:base.name, letter:base.letter, sub:base.sub, cool:base.cool,
-          ex:picked.length?picked:base.ex};
-}
+   itself from whatever is to hand. The slot table and the code that fills it
+   now live in THE COACH, further down — `PLAN2`, `slotChoice` and
+   `buildPlan` — because which candidate wins depends on rather more than
+   what is in the cupboard. `sessionFor` still returns the same thing it
+   always did, so the screens that only want a list of exercises are
+   unchanged. */
 /* Adjustable or multiple pairs means adding weight is the better lever */
 function canAddWeight(){ return hasKit('db') && S.dbAdjustable; }
 
@@ -1007,6 +1184,588 @@ function medalById(id){
 }
 
 
+/* ============================== THE COACH ==============================
+
+   Everything above this line describes what a person *can* do. This section
+   decides what they should do next, and it is the only part of the app that
+   changes its mind.
+
+   Four jobs, in the order they matter:
+
+     1. Keep progress visible. Enough hard sets on every muscle group every
+        week, the big movements while you are fresh, rep ranges that build
+        size, and a planned easy week before the wheels come off.
+     2. Meet people where they are. Somebody in their first week and somebody
+        three years in get different set counts, different rests, and a
+        different rate of promotion up the ladders.
+     3. Notice what is actually happening. A movement that has gone nowhere
+        for a month is treated differently from one climbing every session.
+     4. Stay interesting enough to come back to. Accessory movements rotate
+        and the shape of the session changes now and then — neither often
+        enough to break the comparison that progress depends on.
+
+   One thing it deliberately does not do: promote you. Moving up a ladder
+   rung or adding weight is still an offer in the session player that needs
+   a tap. The engine shapes the session; you make the promotions.
+
+   Everything here reads S and returns a plan. Nothing in this section writes
+   to S except the handful of functions with `set`, `apply`, `ease` or
+   `record` in the name, which are only called from a tap or from the end of
+   a session — so rendering the same screen twice always gives the same plan.
+*/
+
+const PAT_NAME={squat:'Squat',lunge:'Single leg',hinge:'Hinge',push:'Push',
+  pull:'Pull',shoulder:'Overhead',arms:'Arms',core:'Core',calf:'Calves',
+  carry:'Carry',extra:'Weak point'};
+const MUSCLES=['legs','hips','chest','back','shoulders','arms','core'];
+const MUS_NAME={legs:'Thighs',hips:'Glutes & hamstrings',chest:'Chest',back:'Back',
+  shoulders:'Shoulders',arms:'Arms',core:'Core'};
+function patOf(e){ return (e&&e.pat)||'core'; }
+function musOf(e){ return (e&&e.mus)||'core'; }
+
+/* --- 1. Experience ---------------------------------------------------
+
+   Four tiers. A beginner gets fewer sets and a fast promotion, because the
+   first thing to build is the habit and the second is technique. Someone
+   experienced gets more volume and has to earn a rung twice, because at that
+   end one good session is noise. */
+
+const TIERS=[
+  {i:0, name:'Finding your feet', anchorSets:3, accSets:2, slots:5, rest:90,  needHits:1,
+   shapes:['straight'], finisher:false,
+   blurb:'Fewer sets while the movements are new. One good session a week is already a win.'},
+  {i:1, name:'Building', anchorSets:3, accSets:3, slots:5, rest:90, needHits:1,
+   shapes:['straight','tempo','pairs'], finisher:true,
+   blurb:'Full sets now, and the accessory movements start rotating so it does not go stale.'},
+  {i:2, name:'Steady', anchorSets:4, accSets:3, slots:6, rest:100, needHits:2,
+   shapes:['straight','tempo','pairs','rounds'], finisher:true,
+   blurb:'A sixth slot for whatever is short this week, and a rung has to be earned twice.'},
+  {i:3, name:'Seasoned', anchorSets:4, accSets:3, slots:6, rest:110, needHits:2,
+   shapes:['straight','tempo','pairs','rounds','density'], finisher:true,
+   blurb:'Everything switched on, including the formats that trade rest for work.'}
+];
+
+/* How far up the ladders you are, averaged over the movements you can
+   actually do. Someone at the top of five ladders is not a beginner however
+   few sessions the app has seen. */
+function ladderFraction(){
+  const mine=EX.filter(e=>hasKit(e.kit||'db'));
+  if(!mine.length) return 0;
+  let t=0;
+  mine.forEach(e=>{ const top=Math.max(1,topRungFor(e));
+    t+=Math.min(1,(S.levels[e.id]||0)/top); });
+  return t/mine.length;
+}
+function tierFromData(){
+  const n=S.logs.length, f=ladderFraction(), w=weeksTracked();
+  if(n>=80 || f>=0.6) return 3;
+  if(n>=25 || (f>=0.4&&w>=8)) return 2;
+  if(n>=6) return 1;
+  return 0;
+}
+/* The setup assessment is a floor, not a ceiling. Someone who told us they
+   can do twenty push-ups should not be handed a beginner's session just
+   because the app has no history for them yet. */
+function tierFromAssessment(){
+  const a=S.assess; if(!a||!a.bands) return 0;
+  const b=Object.keys(a.bands).map(k=>a.bands[k]);
+  if(!b.length) return 0;
+  const mean=b.reduce((x,y)=>x+y,0)/b.length;
+  return mean>=2.5?2 : mean>=1.5?1 : 0;
+}
+function tierNow(){
+  const want=Math.max(tierFromData(), tierFromAssessment(),
+    S.tierOverride==null?0:S.tierOverride);
+  return TIERS[Math.max(0,Math.min(TIERS.length-1,want))];
+}
+
+/* --- 2. What happened last time -------------------------------------
+
+   One number per movement per session: reps done, multiplied by the weight
+   when there was one. Comparing that against last time is the whole of the
+   progress detector. Climbing a rung counts as progress by definition, since
+   a harder version for fewer reps is the point. */
+
+function progOf(id){
+  S.prog=S.prog||{};
+  return S.prog[id] || (S.prog[id]={n:0,hits:0,stall:0,lastVol:0,bestVol:0,lastAt:0,lastLevel:null,lastOut:null});
+}
+function exVolume(e, sets){
+  return sets.reduce((a,s)=>a + s.reps * ((e.load&&s.weight)?Math.max(1,s.weight):1), 0);
+}
+/* `novel` marks the formats that change the reps on purpose. A circuit day
+   must never read as a collapse in performance. */
+function recordOutcome(exId, level, done, planned, novel){
+  const e=byId(exId); if(!e||!done.length) return null;
+  const p=progOf(exId);
+  const vol=exVolume(e,done);
+  const all=planned>0 && done.length>=planned;
+  const top=all && done.every(s=>s.reps>=e.reps[1]);
+  let out;
+  if(!p.n) out='up';
+  else if(p.lastLevel!=null && level>p.lastLevel) out='up';
+  else if(p.lastLevel!=null && level<p.lastLevel) out='down';
+  else if(vol>p.lastVol*1.02) out='up';
+  else if(vol>=p.lastVol*0.95) out='flat';
+  else out='down';
+  if(top) out='top';
+
+  if(!novel){
+    p.lastVol=vol;
+    if(vol>p.bestVol) p.bestVol=vol;
+    p.stall=(out==='up'||out==='top')?0:p.stall+1;
+    p.hits=top?p.hits+1:0;
+    p.lastLevel=level;
+  }
+  p.n++; p.lastAt=Date.now(); p.lastOut=out;
+
+  /* The promotion offer. Tier decides how many top-of-the-range sessions it
+     takes — fast for a beginner, twice for someone experienced. */
+  const need=tierNow().needHits;
+  if(p.hits>=need && level<e.ladder.length-1) S.ready[exId]=true;
+  else if(all && !top) S.ready[exId]=false;
+  return out;
+}
+
+/* --- 3. Stalling -----------------------------------------------------
+
+   Three interventions, in order, none of them dramatic. A stall is sessions
+   in a row that did not beat the one before at the same rung. */
+function stallPlan(id){
+  const p=(S.prog||{})[id];
+  if(!p||!p.n) return null;
+  if(p.stall>=6 && p.lastOut==='down' && (S.levels[id]||0)>0) return {kind:'ease', n:p.stall};
+  if(p.stall>=4) return {kind:'rotate', n:p.stall};
+  if(p.stall>=2) return {kind:'backoff', n:p.stall};
+  return null;
+}
+/* The only place a rung goes *down* on the engine's suggestion, and even
+   here it is a card with two buttons rather than something that just
+   happens. */
+function easeOffers(){
+  return EX.filter(e=>hasKit(e.kit||'db'))
+    .map(e=>({e, sp:stallPlan(e.id)}))
+    .filter(x=>x.sp&&x.sp.kind==='ease');
+}
+function easeMovement(id){
+  const e=byId(id); if(!e) return;
+  S.levels[id]=Math.max(0,(S.levels[id]||0)-1);
+  const p=progOf(id); p.stall=0; p.hits=0; p.lastVol=0; p.lastLevel=S.levels[id];
+  S.ready[id]=false; save(); render();
+  toast('Back to '+e.ladder[S.levels[id]].n);
+}
+function keepMovement(id){ const p=progOf(id); p.stall=3; save(); render(); }
+
+/* --- 4. Readiness ----------------------------------------------------
+
+   The check-in already asks about sleep, soreness and food, and until now
+   the answers were shown back to the person and then ignored. A bad night
+   should buy an easier session, not a skipped one. */
+function readiness(){
+  const c=(S.checkins||{})[dayKey(new Date())];
+  let r=70;
+  if(c){
+    if(c.sore===0) r+=10; else if(c.sore===1) r-=6; else if(c.sore===2) r-=30;
+    if(c.sleep===2) r+=10; else if(c.sleep===0) r-=20;
+    if(c.fuel===0) r-=8; else if(c.fuel===2) r+=4;
+  }
+  const d=daysSinceLast();
+  if(d!=null){ if(d===0) r-=25; else if(d===1) r-=8; else if(d>=3) r+=8; }
+  if(breakLength()>=14) r-=10;
+  r=Math.max(0,Math.min(100,Math.round(r)));
+  return {score:r, band:r<45?'low':r>78?'high':'normal', logged:!!c, ans:c||null};
+}
+
+/* --- 5. Weekly balance ----------------------------------------------
+
+   The lever that makes progress show up in a mirror rather than only in a
+   chart: every muscle group has a floor of hard sets per week, and the
+   rotating slots are filled by whatever is furthest below its floor. */
+function setsByMuscle(days){
+  const cut=Date.now()-(days||7)*864e5, out={};
+  MUSCLES.forEach(m=>out[m]=0);
+  S.logs.forEach(l=>{
+    if(new Date(l.date).getTime()<cut) return;
+    l.entries.forEach(en=>{ const e=byId(en.exId); if(!e) return;
+      out[musOf(e)]=(out[musOf(e)]||0)+en.sets.length; });
+  });
+  return out;
+}
+/* The least a muscle group needs in a week before anything changes, per
+   tier. Arms are zero for the first two tiers on purpose: at that volume the
+   pressing and pulling is already all the direct work a beginner's elbows
+   want, and a floor nobody can meet is just a red bar on a screen. */
+const SET_FLOOR={legs:[4,6,8,9], hips:[3,5,6,7], chest:[3,5,6,8], back:[3,6,8,9],
+  shoulders:[2,3,4,6], arms:[0,0,4,6], core:[3,4,5,6]};
+/* How many movements the person's kit can actually put against a muscle
+   group. With nothing but a floor there is exactly one direct arm exercise
+   in the whole app, which is a fact about home training rather than a fault
+   in the programme — but a floor nobody can reach is just a red bar, so the
+   floor bends to what is possible and the screen says why. */
+function musPool(mus){
+  return EX.filter(e=>hasKit(e.kit||'db') && musOf(e)===mus).length;
+}
+function setFloor(mus){
+  const base=(SET_FLOOR[mus]||[3,4,5,6])[tierNow().i];
+  if(!base) return 0;
+  return musPool(mus)<=1 ? Math.min(base,3) : base;
+}
+function muscleDeficit(){
+  const has=setsByMuscle(7), out={};
+  MUSCLES.forEach(m=>{ const f=setFloor(m);
+    out[m]=Math.max(0,(f-(has[m]||0))/Math.max(1,f)); });
+  return out;
+}
+
+/* --- 6. The slots ----------------------------------------------------
+
+   Every slot is a movement pattern with an ordered list of candidates, as
+   before. What is new is the role. Anchors hold still, because progression
+   needs the same movement week after week to mean anything. Accessories
+   rotate, which is where the variety comes from and where the weekly
+   balance gets corrected. The last slot of each session is deliberately
+   open: whatever the week is short of. */
+
+/* Each slot names a muscle group as well as a pattern, and candidates are
+   filtered to it. That sounds pedantic until you watch what happens without
+   it: chair dips are a perfectly good push, so a stalled push-up rotates to
+   dips, and the chest quietly gets nothing for five months while the app
+   reports a full house. A slot is a promise about what gets trained.
+
+   The first five slots of each session are a whole body on their own, because
+   tiers 0 and 1 only get five. The sixth is the weak-point slot — no fixed
+   pattern, filled with whatever the week is shortest of. */
+const PLAN2={
+  A:[
+    {k:'a1', pat:'squat',    mus:'legs',      role:'anchor',    cands:['squat','split','stepup','wallsit']},
+    {k:'a2', pat:'push',     mus:'chest',     role:'anchor',    cands:['pushup','press']},
+    {k:'a3', pat:'pull',     mus:'back',      role:'anchor',    cands:['pullup','row','bandrow','tablerow']},
+    {k:'a4', pat:'hinge',    mus:'hips',      role:'accessory', cands:['bridge','rdl','goodmorning','hamcurl']},
+    {k:'a5', pat:'core',     mus:'core',      role:'accessory', cands:['plank','deadbug','sideplank','hollow','climber','carry']},
+    {k:'a6', pat:'extra',    mus:'any',       role:'accessory', cands:['dip','curl','bandcurl','pullapart','calf','climber','carry','hollow','revlunge','pikepush']}
+  ],
+  B:[
+    {k:'b1', pat:'lunge',    mus:'legs',      role:'anchor',    cands:['split','revlunge','stepup','squat']},
+    {k:'b2', pat:'shoulder', mus:'shoulders', role:'anchor',    cands:['ohp','pikepush','pullapart']},
+    {k:'b3', pat:'pull',     mus:'back',      role:'anchor',    cands:['row','bandrow','tablerow','pullup']},
+    {k:'b4', pat:'push',     mus:'chest',     role:'accessory', cands:['press','pushup']},
+    {k:'b5', pat:'hinge',    mus:'hips',      role:'accessory', cands:['rdl','goodmorning','hamcurl','bridge']},
+    {k:'b6', pat:'extra',    mus:'any',       role:'accessory', cands:['curl','bandcurl','dip','hollow','sideplank','climber','carry','calf','wallsit','deadbug']}
+  ]
+};
+
+function varietyCfg(){
+  const v=S.variety||'normal';
+  if(v==='steady')   return {window:1, sticky:9, novel:0.10, n:'Steady'};
+  if(v==='restless') return {window:3, sticky:3, novel:0.45, n:'Restless'};
+  return {window:2, sticky:5, novel:0.26, n:'Balanced'};
+}
+function availCands(slot){
+  const kit=slot.cands.filter(id=>{ const e=byId(id); return e && hasKit(e.kit||'db'); });
+  if(!slot.mus || slot.mus==='any') return kit;
+  const on=kit.filter(id=>musOf(byId(id))===slot.mus);
+  /* Somebody with no kit at all can empty a slot. Better the wrong muscle
+     than an empty session, so fall back rather than drop it. */
+  return on.length?on:kit;
+}
+/* Sessions ago, counting back through the log. Infinity if never. */
+function lastUsed(id){
+  for(let i=S.logs.length-1, k=1; i>=0; i--, k++)
+    if(S.logs[i].entries.some(en=>en.exId===id)) return k;
+  return Infinity;
+}
+function ladderHeadroom(id){
+  const e=byId(id); if(!e) return 0;
+  const top=Math.max(1,topRungFor(e));
+  return Math.max(0,(top-(S.levels[id]||0))/top);
+}
+/* Who currently holds each slot, and for how many sessions — read straight
+   out of the log rather than stored, so deleting a session corrects it and
+   a restored backup does not disagree with the history it came with. */
+function occupantsFor(key, n){
+  const slots=PLAN2[key].slice(0,n);
+  const mine=S.logs.filter(l=>l.session===key);
+  const out={};
+  slots.forEach(s=>out[s.k]={exId:null, run:0, done:false});
+  for(let i=mine.length-1;i>=0;i--){
+    const ids=mine[i].entries.map(en=>en.exId);
+    const taken={};
+    slots.forEach(s=>{
+      const o=out[s.k];
+      const hit=ids.find(id=>s.cands.indexOf(id)>=0 && !taken[id]);
+      if(hit) taken[hit]=1;
+      if(o.done) return;
+      if(!hit){ o.done=true; return; }
+      if(o.exId===null){ o.exId=hit; o.run=1; }
+      else if(hit===o.exId) o.run++;
+      else o.done=true;
+    });
+    if(slots.every(s=>out[s.k].done)) break;
+  }
+  return out;
+}
+function slotChoice(slot, occ, ctx){
+  const cands=availCands(slot);
+  if(!cands.length) return null;
+  const cfg=varietyCfg();
+  const cur=(occ && occ.exId && cands.indexOf(occ.exId)>=0 && !ctx.used[occ.exId]) ? occ.exId : null;
+  const sp=cur?stallPlan(cur):null;
+  const mustRotate=!!(sp && sp.kind==='rotate');
+  /* Offset per slot, or every accessory rotates on the same session and the
+     whole programme lurches instead of drifting. */
+  const sticky=cfg.sticky + ((parseInt(slot.k.slice(1),10)||0)%3);
+  const dueRotate=slot.role!=='anchor' && cur && occ.run>=sticky;
+
+  if(cur && !mustRotate && !dueRotate)
+    return {exId:cur, fresh:false, rotated:null};
+
+  let best=null;
+  cands.forEach(id=>{
+    if(ctx.used[id]) return;
+    const e=byId(id), ai=cands.indexOf(id);
+    const pri=cands.length>1 ? 1-(ai/(cands.length-1)) : 1;
+    const seen=lastUsed(id);
+    /* The weak-point slot is named after its job, so the deficit has to
+       outweigh novelty there or it turns into a raffle. Everywhere else the
+       muscle is already decided by the slot and the deficit only breaks
+       ties between candidates. */
+    let sc = (slot.mus==='any'?3.6:2.0)*(ctx.deficit[musOf(e)]||0)
+           + 1.2*Math.min(1,(seen===Infinity?6:seen)/6)
+           + 0.8*ladderHeadroom(id)
+           + (slot.role==='anchor'?1.6:0.3)*pri
+           - (seen<=cfg.window?(3.0-2.0*(ctx.deficit[musOf(e)]||0)):0)
+           - (ctx.pats[patOf(e)]?1.5:0);
+    /* Just-used is normally a heavy penalty — that is where the variety
+       comes from. But when a muscle group is genuinely short, repeating the
+       only movement that trains it beats a fresh one that does not: a gap in
+       the programme is worse than a repeat in it. */
+    if(cur && id===cur) sc -= mustRotate?2.5:0.7;
+    if(!best || sc>best.sc) best={id, sc};
+  });
+  if(!best) return null;
+  return {exId:best.id, fresh:best.id!==cur,
+          rotated: (cur && best.id!==cur) ? {from:cur, why:mustRotate?'stall':'due'} : null};
+}
+
+/* --- 7. The shape of the session ------------------------------------
+
+   Same movements, different job. These change the prescription, the rests
+   and the wording — never the log format, so the progress maths keeps
+   working across all of them. The two that change the reps on purpose are
+   marked `novel` and sit out the comparison entirely. */
+
+const SHAPES={
+  straight:{k:'straight', n:'Straight sets',
+    d:'One movement at a time, full rest between sets.'},
+  tempo:{k:'tempo', n:'Slow lowering', tempo:'four seconds down',
+    d:'Same sets, same reps, four seconds to lower every one. It will feel like a different exercise.'},
+  pairs:{k:'pairs', n:'Paired sets', pair:true, rest:0.7,
+    d:'Two movements on a screen. Alternate sets, rest once after each pair — same work, several minutes quicker.'},
+  rounds:{k:'rounds', n:'Rounds', circuit:3, novel:true, rest:0.5, bottom:true,
+    d:'Three times through the whole list, one set of each, short rests. Reps at the bottom of the range.'},
+  density:{k:'density', n:'Twelve minutes', circuit:4, novel:true, rest:0.4, bottom:true, clock:12,
+    d:'Four rounds against a twelve-minute clock. Tick what you finish and stop when the clock does.'}
+};
+/* Deterministic: the same session count always produces the same shape, so
+   the preview on Today is exactly what starts. Novelty is rationed — never
+   twice in a row, never on a tired day, never in an easy week, and never
+   before somebody has six sessions behind them. */
+function shapeFor(key, tier, ctx){
+  if(ctx.deload || ctx.readiness.band==='low' || S.logs.length<6) return SHAPES.straight;
+  const cfg=varietyCfg();
+  const last=(S.shape&&S.shape.last)||'straight';
+  const seed=((S.logs.length+1)*2654435761 + (key==='A'?17:41))>>>0;
+  if(((seed%1000)/1000) > cfg.novel) return SHAPES.straight;
+  const pool=tier.shapes.filter(k=>k!=='straight' && k!==last);
+  if(!pool.length) return SHAPES.straight;
+  return SHAPES[pool[(seed>>>9)%pool.length]];
+}
+
+/* --- 8. Finishers ----------------------------------------------------
+   Three or four minutes of something daft at the end, offered only when the
+   person is fresh and never in an easy week. Always skippable, never logged
+   as a set — it is there for the mood, not the numbers. */
+const FINISH=[
+  {k:'squat100', n:'A hundred squats', mins:4,
+   d:'Bodyweight squats to a hundred, in as few sets as it takes. Rest where you have to.'},
+  {k:'plankladder', n:'Plank ladder', mins:4,
+   d:'Twenty seconds on, ten off, five times through. Hold the shape or stop the clock.'},
+  {k:'pushdrop', n:'Push-up drop-off', mins:4,
+   d:'A set stopping two short of failure. Rest twenty seconds. Repeat until you cannot beat half your first number.'},
+  {k:'carrywalk', n:'Loaded walk', mins:4,
+   d:'Pick up the heaviest thing to hand and walk until your grip complains. Three trips, shoulders level.'},
+  {k:'backburn', n:'Back burner', mins:3,
+   d:'Three sets of twenty rows, pull-aparts or table rows, ten seconds between. It is meant to burn.'}
+];
+function finisherFor(tier, ctx){
+  if(!tier.finisher || ctx.deload || ctx.readiness.band!=='high') return null;
+  const lastFin=(S.shape&&S.shape.lastFin)||null;
+  const pool=FINISH.filter(f=>f.k!==lastFin);
+  const seed=((S.logs.length+1)*40503)>>>0;
+  return pool[seed%pool.length]||null;
+}
+
+/* --- 9. The easy week ------------------------------------------------
+   Six weeks on target and the app schedules a lighter one: a set off
+   everything, mid-range targets, no novelty. This is not a reward for good
+   behaviour, it is the week the previous six turn into something you can
+   see. It can be waved away, and it will not ask again that week. */
+function onTargetRun(){
+  const m=weekCounts(), now=mondayOf(new Date());
+  let run=0;
+  for(let i=1;i<=26;i++){
+    const k=weekKey(new Date(now.getTime()-i*7*864e5));
+    if((m[k]||0)>=S.target) run++; else break;
+  }
+  return run;
+}
+function deloadNow(){
+  const wk=weekKey(new Date()), d=S.deload||{};
+  if(d.week===wk) return d.state==='on';
+  if(d.last){
+    const gap=Math.round((new Date(wk)-new Date(d.last))/(7*864e5));
+    if(gap<6) return false;
+  }
+  if(breakLength()>=10) return false;
+  return onTargetRun()>=6;
+}
+function deloadSkip(){
+  S.deload=Object.assign({}, S.deload, {week:weekKey(new Date()), state:'off'});
+  planCache={}; save(); render();
+  toast('Carrying on as normal');
+}
+function deloadKeep(){
+  S.deload=Object.assign({}, S.deload, {week:weekKey(new Date()), state:'on'});
+  planCache={}; save(); render();
+}
+
+/* --- 10. Putting it together ----------------------------------------- */
+
+function lastRepsFor(exId, level){
+  for(let i=S.logs.length-1;i>=0;i--){
+    if(S.logs[i].novel) continue;
+    const en=S.logs[i].entries.find(x=>x.exId===exId);
+    if(!en) continue;
+    if(en.level!==level) return null;
+    const r=en.sets.map(s=>s.reps).filter(x=>x>0);
+    return r.length?Math.min.apply(null,r):null;
+  }
+  return null;
+}
+function restFor(plan){
+  const base=S.restSec||plan.tier.rest||90;
+  return Math.max(30, Math.round(base*((plan.shape&&plan.shape.rest)||1)));
+}
+
+function buildPlan(key){
+  const base=SESSIONS[key], tier=tierNow(), rd=readiness(), deload=deloadNow();
+  const n=Math.min(tier.slots, PLAN2[key].length);
+  const slots=PLAN2[key].slice(0,n);
+  const occ=occupantsFor(key,n);
+  const ctx={deficit:muscleDeficit(), used:{}, pats:{}, readiness:rd, deload};
+  const shape=shapeFor(key,tier,ctx);
+  const why=[], blocks=[];
+
+  slots.forEach(slot=>{
+    const pick=slotChoice(slot, occ[slot.k], ctx);
+    if(!pick) return;
+    const e=byId(pick.exId);
+    ctx.used[pick.exId]=1; ctx.pats[patOf(e)]=1;
+    const level=Math.min(S.levels[pick.exId]||0, e.ladder.length-1);
+    const sp=stallPlan(pick.exId);
+    const lo=e.reps[0], hi=e.reps[1];
+    let sets=slot.role==='anchor'?tier.anchorSets:tier.accSets;
+    let target=lastRepsFor(pick.exId, level);
+    if(target==null) target=lo;
+    let note=null, tempo=shape.tempo||null;
+
+    if(sp && sp.kind==='backoff'){
+      target=lo; sets=sets+1; tempo='four seconds down';
+      note='Back off and slow down — this one has not moved in '+sp.n+' sessions.';
+    }
+    if(shape.bottom) target=lo;
+    if(rd.band==='low' && slot.role!=='anchor') sets=Math.max(2,sets-1);
+    if(deload){ sets=Math.max(2,sets-1); target=Math.round((lo+hi)/2); tempo=null; note=null; }
+    target=Math.max(lo,Math.min(hi,target));
+
+    blocks.push({exId:pick.exId, level, pat:slot.pat, role:slot.role, slot:slot.k,
+      sets, reps:[lo,hi], target, tempo, note,
+      fresh:pick.fresh, rotated:pick.rotated, mus:musOf(e)});
+
+    if(pick.rotated){
+      const from=byId(pick.rotated.from);
+      const fn=from?from.name.toLowerCase():'the last one';
+      why.push(pick.rotated.why==='stall'
+        ? e.name+' replaces '+fn+'. That one had stopped moving, and a change of stimulus is usually what restarts it.'
+        : (slot.mus==='any'
+            ? e.name+' fills the last slot: '+MUS_NAME[musOf(e)].toLowerCase()+' is the thinnest thing in your week, at '+(setsByMuscle(7)[musOf(e)]||0)+' hard sets in seven days.'
+            : e.name+' takes over from '+fn+' for a few weeks. Same job, different way of doing it — long enough to make progress on, short enough to stay interesting.'));
+    } else if(sp && sp.kind==='backoff'){
+      why.push(e.name+': back to '+lo+' reps with a slow lowering. Four sessions of the same number means the answer is a different kind of hard, not more of it.');
+    }
+  });
+
+  /* The headline reasons, in the order they override each other. An easy
+     week and a rough morning can both be true, and a person who told the app
+     they are sore should see that acknowledged either way — so these stack
+     rather than replace. */
+  const head=[];
+  if(deload) head.push('Easy week. Six weeks on target without one — a set comes off everything and the targets sit mid-range. This is the week the last six turn into something you can see.');
+  if(rd.band==='low'){
+    const cause = rd.ans&&rd.ans.sore===2 ? ' — you logged properly sore this morning'
+                : rd.ans&&rd.ans.sleep===0 ? ' — you logged a bad night' : '';
+    head.push(deload
+      ? 'Lighter day on top of it'+cause+'. Take the targets as a ceiling, not a promise.'
+      : 'Lighter day'+cause+'. A set off the accessories, same movements. An easier session beats a skipped one.');
+  }
+  else if(!deload && shape.k!=='straight') head.push(shape.n+'. '+shape.d);
+  while(head.length) why.unshift(head.pop());
+
+  const ready=blocks.filter(b=>S.ready[b.exId]);
+  if(ready.length) why.push('A harder version is waiting on '+ready.map(b=>byId(b.exId).name.toLowerCase()).join(', ')+'. The player will offer it when you get there — it is still your call.');
+
+  const fin=finisherFor(tier,ctx);
+  const plan={key, letter:base.letter, name:base.name, sub:base.sub, cool:base.cool,
+    tier, shape, deload, readiness:rd, blocks, finisher:fin, why,
+    mins: Math.max(12, Math.round(blocks.reduce((a,b)=>a+b.sets,0)*2.2) + (fin?fin.mins:0))};
+  plan.rest=restFor(plan);
+  return plan;
+}
+
+/* Rendering calls this a dozen times a screen, so hold the last answer. The
+   signature covers everything the plan reads. */
+let planCache={};
+function planSig(key){
+  return [key, S.logs.length, dayKey(new Date()), S.variety||'normal', S.target,
+    S.tierOverride, kitList().join(','), S.dbAdjustable?1:0,
+    JSON.stringify((S.checkins||{})[dayKey(new Date())]||0),
+    JSON.stringify(S.levels), JSON.stringify(S.ready),
+    JSON.stringify(S.deload||0)].join('|');
+}
+function planFor(key){
+  const sig=planSig(key);
+  const hit=planCache[key];
+  if(hit && hit.sig===sig) return hit.plan;
+  const plan=buildPlan(key);
+  planCache[key]={sig, plan};
+  return plan;
+}
+/* The old shape, so everything that only wants a list of exercises — Learn,
+   the profile card, the session preview — keeps working untouched. */
+function sessionFor(key){
+  const p=planFor(key);
+  return {name:p.name, letter:p.letter, sub:p.sub, cool:p.cool,
+          ex:p.blocks.map(b=>b.exId), plan:p};
+}
+function planLine(p){
+  const bits=[p.tier.name];
+  if(p.deload) bits.push('easy week');
+  else if(p.shape.k!=='straight') bits.push(p.shape.n.toLowerCase());
+  if(p.readiness.band==='low') bits.push('lighter day');
+  return bits.join(' · ');
+}
+
+
 /* --- rest-day mobility: three moves, about two minutes --- */
 const MOB=[
   {id:'catcow', name:'Cat–cow', hold:'8 slow rounds',
@@ -1081,18 +1840,28 @@ const STR=[
 const byStr = id => STR.find(s=>s.id===id) || MOB.find(m=>m.id===id);
 
 /* ============================== STATE ============================== */
-const BUILD='2026-09-19 16:45';
+const BUILD='2026-09-19 20:10';
 const KEY='groundwork.v1';
 let S = {
   setup:false,
   unit:'kg', db:10, target:3, restSec:90,
   kit:['none'], dbAdjustable:false,
   levels:{}, weights:{}, ready:{},
-  logs:[], badges:[], checkins:{}
+  logs:[], badges:[], checkins:{},
+  /* the coach's working memory. prog is per movement, shape remembers the
+     last session format so novelty never repeats back to back, deload
+     tracks the planned easy week, variety is how restless the person wants
+     the programme to be, tierOverride lets somebody say they have trained
+     before. All of it is derived or preference — nothing here is history,
+     so losing it costs a few sessions of calibration and nothing else. */
+  prog:{}, shape:{}, deload:{}, variety:'normal', tierOverride:null, assess:null
 };
 function load(){
   try{ const r=localStorage.getItem(KEY); if(r) S=Object.assign(S,JSON.parse(r)); }catch(e){}
   EX.forEach(e=>{ if(S.levels[e.id]===undefined) S.levels[e.id]=0; });
+  S.prog=S.prog||{}; S.shape=S.shape||{}; S.deload=S.deload||{};
+  S.variety=S.variety||'normal';
+  if(S.tierOverride===undefined) S.tierOverride=null;
 }
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 
@@ -1143,6 +1912,12 @@ function applyDeload(){
   EX.forEach(e=>{ const cur=S.levels[e.id]||0;
     if(cur>0){ S.levels[e.id]=Math.max(0,cur-rungs); moved++; } });
   Object.keys(S.ready).forEach(k=>S.ready[k]=false);
+  /* Everything the coach thought it knew about your rate of progress was
+     learned before the break, so throw it away rather than have it call the
+     first session back a collapse. */
+  Object.keys(S.prog||{}).forEach(k=>{ const p=S.prog[k];
+    p.stall=0; p.hits=0; p.lastVol=0; p.lastLevel=S.levels[k]||0; });
+  planCache={};
   S.deloadedAt=Date.now(); save();
   return moved;
 }
@@ -1170,6 +1945,8 @@ function bumpAllLadders(){
     const cur=S.levels[e.id]||0, top=e.ladder.length-1;
     if(cur<top){ S.levels[e.id]=cur+1; n++; } });
   Object.keys(S.ready).forEach(k=>S.ready[k]=false);
+  Object.keys(S.prog||{}).forEach(k=>{ S.prog[k].hits=0; S.prog[k].stall=0; S.prog[k].lastVol=0; });
+  planCache={};
   S.extraNudgedAt=Date.now(); save(); render();
   toast(n+' movements stepped up');
 }
@@ -1423,6 +2200,12 @@ function suApply(){
   const band=(ACTIVITY.find(a=>a.k===su.activity)||{band:1}).band;
   const bands={}; ASSESS.forEach(q=>bands[q.k]=su.bands[q.k]??0);
   EX.forEach(e=>{ S.levels[e.id]=rungFor(e,bands,band); });
+  /* Kept so the coach can tell the difference between somebody with no
+     history because they are new and somebody with no history because the
+     app is. Without it, a person who can do twenty push-ups spends their
+     first month on a beginner's set count. */
+  S.assess={bands, activity:band, at:Date.now()};
+  planCache={};
 }
 function suGo(d){
   suRead();
@@ -1551,16 +2334,17 @@ function suPlan(){
   <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:18px">
     <div style="min-width:0">
       <h3 style="font-size:16px">${sess.name} ${sess.letter}</h3>
-      <div class="tiny muted" style="margin-top:2px">${sess.sub} · about 25 minutes</div>
+      <div class="tiny muted" style="margin-top:2px">${sess.sub} · about ${sess.plan.mins} minutes</div>
     </div>
     <span class="sessiontag">First up</span>
   </div>
   <div class="exhead"><span>Exercise</span><span>Target</span></div>
   <ul class="exlist">
-    ${sess.ex.map(id=>{const e=byId(id), lv=e.ladder[S.levels[id]||0];
-      return `<li><span>${lv.n}</span><span class="meta">${e.sets} sets of ${e.reps[0]}–${e.reps[1]}${e.hold?' sec':''}</span></li>`}).join('')}
+    ${sess.plan.blocks.map(b=>{const e=byId(b.exId), lv=e.ladder[b.level];
+      return `<li><span>${lv.n}</span><span class="meta">${b.sets} sets of ${e.reps[0]}–${e.reps[1]}${e.hold?' sec':''}</span></li>`}).join('')}
     <li style="color:var(--muted)"><span>Cooldown stretches</span><span class="meta">3 holds of 30 sec</span></li>
   </ul>
+  <p class="tiny muted" style="margin:10px 0 0">${sess.plan.tier.blurb}</p>
 
   <p class="tiny muted" style="margin:14px 0 0">Session B alternates with it: ${next.sub.toLowerCase()}.</p>
 
@@ -1611,6 +2395,7 @@ function todayPartner(){
 
 function viewToday(){
   const st=streak(), ds=dayStreak(), done=thisWeekCount(), key=nextSession(), sess=sessionFor(key);
+  const plan=sess.plan;
   const d=new Date(), rest=isRestDay(), trainedToday=trainedOn(dayKey(d)), ci=checkedInToday();
   const rungs=Array.from({length:S.target},(_,i)=>`<div class="rung ${i<done?'done':''}"></div>`).join('');
   const readyList=sess.ex.filter(id=>S.ready[id]);
@@ -1651,6 +2436,19 @@ function viewToday(){
     <button class="btn ghost sm" onclick="dismissExtraNudge()">Leave it as it is</button>
   </div>`:''}
 
+  ${deloadNow()?`<div class="card" style="margin-top:14px;border-color:var(--pine)">
+    <h3 style="font-size:16px">This week is the easy one</h3>
+    <p class="small muted" style="margin:8px 0 0">Six weeks on target without a light one. A set comes off everything and the targets sit mid-range for seven days. This is not a reward for good behaviour \u2014 it is the week the last six turn into something you can see in a mirror.</p>
+    <button class="btn ghost sm" onclick="deloadSkip()">I feel fine, keep it normal</button>
+  </div>`:''}
+
+  ${easeOffers().slice(0,1).map(x=>`<div class="card" style="margin-top:14px;border-color:var(--brass)">
+    <h3 style="font-size:16px">${x.e.name} is going backwards</h3>
+    <p class="small muted" style="margin:8px 0 0">${x.sp.n} sessions without beating the one before, and the last one was worse than the one before that. Easing it back a rung usually rebuilds in a fortnight, and nothing about your history or streaks changes.</p>
+    <button class="btn sm" style="background:var(--brass);color:var(--surface)" onclick="easeMovement('${x.e.id}')">Back to ${esc(x.e.ladder[Math.max(0,(S.levels[x.e.id]||0)-1)].n.toLowerCase())}</button>
+    <button class="btn ghost sm" onclick="keepMovement('${x.e.id}')">Leave it, I\u2019ll push through</button>
+  </div>`).join('')}
+
   ${(breakLength()>=14 && !(S.deloadedAt&&Date.now()-S.deloadedAt<864e5*3))?`<div class="card" style="margin-top:14px;border-color:var(--brass)">
     <h3 style="font-size:16px">Been a while</h3>
     <p class="small muted" style="margin:8px 0 0">${breakLength()} days since your last session. Drop back ${breakLength()>=56?'two rungs':'a rung'} on everything and you will climb back within a fortnight. Your history and streaks are untouched.</p>
@@ -1676,18 +2474,14 @@ function viewToday(){
     <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
       <div style="min-width:0">
         <h2 style="font-size:19px">Today's workout</h2>
-        <div class="tiny muted" style="margin-top:2px">${sess.sub} · about 25 minutes</div>
+        <div class="tiny muted" style="margin-top:2px">${plan.sub} · about ${plan.mins} minutes</div>
       </div>
-      <span class="sessiontag">Workout ${sess.letter}</span>
+      <span class="sessiontag">Workout ${plan.letter}</span>
     </div>
-    ${readyList.length?`<div class="flag" style="margin-top:12px"><b>Step up today.</b> You hit the top of the range last time on ${readyList.map(id=>byId(id).name.toLowerCase()).join(', ')}. The app will offer a harder version when you get there.</div>`:''}
-    <div class="exhead"><span>Exercise</span><span>Target</span></div>
-    <ul class="exlist">
-      ${sess.ex.map(id=>{const e=byId(id),lv=e.ladder[S.levels[id]];
-        return `<li><span>${lv.n}</span><span class="meta">${e.sets} sets of ${e.reps[0]}–${e.reps[1]}${e.hold?' sec':''}</span></li>`}).join('')}
-      <li style="color:var(--muted)"><span>Cooldown stretches</span><span class="meta">3 holds of 30 sec</span></li>
-    </ul>
-    <p class="tiny muted" style="margin:12px 0 0">A range, not a number. Start near the lower end and add reps each week — reach the top on every set and the app moves you to a harder version.</p>
+    ${planChips(plan)}
+    ${readyList.length?`<div class="flag" style="margin-top:12px"><b>Step up today.</b> You hit the top of the range last time on ${readyList.map(id=>byId(id).name.toLowerCase()).join(', ')}. The app will offer a harder version when you get there \u2014 it is still a tap, not a surprise.</div>`:''}
+    ${planList(plan)}
+    ${whyCard(plan)}
     <button class="btn pine" onclick="startSession('${key}')">Start the workout</button>
   </div>`}
 
@@ -1721,22 +2515,43 @@ function last7(){
   return o;
 }
 function showExtra(){
-  const key=extraKey(), sess=sessionFor(key);
+  const key=extraKey(), sess=sessionFor(key), plan=sess.plan;
   document.getElementById('peek').innerHTML=`
     <p class="small muted" style="margin:14px 0 0">Today's workout is logged and cannot be repeated. An extra uses the other set of movements — ${sess.sub.toLowerCase()} — so nothing you trained today gets worked twice.</p>
-    <ul class="exlist" style="margin-top:12px">
-      ${sess.ex.map(id=>{const e=byId(id),lv=e.ladder[S.levels[id]||0];
-        return `<li><span>${lv.n}</span><span class="meta">${e.sets} × ${e.reps[0]}–${e.reps[1]}${e.unit==='sec'?'s':''}</span></li>`}).join('')}</ul>
+    ${planList(plan, true)}
     <p class="tiny muted" style="margin:12px 0 0">Logged as an extra. If extras become a habit, the app will offer to make the scheduled sessions harder instead.</p>
     <button class="btn pine sm" onclick="startSession('${key}',true)">Start the extra session</button>`;
 }
 function showSession(key){
   const sess=sessionFor(key);
-  document.getElementById('peek').innerHTML=`<ul class="exlist" style="margin-top:14px">
-    ${sess.ex.map(id=>{const e=byId(id),lv=e.ladder[S.levels[id]];
-      return `<li><span>${lv.n}</span><span class="meta">${e.sets} × ${e.reps[0]}–${e.reps[1]}${e.unit==='sec'?'s':''}</span></li>`}).join('')}</ul>
+  document.getElementById('peek').innerHTML=planList(sess.plan, true)
+    + whyCard(sess.plan)
+    + `<button class="btn ghost sm" onclick="startSession('${key}')">Train anyway</button>`;
+}
 
-    <button class="btn ghost sm" onclick="startSession('${key}')">Train anyway</button>`;
+/* --- how a plan is shown, wherever it is shown --- */
+function planChips(plan){
+  const out=[`<span class="chip" style="color:var(--pine);border-color:var(--pine)">${plan.tier.name}</span>`];
+  if(plan.deload) out.push(`<span class="chip" style="color:var(--brass);border-color:var(--brass)">Easy week</span>`);
+  else if(plan.shape.k!=='straight') out.push(`<span class="chip" style="color:var(--brass);border-color:var(--brass)">${plan.shape.n}</span>`);
+  if(plan.readiness.band==='low' && !plan.deload) out.push(`<span class="chip">Lighter day</span>`);
+  if(plan.blocks.some(b=>b.fresh)) out.push(`<span class="chip">New today</span>`);
+  return `<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:12px">${out.join('')}</div>`;
+}
+function planList(plan, compact){
+  return `${compact?'':'<div class="exhead"><span>Exercise</span><span>Target</span></div>'}
+  <ul class="exlist" style="${compact?'margin-top:12px':''}">
+    ${plan.blocks.map(b=>{ const e=byId(b.exId), lv=e.ladder[b.level];
+      return `<li><span>${lv.n}${b.fresh?' <span class="tiny" style="color:var(--brass)">new</span>':''}</span><span class="meta">${b.sets} × ${b.target}${e.hold?'s':''}</span></li>`}).join('')}
+    ${plan.finisher?`<li style="color:var(--muted)"><span>${plan.finisher.n}<span class="tiny"> optional</span></span><span class="meta">${plan.finisher.mins} min</span></li>`:''}
+    <li style="color:var(--muted)"><span>Cooldown stretches</span><span class="meta">3 × 30s</span></li>
+  </ul>`;
+}
+/* The engine explains itself or it is just a slot machine. */
+function whyCard(plan){
+  if(!plan.why||!plan.why.length) return '';
+  return `<div class="flag" style="margin-top:14px"><b>Why this workout.</b> ${plan.why[0]}
+    ${plan.why.length>1?`<span class="tiny muted" style="display:block;margin-top:9px;line-height:1.6">${plan.why.slice(1).join(' ')}</span>`:''}</div>`;
 }
 function lastSummary(){
   const l=S.logs[S.logs.length-1]; const dt=new Date(l.date);
@@ -1899,7 +2714,9 @@ function setLevel(exId,i){
   const e=byId(exId); if(!e) return;
   i=Math.max(0,Math.min(i,e.ladder.length-1));
   if((S.levels[exId]||0)===i) return;
-  S.levels[exId]=i; S.ready[exId]=false; save();
+  S.levels[exId]=i; S.ready[exId]=false;
+  const pr=progOf(exId); pr.hits=0; pr.stall=0; pr.lastVol=0; pr.lastLevel=i;
+  planCache={}; save();
   const ld=document.getElementById('ld_'+exId); if(ld) ld.innerHTML=ladderPills(exId);
   const fig=document.getElementById('fw_'+exId);
   if(fig){ stopAll(); fig.innerHTML=figure(e,'fg_'+exId); setTimeout(()=>figPlay(e,'fg_'+exId),80); }
@@ -1942,6 +2759,50 @@ function acc(btn, exId, strId, logIdx){
   if(open && exId){ stopAll(); }
 }
 
+/* The engine, shown back to the person. Nobody should have to guess why the
+   app picked what it picked, and a weekly set count per muscle group is the
+   single most useful number for anybody who cares whether this is working. */
+function coachCard(){
+  const tier=tierNow(), has=setsByMuscle(7), plan=planFor(nextSession());
+  const rows=MUSCLES.map(mus=>{
+    const f=setFloor(mus), v=has[mus]||0;
+    const pct=f?Math.min(100, Math.round(v/f*100)):100;
+    return `<div style="margin-top:11px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;font-size:13.5px">
+        <span>${MUS_NAME[mus]}</span>
+        <span class="tiny muted">${f
+          ? `<span class="num" style="font-size:14px;color:${v>=f?'var(--pine)':'var(--muted)'}">${v}</span> of ${f}`
+          : `${v} \u00b7 covered by the pressing and pulling`}</span>
+      </div>
+      ${f?`<div class="lvbar" style="margin-top:5px"><i style="width:${pct}%;background:${v>=f?'var(--pine)':'var(--brass)'}"></i></div>`:''}
+    </div>`;
+  }).join('');
+  const moving=EX.filter(e=>hasKit(e.kit||'db') && (S.prog||{})[e.id] && S.prog[e.id].n>1);
+  const stuck=moving.filter(e=>stallPlan(e.id));
+  const ready=moving.filter(e=>S.ready[e.id]);
+  return `<div class="card" style="margin-top:14px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+      <h3 style="font-size:15px">Your plan</h3>
+      <span class="tiny muted">${tier.name}</span>
+    </div>
+    <p class="tiny muted" style="margin:5px 0 0">${tier.blurb}</p>
+
+    <div class="exhead" style="margin-top:18px"><span>Hard sets, last 7 days</span><span>floor</span></div>
+    ${rows}
+    <p class="tiny muted" style="margin:12px 0 0">The floor is the least a muscle group needs in a week for anything to change. Whatever is furthest below it gets first refusal on the last slot of your next session.</p>
+    ${(()=>{ const thin=MUSCLES.filter(m=>setFloor(m)&&musPool(m)<=1);
+      return thin.length?`<p class="tiny muted" style="margin:8px 0 0">${thin.map(m=>MUS_NAME[m].toLowerCase()).join(' and ')}: your kit gives ${thin.length===1?'one movement':'one movement each'} here, so the floor is set to what is reachable. Bands or a pull-up bar open it up.</p>`:''; })()}
+
+    ${ready.length?`<p class="small" style="margin:14px 0 0">Waiting to step up: <b>${ready.map(e=>e.name.toLowerCase()).join(', ')}</b>.</p>`:''}
+    ${stuck.length?`<p class="small muted" style="margin:8px 0 0">Not moving: ${stuck.map(e=>e.name.toLowerCase()).join(', ')}. The app is already changing how ${stuck.length===1?'it is':'they are'} prescribed.</p>`:''}
+    ${moving.length?'':`<p class="small muted" style="margin:14px 0 0">A couple more sessions and this fills in — the coach needs two goes at a movement before it has anything to compare.</p>`}
+
+    <div class="exhead" style="margin-top:18px"><span>Next session</span><span>${planLine(plan)}</span></div>
+    ${planList(plan, true)}
+    <button class="btn ghost sm" onclick="openSub('coach')">How this is decided</button>
+  </div>`;
+}
+
 function viewProgress(){
   const st=streak(), m=weekCounts();
   const weeks=Object.keys(m).sort();
@@ -1969,6 +2830,8 @@ function viewProgress(){
       : 'Top level. Everything from here is just doing the work.'}</div>
     <div class="tiny muted" style="margin-top:9px">10 a session · 3 a check-in · 15 for finishing a week</div>
   </div>
+
+  ${coachCard()}
 
   <div class="statgrid" style="margin-top:14px">
     <div class="stat"><div class="v num">${S.logs.length}</div><div class="k">sessions done</div></div>
@@ -2575,6 +3438,7 @@ const MENU=[
   }},
   {k:'kit',   n:'Equipment',        sum:()=>kitSummary()},
   {k:'train', n:'Training',         sum:()=>`${S.target} sessions a week · ${S.restSec}s rest`},
+  {k:'coach', n:'Coaching',         sum:()=>`${tierNow().name} · ${varietyCfg().n.toLowerCase()} variety`},
   {k:'ladder',n:'Exercise levels',  sum:()=>`${EX.filter(e=>hasKit(e.kit||'db')).length} movements`},
   {k:'remind',n:'Daily reminder',   sum:()=>!Native.on?'Not available on this platform':(S.notify?`On at ${S.notifyAt||'19:00'}`:'Off')},
   {k:'look',  n:'Appearance',       sum:()=>({auto:'Match device',light:'Light',dark:'Dark'})[S.theme||'auto']},
@@ -2589,8 +3453,9 @@ const MENU=[
 
 function viewYou(){
   if(sub==='me' && asq) return drawAssess();
-  if(sub) return ({me:subMe,kit:subKit,train:subTrain,ladder:subLadder,remind:subRemind,
-                   look:subLook,acct:subAcct,priv:subPrivacy,data:subData,stats:subStats})[sub]();
+  if(sub) return ({me:subMe,kit:subKit,train:subTrain,coach:subCoach,ladder:subLadder,
+                   remind:subRemind,look:subLook,acct:subAcct,priv:subPrivacy,
+                   data:subData,stats:subStats})[sub]();
   $v.innerHTML=`<div class="topbar"><h1>You</h1></div>
   ${profileHeader()}
   ${profileBody()}
@@ -2849,6 +3714,73 @@ function subTrain(){
   </div>`;
 }
 
+/* The coach, with its lid off. Two dials and an explanation — anything more
+   and it becomes a programme editor, which is the thing this app exists to
+   save people from. */
+const VARIETY=[
+  {k:'steady',   n:'Steady',   d:'Movements change rarely. The easiest version to compare week to week.'},
+  {k:'normal',   n:'Balanced', d:'Accessory movements change every few weeks, formats now and then.'},
+  {k:'restless', n:'Restless', d:'Something is different most sessions. Progress is harder to read, but you will not get bored.'}
+];
+const TIER_SET=[
+  {v:null, n:'Work it out for me', d:'The default. Moves up on its own as the history builds.'},
+  {v:1,    n:'I have trained before',        d:'Start at full sets rather than a beginner\u2019s load.'},
+  {v:2,    n:'I train regularly',            d:'Six slots, more volume, and a rung has to be earned twice.'}
+];
+function setVariety(v){ S.variety=v; planCache={}; save(); render(); }
+function setTierOverride(v){ S.tierOverride=v; planCache={}; save(); render(); }
+
+function subCoach(){
+  const tier=tierNow(), plan=planFor(nextSession()), cfg=varietyCfg();
+  const d=S.deload||{}, wk=weekKey(new Date());
+  $v.innerHTML=subhead('Coaching')+`
+  <div class="card">
+    <h3 style="font-size:15px">Where the app thinks you are</h3>
+    <p class="small" style="margin:8px 0 0"><b>${tier.name}.</b> ${tier.blurb}</p>
+    <p class="tiny muted" style="margin:8px 0 0">${S.logs.length} session${S.logs.length===1?'':'s'} logged, ${Math.round(ladderFraction()*100)}% of the way up the ladders you can use. It moves on its own; the setting below is a floor, not a lock.</p>
+    <div class="choices" style="margin-top:12px">
+      ${TIER_SET.map(t=>`<button class="choice ${((S.tierOverride==null&&t.v==null)||S.tierOverride===t.v)?'on':''}"
+        onclick="setTierOverride(${t.v==null?'null':t.v})">${t.n}</button>`).join('')}
+    </div>
+    <p class="tiny muted" style="margin:8px 0 0">${(TIER_SET.find(t=>t.v===(S.tierOverride==null?null:S.tierOverride))||TIER_SET[0]).d}</p>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:15px">How much should change</h3>
+    <p class="tiny muted" style="margin:5px 0 0">Squats, presses and pulls hold still whatever you pick here — progress needs something to compare against. This is about everything else.</p>
+    <div class="choices" style="margin-top:12px">
+      ${VARIETY.map(v=>`<button class="choice ${(S.variety||'normal')===v.k?'on':''}" onclick="setVariety('${v.k}')">${v.n}</button>`).join('')}
+    </div>
+    <p class="tiny muted" style="margin:8px 0 0">${(VARIETY.find(v=>v.k===(S.variety||'normal'))||VARIETY[1]).d}</p>
+    <p class="tiny muted" style="margin:8px 0 0">Right now: a movement holds a rotating slot for about ${cfg.sticky} sessions, and roughly ${Math.round(cfg.novel*100)}% of sessions come in a different shape.</p>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:15px">Easy weeks</h3>
+    <p class="small muted" style="margin:6px 0 0">After six weeks on target the app takes a set off everything for seven days. It is the week the previous six turn into something visible, and skipping it is how people plateau.</p>
+    <p class="tiny muted" style="margin:8px 0 0">${deloadNow()
+      ? 'This week is an easy one.'
+      : (onTargetRun()>=1 ? onTargetRun()+' week'+(onTargetRun()===1?'':'s')+' on target so far. ' : 'No full weeks on target yet. ')
+        + (d.last ? 'Last easy week: '+new Date(d.last).toLocaleDateString('en-GB',{day:'numeric',month:'long'})+'.' : 'None taken yet.')}</p>
+    ${deloadNow()?`<button class="btn ghost sm" onclick="deloadSkip()">Skip it this time</button>`
+      :(d.week===wk&&d.state==='off'?`<button class="btn ghost sm" onclick="deloadKeep()">Actually, take it</button>`:'')}
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:15px">What it does with your answers</h3>
+    <div class="prow"><span>Sets next session</span><span>${plan.blocks.reduce((a,b)=>a+b.sets,0)} across ${plan.blocks.length} movements</span></div>
+    <div class="prow"><span>Shape</span><span>${plan.shape.n}</span></div>
+    <div class="prow"><span>Rest between sets</span><span>${plan.rest}s</span></div>
+    <div class="prow"><span>Readiness today</span><span>${plan.readiness.logged?plan.readiness.score+' of 100':'no check-in yet'}</span></div>
+    <p class="tiny muted" style="margin:10px 0 0">Readiness comes from the check-in — sleep, soreness, food — plus how long since the last session. A bad night buys a set off the accessories, not a day off.</p>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:15px">What it will never do</h3>
+    <p class="small muted" style="margin:6px 0 0;line-height:1.6">Move you up a ladder rung, add weight, or drop you back down, without asking. Those are offers on the screen with two buttons, every time. The app decides how much work you do and which movements do it; you decide how hard each one gets.</p>
+  </div>`;
+}
+
 function subLadder(){
   $v.innerHTML=subhead('Exercise levels')+`
   <p class="small muted" style="margin:0 0 14px">Change one if a version feels wrong today.</p>
@@ -3013,181 +3945,346 @@ function wipe(){ ask('Erase all sessions, streaks and settings? This cannot be u
 
 /* ============================== SESSION PLAYER ============================== */
 let run=null;
+
+/* A session is a list of *steps*, not a list of exercises, because the coach
+   can hand us four different shapes:
+
+     straight / tempo  one exercise per step, all its sets
+     pairs             two exercises per step, alternate sets, rest once
+     rounds / density   one step per round, every exercise, one set each
+
+   The set rows on screen are always a flat list, and `run.rows` maps each row
+   back to an entry and a set. Everything that touches a row — the steppers,
+   the tick, the hold clock — goes through that map, so the three layouts all
+   share one set of handlers. The log that comes out the far end is identical
+   whichever shape was used. */
+
+function buildSteps(plan, entries){
+  const steps=[];
+  if(plan.shape.circuit){
+    for(let r=0;r<plan.shape.circuit;r++)
+      steps.push({kind:'round', round:r, eis:entries.map((_,i)=>i)});
+  } else if(plan.shape.pair){
+    for(let i=0;i<entries.length;i+=2)
+      steps.push({kind:'pair', eis: entries[i+1]?[i,i+1]:[i]});
+  } else {
+    entries.forEach((_,i)=>steps.push({kind:'ex', eis:[i]}));
+  }
+  if(plan.finisher) steps.push({kind:'finisher'});
+  return steps;
+}
+
 function startSession(key, extra){
-  const sess=sessionFor(key);
-  run={ key, i:0, extra:!!extra, startedAt:Date.now(), entries: sess.ex.map(id=>{
-    const e=byId(id);
-    return { exId:id, level:S.levels[id], sets:Array.from({length:e.sets},()=>({reps:e.hold?30:e.reps[0], weight:S.weights[id]??S.db, done:false, hold:!!e.hold})) };
-  })};
+  const plan=planFor(key);
+  run={ key, plan, si:0, rows:[], extra:!!extra, startedAt:Date.now(),
+    entries: plan.blocks.map(b=>{
+      const e=byId(b.exId);
+      const n=plan.shape.circuit||b.sets;
+      return { exId:b.exId, level:b.level, planned:n, target:b.target,
+        tempo:b.tempo, note:b.note, role:b.role,
+        sets:Array.from({length:n},()=>({reps:b.target, weight:S.weights[b.exId]??S.db,
+          done:false, hold:!!e.hold})) };
+    })};
+  run.steps=buildSteps(plan, run.entries);
+  run.total=run.steps.length+plan.cool.length;
   document.getElementById('player').classList.add('on');
   document.body.style.overflow='hidden';
+  if(plan.shape.clock) startClock(plan.shape.clock);
   drawStep();
 }
-function drawStep(){
-  const en=run.entries[run.i], e=byId(en.exId), lv=e.ladder[en.level];
-  const total=run.entries.length;
-  document.getElementById('pfill').style.width=((run.i)/total*100)+'%';
-  const stepUp = S.ready[en.exId] && en.level < e.ladder.length-1;
-  document.getElementById('pbody').innerHTML=`
-  <div class="topbar" style="margin-bottom:16px">
-    <div><div class="tiny muted">${SESSIONS[run.key].name} ${SESSIONS[run.key].letter} · ${run.i+1} of ${total}</div><h1 style="font-size:21px;margin-top:2px">${lv.n}</h1></div>
-    <button class="tiny muted" onclick="quitSession()" style="text-decoration:underline">Quit</button>
-  </div>
-  <div onclick="figPlay(byId('${en.exId}'),'pf')" style="cursor:pointer">${figure(e,'pf')}</div>
-  <p class="small muted" style="margin:12px 0 0">${lv.h}</p>
 
-  ${stepUp?`<div class="card" style="margin-top:14px;border-color:var(--brass);background:var(--brass-soft)">
+/* --- the twelve-minute clock, for the density shape only --- */
+let clk_t=null, clkLeft=0;
+function startClock(mins){
+  clkLeft=mins*60;
+  clearInterval(clk_t);
+  clk_t=setInterval(()=>{
+    clkLeft--;
+    paintClock();
+    if(clkLeft<=0){ clearInterval(clk_t); clk_t=null;
+      if(navigator.vibrate) navigator.vibrate([30,80,30]);
+      toast('Clock’s up. Tick what you finished.'); }
+  },1000);
+}
+function stopClock(){ clearInterval(clk_t); clk_t=null; }
+function clockText(){
+  const m=Math.floor(Math.max(0,clkLeft)/60), s=Math.max(0,clkLeft)%60;
+  return m+':'+String(s).padStart(2,'0');
+}
+function paintClock(){ const el=document.getElementById('sclock'); if(el) el.textContent=clockText(); }
+
+function shapeChip(){
+  const p=run.plan;
+  const bits=[];
+  if(p.deload) bits.push('Easy week');
+  else if(p.shape.k!=='straight') bits.push(p.shape.n);
+  if(p.readiness.band==='low' && !p.deload) bits.push('lighter');
+  if(!bits.length) return '';
+  return `<span class="sessiontag" style="color:var(--brass);background:var(--brass-soft)">${bits.join(' · ')}</span>`;
+}
+
+/* A set row. `k` is its index in run.rows, which is the same as its index in
+   the DOM — that is the whole contract the handlers rely on. */
+function setRowHtml(k, en, si){
+  const e=byId(en.exId), s=en.sets[si];
+  return `<div class="setrow">
+    <div class="sn">Set ${si+1}</div>
+    <div class="stepper">
+      <button onclick="bump(${k},'reps',-1)" aria-label="fewer">−</button>
+      <div class="val">${s.reps}</div>
+      <button onclick="bump(${k},'reps',1)" aria-label="more">+</button>
+    </div><span class="unit">${e.hold?'sec':'reps'}</span>
+    ${e.hold?`<button class="chip" onclick="holdSet(${k})" id="hb${k}">Start</button>`:''}
+    ${e.load?`<div class="stepper">
+      <button onclick="bump(${k},'weight',-0.5)" aria-label="lighter">−</button>
+      <div class="val">${s.weight}</div>
+      <button onclick="bump(${k},'weight',0.5)" aria-label="heavier">+</button>
+    </div><span class="unit">${S.unit}</span>`:''}
+    <button class="donebtn ${s.done?'on':''}" onclick="markSet(${k})" aria-label="mark set done">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg></button>
+  </div>`;
+}
+
+function stepUpCard(ei){
+  const en=run.entries[ei], e=byId(en.exId);
+  if(!S.ready[en.exId] || en.level>=e.ladder.length-1) return '';
+  return `<div class="card" style="margin-top:14px;border-color:var(--brass);background:var(--brass-soft)">
     <h3 style="font-size:15px;color:var(--brass)">Ready to step up</h3>
-    <p class="small" style="margin:6px 0 0">You hit ${e.reps[1]} reps on every set last time.${canAddWeight()&&e.load?` Add a little weight and drop back to ${e.reps[0]} reps, or move up to <b>${e.ladder[en.level+1].n}</b>.`:` Move up to <b>${e.ladder[en.level+1].n}</b> and start again near the bottom of the range.`}</p>
+    <p class="small" style="margin:6px 0 0">You hit ${e.reps[1]}${e.hold?' seconds':' reps'} on every set${tierNow().needHits>1?' twice running':''}.${canAddWeight()&&e.load?` Add a little weight and drop back to ${e.reps[0]}, or move up to <b>${e.ladder[en.level+1].n}</b>.`:` Move up to <b>${e.ladder[en.level+1].n}</b> and start again near the bottom of the range.`}</p>
     ${canAddWeight()&&e.load?`<button class="btn sm" style="background:var(--brass);color:var(--surface)" onclick="addWeight('${en.exId}')">Add weight, keep this version</button><button class="btn ghost sm" onclick="stepUp('${en.exId}')">Move up a rung instead</button>`
       :`<button class="btn sm" style="background:var(--brass);color:var(--surface)" onclick="stepUp('${en.exId}')">Move up a rung</button>`}
     <button class="btn ghost sm" onclick="S.ready['${en.exId}']=false;save();drawStep()">Stay here for now</button>
-  </div>`:''}
-
-  <div class="card" style="margin-top:14px">
-    <div style="display:flex;justify-content:space-between;align-items:baseline">
-      <h3 style="font-size:15px">${e.sets} sets of ${e.reps[0]}–${e.reps[1]}${e.hold?' seconds':' reps'}</h3>
-      <span class="tiny muted">${e.trains}</span>
-    </div>
-    ${en.sets.map((s,i)=>`<div class="setrow">
-      <div class="sn">Set ${i+1}</div>
-      <div class="stepper">
-        <button onclick="bump(${i},'reps',-1)" aria-label="fewer">−</button>
-        <div class="val">${s.reps}</div>
-        <button onclick="bump(${i},'reps',1)" aria-label="more">+</button>
-      </div><span class="unit">${e.hold?'sec':'reps'}</span>
-      ${e.hold?`<button class="chip" onclick="holdSet(${i})" id="hb${i}">Start</button>`:''}
-      ${e.load?`<div class="stepper">
-        <button onclick="bump(${i},'weight',-0.5)" aria-label="lighter">−</button>
-        <div class="val">${s.weight}</div>
-        <button onclick="bump(${i},'weight',0.5)" aria-label="heavier">+</button>
-      </div><span class="unit">${S.unit}</span>`:''}
-      <button class="donebtn ${s.done?'on':''}" onclick="markSet(${i})" aria-label="mark set done">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg></button>
-    </div>`).join('')}
-  </div>
-
-  <div class="card"><h3 style="font-size:15px">How to do it</h3>
-    <ol class="cues">${e.cues.map(c=>`<li>${c}</li>`).join('')}</ol>
-    <div class="flag"><b>Commonest mistake.</b> ${e.wrong}</div></div>
-
-  <button class="btn pine" onclick="nextStep()">${run.i===total-1?'Finish session':'Next exercise'}</button>
-  <div style="display:flex;gap:8px;margin-top:10px">
-    ${(e.alt||[]).filter(byId).map(a=>`<button class="btn ghost sm" style="margin:0;flex:1;font-size:13.5px" onclick="swapEx('${a}')">Do ${byId(a).name.toLowerCase()} instead</button>`).join('')}
-  </div>
-  <button class="btn ghost sm" onclick="skipEx()">Skip this one today</button>
-
-  <div style="height:20px"></div>`;
-  setTimeout(()=>figPlay(e,'pf'),120);
+  </div>`;
 }
+
+function exCard(ei, opts){
+  opts=opts||{};
+  const en=run.entries[ei], e=byId(en.exId), lv=e.ladder[en.level];
+  let rows='';
+  en.sets.forEach((s,si)=>{ rows+=setRowHtml(run.rows.length,en,si); run.rows.push({ei,si}); });
+  return `<div class="card" style="margin-top:14px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
+      <h3 style="font-size:15px;min-width:0">${opts.name?lv.n:`${en.sets.length} sets of ${e.reps[0]}–${e.reps[1]}${e.hold?' seconds':' reps'}`}</h3>
+      <span class="tiny muted" style="flex:0 0 auto">${opts.name?`${en.sets.length} × ${e.reps[0]}–${e.reps[1]}${e.hold?'s':''}`:e.trains}</span>
+    </div>
+    ${en.tempo?`<p class="tiny" style="margin:6px 0 0;color:var(--brass)">Tempo: ${en.tempo}.</p>`:''}
+    ${en.note?`<p class="tiny muted" style="margin:6px 0 0">${en.note}</p>`:''}
+    ${rows}
+  </div>`;
+}
+
+function drawStep(){
+  const st=run.steps[run.si];
+  run.rows=[];
+  document.getElementById('pfill').style.width=((run.si)/run.total*100)+'%';
+  if(st.kind==='finisher') return drawFinisher();
+  if(st.kind==='round')    return drawRound(st);
+  return drawEx(st);
+}
+
+/* One exercise, or two side by side when the shape is paired. */
+function drawEx(st){
+  const many=st.eis.length>1;
+  const lead=run.entries[st.eis[0]], le=byId(lead.exId);
+  const title = many
+    ? st.eis.map(i=>byId(run.entries[i].exId).ladder[run.entries[i].level].n).join(' + ')
+    : le.ladder[lead.level].n;
+  const body=st.eis.map((ei,n)=>{
+    const en=run.entries[ei], e=byId(en.exId), lv=e.ladder[en.level];
+    return `
+    ${many?`<div class="exhead" style="margin-top:18px"><span>${n===0?'First':'Then'}</span><span>${MUS_NAME[en_mus(en)]||''}</span></div>
+      <h2 style="font-size:17px;margin-top:2px">${lv.n}</h2>`:''}
+    <div onclick="figPlay(byId('${en.exId}'),'pf${ei}')" style="cursor:pointer">${figure(e,'pf'+ei)}</div>
+    <p class="small muted" style="margin:12px 0 0">${lv.h}</p>
+    ${st.eis.length===1?stepUpCard(ei):''}
+    ${exCard(ei, {name:many})}
+    ${many?'':`<div class="card"><h3 style="font-size:15px">How to do it</h3>
+      <ol class="cues">${e.cues.map(c=>`<li>${c}</li>`).join('')}</ol>
+      <div class="flag"><b>Commonest mistake.</b> ${e.wrong}</div></div>`}`;
+  }).join('');
+
+  document.getElementById('pbody').innerHTML=`
+  <div class="topbar" style="margin-bottom:16px">
+    <div style="min-width:0"><div class="tiny muted">${SESSIONS[run.key].name} ${SESSIONS[run.key].letter} · ${run.si+1} of ${run.steps.length}</div>
+      <h1 style="font-size:21px;margin-top:2px">${title}</h1></div>
+    <button class="tiny muted" onclick="quitSession()" style="text-decoration:underline;flex:0 0 auto">Quit</button>
+  </div>
+  ${shapeChip()?`<div style="margin-bottom:12px">${shapeChip()}</div>`:''}
+  ${many?`<p class="small muted" style="margin:0">${run.plan.shape.d}</p>`:''}
+  ${body}
+  <button class="btn pine" onclick="nextStep()">${run.si===run.steps.length-1?'Finish session':'Next'}</button>
+  ${st.eis.length===1?`<div style="display:flex;gap:8px;margin-top:10px">
+    ${(le.alt||[]).filter(byId).map(a=>`<button class="btn ghost sm" style="margin:0;flex:1;font-size:13.5px" onclick="swapEx('${a}')">Do ${byId(a).name.toLowerCase()} instead</button>`).join('')}
+  </div>
+  <button class="btn ghost sm" onclick="skipEx()">Skip this one today</button>`:''}
+  <div style="height:20px"></div>`;
+  st.eis.forEach(ei=>setTimeout(()=>figPlay(byId(run.entries[ei].exId),'pf'+ei),120));
+}
+function en_mus(en){ const e=byId(en.exId); return musOf(e); }
+
+/* A whole round on one screen. By the time anybody sees this they have
+   twenty-five sessions behind them and know the movements, so the cues and
+   the stick figures step aside and it becomes a checklist against a clock. */
+function drawRound(st){
+  const plan=run.plan;
+  const rows=run.entries.map((en,ei)=>{
+    const e=byId(en.exId), lv=e.ladder[en.level];
+    const html=setRowHtml(run.rows.length,en,st.round);
+    run.rows.push({ei, si:st.round});
+    return `<div class="card" style="margin-top:12px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
+        <h3 style="font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${lv.n}</h3>
+        <span class="tiny muted" style="flex:0 0 auto">${e.trains}</span>
+      </div>
+      ${html}
+    </div>`;
+  }).join('');
+  document.getElementById('pbody').innerHTML=`
+  <div class="topbar" style="margin-bottom:14px">
+    <div><div class="tiny muted">${plan.shape.n} · round ${st.round+1} of ${plan.shape.circuit}</div>
+      <h1 style="font-size:21px;margin-top:2px">${plan.shape.clock?`<span id="sclock">${clockText()}</span> left`:'One set of each'}</h1></div>
+    <button class="tiny muted" onclick="quitSession()" style="text-decoration:underline">Quit</button>
+  </div>
+  <p class="small muted" style="margin:0 0 4px">${st.round===0?plan.shape.d:'Same again. Tick only what you actually finish.'}</p>
+  ${rows}
+  <button class="btn pine" onclick="nextStep()">${run.si===run.steps.length-1?'Finish session':(st.round+1<plan.shape.circuit?'Next round':'Done — cool down')}</button>
+  <div style="height:20px"></div>`;
+}
+
+function drawFinisher(){
+  const f=run.plan.finisher;
+  document.getElementById('pbody').innerHTML=`
+  <div class="topbar" style="margin-bottom:16px">
+    <div><div class="tiny muted">Finisher · optional</div>
+      <h1 style="font-size:21px;margin-top:2px">${f.n}</h1></div>
+    <button class="tiny muted" onclick="quitSession()" style="text-decoration:underline">Quit</button>
+  </div>
+  <div class="card">
+    <p class="small" style="margin:0;line-height:1.6">${f.d}</p>
+    <p class="tiny muted" style="margin:10px 0 0">About ${f.mins} minutes. Nothing here is logged or counted — the lifting is already done. It is offered because you turned up fresh.</p>
+  </div>
+  <button class="btn pine" onclick="nextStep()">Done</button>
+  <button class="btn ghost sm" onclick="nextStep()">Not today</button>
+  <div style="height:20px"></div>`;
+}
+
 function swapEx(id){
-  const e=byId(id); if(!e) return;
+  const e=byId(id); if(!e||!run) return;
+  const st=run.steps[run.si]; if(!st.eis||st.eis.length!==1) return;
+  const ei=st.eis[0], old=run.entries[ei];
   if(hs_t){ clearInterval(hs_t.t); hs_t=null; }
-  run.entries[run.i]={ exId:id, level:S.levels[id]||0,
-    sets:Array.from({length:e.sets},()=>({reps:e.hold?30:e.reps[0], weight:S.weights[id]??S.db, done:false, hold:!!e.hold})) };
+  const n=old.sets.length;
+  const lvl=Math.min(S.levels[id]||0, e.ladder.length-1);
+  const target=Math.max(e.reps[0], Math.min(e.reps[1], lastRepsFor(id,lvl)||e.reps[0]));
+  run.entries[ei]={ exId:id, level:lvl, planned:n, target, tempo:old.tempo, note:null, role:old.role,
+    sets:Array.from({length:n},()=>({reps:target, weight:S.weights[id]??S.db, done:false, hold:!!e.hold})) };
   stopAll(); drawStep(); document.getElementById('player').scrollTo(0,0);
   toast('Swapped to '+e.name.toLowerCase());
 }
 function skipEx(){
   if(hs_t){ clearInterval(hs_t.t); hs_t=null; }
-  run.entries[run.i].sets.forEach(s=>s.done=false);
-  if(run.i<run.entries.length-1){ run.i++; stopAll(); drawStep(); document.getElementById('player').scrollTo(0,0); }
-  else if(run.phase!=='cool'){ run.phase='cool'; run.ci=0; stopAll(); drawCool(); }
-  else finishSession();
+  const st=run.steps[run.si];
+  if(st.eis) st.eis.forEach(ei=>run.entries[ei].sets.forEach(s=>s.done=false));
+  advance();
 }
-function bump(i,f,d){
-  const en=run.entries[run.i], s=en.sets[i];
+function bump(k,f,d){
+  const r=run.rows[k]; if(!r) return;
+  const en=run.entries[r.ei], s=en.sets[r.si];
   s[f]=Math.max(f==='weight'?0:1, Math.round((s[f]+d)*2)/2);
   if(f==='weight'){ S.weights[en.exId]=s.weight; save(); }
-  const el=document.querySelectorAll('.setrow')[i].querySelectorAll('.val')[f==='reps'?0:1];
+  const row=document.querySelectorAll('.setrow')[k];
+  const el=row?row.querySelectorAll('.val')[f==='reps'?0:1]:null;
   if(el) el.textContent=s[f];
 }
 let hs_t=null;
 const HOLD_LEAD=5;   // seconds to get into position before either hold clock starts
 
-function holdSet(i){
-  const en=run.entries[run.i], s=en.sets[i];
-  const btn=document.getElementById('hb'+i);
-  const row=document.querySelectorAll('.setrow')[i];
+function holdSet(k){
+  const r=run.rows[k]; if(!r) return;
+  const s=run.entries[r.ei].sets[r.si];
+  const btn=document.getElementById('hb'+k);
+  const row=document.querySelectorAll('.setrow')[k];
   const val=row?row.querySelector('.val'):null;
   const reset=()=>{ if(val){ val.textContent=s.reps; val.style.color=''; } if(btn) btn.textContent='Start'; };
 
-  if(hs_t&&hs_t.i===i){ clearInterval(hs_t.t); hs_t=null; reset(); return; }
+  if(hs_t&&hs_t.k===k){ clearInterval(hs_t.t); hs_t=null; reset(); return; }
   if(hs_t){ clearInterval(hs_t.t); hs_t=null; }
 
   // same five seconds to get set as the cooldown holds
   let lead=HOLD_LEAD;
   if(val){ val.textContent=lead; val.style.color='var(--brass)'; }
   if(btn) btn.textContent='Get set';
-  hs_t={i, t:setInterval(()=>{
+  hs_t={k, t:setInterval(()=>{
     lead--;
     if(lead>0){ if(val) val.textContent=lead; if(navigator.vibrate) navigator.vibrate(12); return; }
     clearInterval(hs_t.t);
     if(navigator.vibrate) navigator.vibrate(30);
     if(val) val.style.color='var(--pine)';
-    holdSetRun(i);
+    holdSetRun(k);
   },1000)};
 }
-function holdSetRun(i){
-  const en=run.entries[run.i], s=en.sets[i];
-  const btn=document.getElementById('hb'+i);
-  const row=document.querySelectorAll('.setrow')[i];
+function holdSetRun(k){
+  const r=run.rows[k]; if(!r) return;
+  const s=run.entries[r.ei].sets[r.si];
+  const btn=document.getElementById('hb'+k);
+  const row=document.querySelectorAll('.setrow')[k];
   const val=row?row.querySelector('.val'):null;
   let left=s.reps;
   if(val) val.textContent=left;
   if(btn) btn.textContent='Stop';
-  hs_t={i, t:setInterval(()=>{
+  hs_t={k, t:setInterval(()=>{
     left--; if(val) val.textContent=Math.max(left,0);
     if(left<=0){
       clearInterval(hs_t.t); hs_t=null;
       if(val){ val.textContent=s.reps; val.style.color=''; }
       if(btn) btn.textContent='Done';
       if(navigator.vibrate) navigator.vibrate(40);
-      if(!s.done) markSet(i);
+      if(!s.done) markSet(k);
     }
   },1000)};
 }
-function markSet(i){
-  const en=run.entries[run.i], s=en.sets[i];
+function markSet(k){
+  const r=run.rows[k]; if(!r) return;
+  const en=run.entries[r.ei], s=en.sets[r.si];
   s.done=!s.done;
-  document.querySelectorAll('.setrow')[i].querySelector('.donebtn').classList.toggle('on',s.done);
-  if(s.done && i<en.sets.length-1) startRest();
-  if(s.done && i===en.sets.length-1 && navigator.vibrate) navigator.vibrate(18);
+  const row=document.querySelectorAll('.setrow')[k];
+  if(row) row.querySelector('.donebtn').classList.toggle('on',s.done);
+  const last = r.si===en.sets.length-1;
+  if(s.done && !last) startRest();
+  if(s.done && last && navigator.vibrate) navigator.vibrate(18);
 }
 function addWeight(id){
   const e=byId(id), step=S.unit==='kg'?1:2.5;
   const w=Math.round(((S.weights[id]??S.db)+step)*2)/2;
   S.weights[id]=w; S.ready[id]=false;
-  run.entries[run.i].sets.forEach(s=>{ if(!s.done){ s.weight=w; s.reps=e.reps[0]; } });
+  const en=run.entries.find(x=>x.exId===id);
+  if(en) en.sets.forEach(s=>{ if(!s.done){ s.weight=w; s.reps=e.reps[0]; } });
   save(); stopAll(); drawStep();
-  toast('Now '+w+S.unit+' \u2014 back to '+e.reps[0]+' reps');
+  toast('Now '+w+S.unit+' — back to '+e.reps[0]+' reps');
 }
 function stepUp(id){
-  S.levels[id]=Math.min(S.levels[id]+1, byId(id).ladder.length-1);
-  S.ready[id]=false;
-  run.entries[run.i].level=S.levels[id];
   const e=byId(id);
-  run.entries[run.i].sets.forEach(s=>{ if(!s.done) s.reps=e.reps[0]; });
+  S.levels[id]=Math.min((S.levels[id]||0)+1, e.ladder.length-1);
+  S.ready[id]=false;
+  const p=progOf(id); p.hits=0; p.stall=0; p.lastVol=0; p.lastLevel=S.levels[id];
+  planCache={};
+  const en=run.entries.find(x=>x.exId===id);
+  if(en){ en.level=S.levels[id]; en.sets.forEach(s=>{ if(!s.done) s.reps=e.reps[0]; }); }
   save(); stopAll(); drawStep(); toast('Moved up to '+e.ladder[S.levels[id]].n);
 }
-function nextStep(){
-  const en=run.entries[run.i], e=byId(en.exId);
-  const logged=en.sets.filter(s=>s.done);
-  if(logged.length && logged.every(s=>s.reps>=e.reps[1]) && logged.length===en.sets.length && en.level<e.ladder.length-1){
-    S.ready[en.exId]=true;
-  } else if(logged.length===en.sets.length){ S.ready[en.exId]=false; }
-  save(); stopAll();
-  if(run.i < run.entries.length-1){ run.i++; drawStep(); document.getElementById('player').scrollTo(0,0); }
+function advance(){
+  stopAll();
+  if(run.si < run.steps.length-1){ run.si++; drawStep(); document.getElementById('player').scrollTo(0,0); }
   else if(run.phase!=='cool'){ run.phase='cool'; run.ci=0; drawCool(); document.getElementById('player').scrollTo(0,0); }
   else finishSession();
 }
+function nextStep(){ save(); advance(); }
 
 /* --- cooldown stretches --- */
 let st_t=null;
 function drawCool(){
-  const list=sessionFor(run.key).cool, s=byStr(list[run.ci]);
-  const total=run.entries.length+list.length;
-  document.getElementById('pfill').style.width=((run.entries.length+run.ci)/total*100)+'%';
+  const list=run.plan.cool, s=byStr(list[run.ci]);
+  document.getElementById('pfill').style.width=((run.steps.length+run.ci)/run.total*100)+'%';
   document.getElementById('pbody').innerHTML=`
   <div class="topbar" style="margin-bottom:16px">
     <div><div class="tiny muted">Cooldown · ${run.ci+1} of ${list.length}</div><h1 style="font-size:21px;margin-top:2px">${s.name}</h1></div>
@@ -3252,33 +4349,50 @@ function holdRun(sec,twoSides){
 }
 function coolNext(){
   clearInterval(st_t); stopAll();
-  const list=sessionFor(run.key).cool;
+  const list=run.plan.cool;
   if(run.ci < list.length-1){ run.ci++; drawCool(); document.getElementById('player').scrollTo(0,0); }
   else finishSession();
 }
 function quitSession(){
   ask('Quit without saving this workout?', ()=>{
-    clearInterval(st_t); if(hs_t){clearInterval(hs_t.t);hs_t=null;} stopAll(); skipRest();
+    clearInterval(st_t); if(hs_t){clearInterval(hs_t.t);hs_t=null;} stopClock(); stopAll(); skipRest();
     document.getElementById('player').classList.remove('on');
     document.body.style.overflow=''; run=null; render();
   }, 'Quit', true);
 }
 function finishSession(){
-  clearInterval(st_t); if(hs_t){clearInterval(hs_t.t);hs_t=null;} stopAll();
+  clearInterval(st_t); if(hs_t){clearInterval(hs_t.t);hs_t=null;} stopClock(); stopAll();
   const entries=run.entries.map(en=>({exId:en.exId,level:en.level,sets:en.sets.filter(s=>s.done)})).filter(en=>en.sets.length);
   if(!entries.length){
     // nothing was ticked off, so there is nothing to save — say so rather than
     // dropping the person into a quit dialog they did not ask for
     ask('No sets were ticked off, so there is nothing to save. Tick the circle beside a set as you finish it.',
-      ()=>{ clearInterval(st_t); if(hs_t){clearInterval(hs_t.t);hs_t=null;} stopAll(); skipRest();
+      ()=>{ clearInterval(st_t); if(hs_t){clearInterval(hs_t.t);hs_t=null;} stopClock(); stopAll(); skipRest();
         document.getElementById('player').classList.remove('on');
         document.body.style.overflow=''; run=null; render(); },
       'Discard the workout', true);
     return;
   }
   const before=stats(), beforeMedals=medalsEarned(before), beforeLevel=levelNow().n;
+  const shape=run.plan.shape, novel=!!shape.novel;
+
+  /* Read the session before it becomes history. Every movement gets one
+     verdict — beat it, held, or went backwards — and that verdict is what
+     the next plan is built from. The formats that deliberately change the
+     reps sit this out. */
+  const verdicts={};
+  run.entries.forEach(en=>{
+    const done=en.sets.filter(s=>s.done);
+    if(!done.length) return;
+    verdicts[en.exId]=recordOutcome(en.exId, en.level, done, en.planned, novel);
+  });
+  if(run.plan.deload) S.deload={week:weekKey(new Date()), state:'on', last:weekKey(new Date())};
+  S.shape={last:shape.k, lastFin:run.plan.finisher?run.plan.finisher.k:(S.shape||{}).lastFin};
+  planCache={};
+
   const newLog={date:new Date().toISOString(), session:run.key, entries,
-    extra: !!run.extra,
+    extra: !!run.extra, shape:shape.k, novel:novel||undefined,
+    deload: run.plan.deload||undefined,
     mins: run.startedAt?Math.max(1,Math.round((Date.now()-run.startedAt)/60000)):null};
   S.logs.push(newLog);
   save();
@@ -3315,12 +4429,32 @@ function finishSession(){
             <h3 style="font-size:17px;margin-top:2px">${m.t.t}</h3>
             <p class="tiny muted" style="margin:2px 0 0">${m.g.g}</p></div></div>
         ${Signer.canWrite?`<button class="btn ghost sm" onclick="nostrShareMilestone('${esc(m.t.t)}')">Share on nostr</button>`:''}</div>`).join('')}
-      ${Object.keys(S.ready).filter(k=>S.ready[k]).length?`<div class="card" style="text-align:left"><h3 style="font-size:15px">Next time, harder</h3>
-        <p class="small muted" style="margin:6px 0 0">You maxed out the rep range on ${Object.keys(S.ready).filter(k=>S.ready[k]).map(k=>byId(k).name.toLowerCase()).join(', ')}. The app will offer the next version when you get there.</p></div>`:''}
+      ${nextTimeCard(verdicts, novel)}
       <button class="btn" onclick="closeSession()">Done</button>
       <div style="height:26px"></div>
     </div>`;
   if(navigator.vibrate) navigator.vibrate([20,60,20]);
+}
+/* What the session just did to the plan. This is the honest version of a
+   progress bar: which movements beat last time, which did not, and what the
+   app intends to do about the ones that did not. */
+function nextTimeCard(verdicts, novel){
+  if(novel) return `<div class="card" style="text-align:left"><h3 style="font-size:15px">Nothing compared today</h3>
+    <p class="small muted" style="margin:6px 0 0">Rounds change the reps on purpose, so today sits out the comparison rather than counting as a bad day. Your next straight session picks up exactly where the last one left off.</p></div>`;
+  const ids=Object.keys(verdicts);
+  if(!ids.length) return '';
+  const beat=ids.filter(k=>verdicts[k]==='up'||verdicts[k]==='top');
+  const ready=ids.filter(k=>S.ready[k]);
+  const stuck=ids.filter(k=>{ const sp=stallPlan(k); return sp&&sp.kind!=='ease'; });
+  const parts=[];
+  if(beat.length) parts.push(`<p class="small" style="margin:6px 0 0">Beat last time on <b>${beat.map(k=>byId(k).name.toLowerCase()).join(', ')}</b>.</p>`);
+  if(ready.length) parts.push(`<p class="small muted" style="margin:6px 0 0">Top of the range on ${ready.map(k=>byId(k).name.toLowerCase()).join(', ')} \u2014 a harder version is offered next time. Still your call.</p>`);
+  if(stuck.length){
+    const k=stuck[0], sp=stallPlan(k);
+    parts.push(`<p class="small muted" style="margin:6px 0 0">${byId(k).name} has not moved in ${sp.n} sessions, so next time it comes back ${sp.kind==='rotate'?'as a different movement in the same pattern':'lighter and slower, with an extra set'}.</p>`);
+  }
+  if(!parts.length) parts.push(`<p class="small muted" style="margin:6px 0 0">Everything held. Holding is not nothing \u2014 most weeks look like this, and the ones that do not are built on them.</p>`);
+  return `<div class="card" style="text-align:left"><h3 style="font-size:15px">What changes next time</h3>${parts.join('')}</div>`;
 }
 function closeSession(){
   document.getElementById('player').classList.remove('on');
@@ -3757,6 +4891,31 @@ function mergeData(d){
     S.weighins=(S.weighins||[]).concat(d.weighins.filter(x=>x&&x.d&&!seen.has(x.d)));
     S.weighins.sort((a,b)=>a.d<b.d?-1:1);
   }
+  /* The coach's own memory. Same rule as the ladders: take whichever side is
+     further along, and never let a restore make the app think you have gone
+     backwards. Anything it cannot reconcile it drops, because all of it is
+     rebuilt from the log within a couple of sessions anyway. */
+  S.prog=S.prog||{};
+  Object.keys(d.prog||{}).forEach(k=>{
+    if(!byId(k)) return;
+    const a=S.prog[k], b=d.prog[k];
+    if(!b||typeof b!=='object') return;
+    if(!a){ S.prog[k]=b; return; }
+    S.prog[k]={ n:Math.max(a.n|0,b.n|0),
+      hits:Math.max(a.hits|0,b.hits|0),
+      stall:Math.min(a.stall|0,b.stall|0),
+      lastVol:Math.max(a.lastVol||0,b.lastVol||0),
+      bestVol:Math.max(a.bestVol||0,b.bestVol||0),
+      lastAt:Math.max(a.lastAt||0,b.lastAt||0),
+      lastLevel:Math.max(a.lastLevel||0,b.lastLevel||0),
+      lastOut:(a.lastAt||0)>=(b.lastAt||0)?a.lastOut:b.lastOut };
+  });
+  if(d.assess && !S.assess) S.assess=d.assess;
+  if(d.variety && (S.variety||'normal')==='normal') S.variety=d.variety;
+  if(d.tierOverride!=null && S.tierOverride==null) S.tierOverride=d.tierOverride;
+  if(d.deload && d.deload.last && (!S.deload||!S.deload.last || d.deload.last>S.deload.last))
+    S.deload=Object.assign({}, S.deload, {last:d.deload.last});
+  planCache={};
   save();
   return S.logs.length-before;
 }
@@ -4341,7 +5500,11 @@ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==
 /* --- rest timer --- */
 let rt=null, rleft=0;
 function startRest(){
-  rleft=S.restSec; const el=document.getElementById('rest');
+  /* Paired sets and circuits earn their time saving by cutting the rest,
+     so the clock comes from the plan rather than the setting when there is
+     a session running. */
+  rleft=(run&&run.plan)?run.plan.rest:S.restSec;
+  const el=document.getElementById('rest');
   el.classList.add('on'); paintRest();
   clearInterval(rt);
   rt=setInterval(()=>{ rleft--; paintRest();
