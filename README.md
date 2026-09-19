@@ -42,6 +42,21 @@ The catch is that it only works for people who have public workout publishing sw
 
 Cheering someone publishes a `kind 7` reaction to their most recent workout.
 
+### The board
+
+A leaderboard, under **Social → Board**, with two scopes: everyone the relays return, and just the people you have added.
+
+It ranks on **days you turned up in the last thirty**, and nothing else. No weights, no reps, no volume — the same constraint the rest of the Social tab has always had, for the same reason. A beginner and a veteran who both trained three times this week are level, because they are.
+
+Two rules do the work:
+
+- **One session a day counts once.** Training twice on a Tuesday beats nobody, and publishing the same session twenty times buys nothing. Weeks on target are counted from days for the same reason.
+- **Two separate days to appear at all**, which keeps out the long tail of people who published once and vanished.
+
+The global scope is the only query in the app with no `authors` filter — `kind 1301` over the last thirty days, whatever your relays feel like returning. Names are looked up for the top 25 only, so scrolling does not cause a fetch storm.
+
+What it cannot do, and says on the screen rather than implying otherwise: none of it is verified. Anyone can publish a workout record they did not earn. It only ever sees people who have public publishing switched on, which most people leave off, and it is whatever your relays hold rather than the whole world. It is a nudge, not a record.
+
 ### Relays
 
 Four defaults, editable under **You → Nostr account → Relays**. One `wss://` relay is the minimum.

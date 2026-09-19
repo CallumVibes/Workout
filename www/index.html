@@ -306,6 +306,13 @@ button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
 .feedrow .fw{font-weight:600}
 .feedrow .fm{font-size:12px;color:var(--muted);margin-top:2px}
 .feedrow .fa{flex:0 0 auto}
+/* --- leaderboard --- */
+.feedrow.brow{align-items:center}
+.brank{flex:0 0 auto;width:22px;text-align:right;font-size:13px;color:var(--muted);
+  font-variant-numeric:tabular-nums}
+.brank.top{color:var(--brass);font-weight:600}
+.boardme{background:var(--brass-soft);margin:0 -14px;padding-left:14px;padding-right:14px;
+  border-radius:10px;border-top-color:transparent}
 .feedday{font-size:11.5px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;
   margin:20px 0 2px}
 .feedday:first-child{margin-top:4px}
@@ -1840,7 +1847,7 @@ const STR=[
 const byStr = id => STR.find(s=>s.id===id) || MOB.find(m=>m.id===id);
 
 /* ============================== STATE ============================== */
-const BUILD='2026-09-19 20:10';
+const BUILD='2026-09-19 22:30';
 const KEY='groundwork.v1';
 let S = {
   setup:false,
@@ -3111,14 +3118,16 @@ function viewSocial(){
   </div>`:''}
 
   <div class="seg" role="tablist" style="margin-top:14px">
-    ${[['feed','Feed'],['people','People'],['goals','Goals']].map(([k,n])=>
+    ${[['feed','Feed'],['people','People'],['board','Board'],['goals','Goals']].map(([k,n])=>
       `<button role="tab" aria-selected="${socTab===k}" class="${socTab===k?'on':''}" onclick="socGo('${k}')">${n}</button>`).join('')}
   </div>
   ${navigator.onLine===false?`<p class="tiny muted" style="margin:12px 0 0;text-align:center">Offline — showing what was last synced.</p>`
     :syncFailed?`<p class="tiny muted" style="margin:12px 0 0;text-align:center">Could not reach the relays. <button style="color:var(--pine);text-decoration:underline" onclick="socialSync(true)">Try again</button></p>`:''}`;
 
-  $v.innerHTML = head + ({feed:socFeed, people:socPeople, goals:socGoals})[socTab]();
+  $v.innerHTML = head + ({feed:socFeed, people:socPeople, board:socBoard, goals:socGoals})[socTab]();
   socialSync();
+  /* the board's query is the expensive one — only run it on the board */
+  if(socTab==='board' && boardScope==='global') boardSync();
 }
 
 /* --- feed --- */
@@ -5006,6 +5015,7 @@ function socialInit(){
   if(!d.pledges) d.pledges=[];
   if(!d.dropped) d.dropped=[];
   if(d.partner===undefined) d.partner=null;
+  if(!d.board) d.board={rows:{}, at:0};
 }
 function crewList(){ socialInit(); return S.social.crew; }
 function profOf(pk){ socialInit(); return S.social.profiles[pk]||{}; }
@@ -5261,6 +5271,177 @@ function dayHeading(ts){
   if(k===today) return 'Today';
   if(k===dayKey(new Date(Date.now()-864e5))) return 'Yesterday';
   return new Date(ts*1000).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'});
+}
+
+/* ============================== THE BOARD ==============================
+
+   A leaderboard in an app built on the idea that comparison discourages
+   beginners needs a defensible answer to "ranked on what?". This one ranks
+   on days you turned up and nothing else. No weights, no reps, no volume,
+   anywhere on the screen — the same rule the Social tab has always had,
+   for the same reason: turning up three times a week looks identical
+   whoever you are, and that is the only part worth copying.
+
+   Two rules keep it honest rather than merely nice:
+
+     One session per day. Somebody training twice on Tuesday does not beat
+     somebody training on Tuesday and Thursday. This also means publishing
+     the same session twenty times buys nothing.
+
+     Two distinct days to appear at all, which keeps the tail of people who
+     published once and vanished out of the way.
+
+   None of it is verifiable. Anyone can publish a workout record they did
+   not earn, and the screen says so rather than implying a rigour it does
+   not have. */
+
+const BOARD_DAYS=30;          // the window everyone is ranked over
+const BOARD_ON_TARGET=3;      // sessions in a week that make it a full week
+const BOARD_MIN_DAYS=2;       // fewer than this and you do not appear
+const BOARD_PROFILES=25;      // how many names to look up after a sync
+
+/* Pure: takes {pk: [{at}, …]} and returns the ranked rows. Everything that
+   makes the board fair or unfair lives in here, so it can be tested without
+   a relay in sight. */
+function rankBoard(bySession, nowSec){
+  const now = nowSec || Math.floor(Date.now()/1000);
+  const cut = now - BOARD_DAYS*86400;
+  const out = [];
+  Object.keys(bySession||{}).forEach(pk=>{
+    const list = bySession[pk] || [];
+    const days = {};
+    let last = 0;
+    list.forEach(e=>{
+      const at = e && e.at;
+      if(!at || at < cut) return;
+      if(at > now + 3600) return;            // dated in the future: not real
+      days[dayKey(new Date(at*1000))] = 1;
+      if(at > last) last = at;
+    });
+    const dayList = Object.keys(days);
+    if(dayList.length < BOARD_MIN_DAYS) return;
+    /* weeks on target counts *days* per week, not sessions, so the one-a-day
+       cap carries all the way through */
+    const perWeek = {};
+    dayList.forEach(d=>{
+      const wk = weekKey(new Date(d+'T12:00:00'));
+      perWeek[wk] = (perWeek[wk]||0) + 1;
+    });
+    const weeks = Object.keys(perWeek).filter(w=>perWeek[w] >= BOARD_ON_TARGET).length;
+    out.push({pk, days:dayList.length, weeks, last});
+  });
+  return out.sort((a,b)=> b.days-a.days || b.weeks-a.weeks || b.last-a.last);
+}
+
+function boardRows(scope){
+  socialInit();
+  if(scope==='crew'){
+    const mine = {};
+    [S.nostr.pk].concat(crewList()).forEach(pk=>{ mine[pk] = sessionsOf(pk); });
+    return rankBoard(mine);
+  }
+  /* the global pool, plus our own sessions so we are ranked on the same
+     footing even before a relay has echoed them back */
+  const pool = Object.assign({}, S.social.board.rows||{});
+  if(S.nostr && S.nostr.publishWorkouts) pool[S.nostr.pk] = sessionsOf(S.nostr.pk);
+  return rankBoard(pool);
+}
+
+let boardScope='global', boardSyncing=false, boardFailed=false;
+function boardGo(s){ boardScope=s; render(); window.scrollTo(0,0); }
+
+/* The one query in the app with no `authors` filter: whoever the relays feel
+   like returning. That is the honest meaning of "global" without a server,
+   and the screen says as much. */
+async function boardSync(force){
+  if(!S.nostr || boardSyncing) return;
+  socialInit();
+  if(!force && Date.now()-(S.social.board.at||0) < 300000) return;
+  if(navigator.onLine===false){ if(force) toast('No connection'); return; }
+  boardSyncing=true; boardFailed=false; paintSyncing(true);
+  try{
+    const works = await relayFetch({kinds:[1301],
+      since: Math.floor(Date.now()/1000) - BOARD_DAYS*86400, limit:600});
+    const byPk={};
+    works.forEach(w=>{
+      if(!w || !w.pubkey || w.pubkey.length!==64) return;
+      (byPk[w.pubkey]=byPk[w.pubkey]||[]).push({id:w.id, at:w.created_at});
+    });
+    S.social.board={rows:byPk, at:Date.now()};
+    /* names for the top of the board only — looking up every stranger the
+       relays returned would be a fetch storm for rows nobody scrolls to */
+    const want=rankBoard(byPk).slice(0,BOARD_PROFILES)
+      .map(r=>r.pk).filter(pk=>!S.social.profiles[pk]);
+    if(want.length){
+      const metas=await relayFetch({kinds:[0], authors:want, limit:want.length*2});
+      metas.sort((a,b)=>a.created_at-b.created_at);
+      metas.forEach(m=>{ try{ S.social.profiles[m.pubkey]=JSON.parse(m.content); }catch(e){} });
+    }
+    save();
+  }catch(e){ boardFailed=true; }
+  boardSyncing=false; paintSyncing(false);
+  if(force) toast(boardFailed?'Could not reach the relays':'Board updated');
+  if(tab==='social' && socTab==='board') viewSocial();
+}
+
+function boardRow(r, i, me){
+  const mine = r.pk===me;
+  return `<div class="feedrow brow${mine?' boardme':''}">
+    <div class="brank${i<3?' top':''}">${i+1}</div>
+    ${avatarHtml(r.pk,'av')}
+    <div class="ft">
+      <span class="fw">${mine?'You':nameOf(r.pk)}</span>
+      <div class="fm">${r.weeks?`${r.weeks} full week${r.weeks===1?'':'s'}`:'building up'} · ${agoText(r.last)}</div>
+    </div>
+    <div style="text-align:right;flex:0 0 auto">
+      <div class="num" style="font-size:19px;color:${mine?'var(--brass)':'var(--pine)'}">${r.days}</div>
+      <div class="tiny muted">days</div>
+    </div>
+  </div>`;
+}
+
+function socBoard(){
+  const me = S.nostr.pk;
+  const rows = boardRows(boardScope);
+  const mineAt = rows.findIndex(r=>r.pk===me);
+  const shown = rows.slice(0,50);
+  const offBoard = boardScope==='global' && !S.nostr.publishWorkouts;
+
+  const scope=`<div class="seg" role="tablist" style="margin-top:14px">
+    ${[['global','Everyone'],['crew','Your people']].map(([k,n])=>
+      `<button role="tab" aria-selected="${boardScope===k}" class="${boardScope===k?'on':''}" onclick="boardGo('${k}')">${n}</button>`).join('')}
+  </div>`;
+
+  if(!shown.length){
+    return scope + `<div class="card" style="margin-top:14px"><h3 style="font-size:16px">Nothing to rank yet</h3>
+      <p class="small muted" style="margin:8px 0 0">${boardScope==='global'
+        ? 'No published sessions came back from your relays in the last month. The board only ever sees people who have public publishing switched on, which most people leave off.'
+        : crewList().length
+          ? 'Nobody you have added has published two separate days in the last month.'
+          : 'Add people on the People tab and they will be ranked here.'}</p>
+      ${boardScope==='global'?`<button class="btn ghost sm" onclick="boardSync(true)">Look again</button>`:''}
+    </div>`;
+  }
+
+  return scope + `
+  <div class="card" style="margin-top:14px;padding-top:6px">
+    <div class="exhead" style="margin-top:10px"><span>Last ${BOARD_DAYS} days</span><span>days turned up</span></div>
+    ${shown.map((r,i)=>boardRow(r,i,me)).join('')}
+  </div>
+
+  ${mineAt>=50?`<div class="card"><p class="small muted" style="margin:0">You are ${mineAt+1}${mineAt+1===1?'st':''} with ${rows[mineAt].days} days. Only the top 50 are listed.</p></div>`:''}
+
+  ${offBoard?`<div class="card"><h3 style="font-size:15px">You are not on this board</h3>
+    <p class="small muted" style="margin:6px 0 0">Your sessions are not published, so nobody's relay has them. Publishing is unencrypted and public by design — it shows that you trained and when, never what you lifted.</p>
+    <button class="btn ghost sm" onclick="openSub('acct')">Where to turn it on</button></div>`:''}
+
+  <p class="tiny muted" style="margin:16px 0 0;text-align:center;line-height:1.6">
+    Ranked on days you turned up, never on what you lifted.<br>
+    One session a day counts once, so training twice on a Tuesday wins nothing.<br>
+    ${boardScope==='global'
+      ? 'Anyone can publish a workout record they did not earn, and none of this is checked. Treat it as a nudge, not a record.'
+      : 'Only the people you have added, ranked the same way.'}
+  </p>`;
 }
 
 /* --- quiet lately: who has dropped off --- */
