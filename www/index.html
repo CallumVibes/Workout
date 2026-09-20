@@ -2237,7 +2237,7 @@ function guidesFor(k){
 const byStr = id => STR.find(s=>s.id===id) || MOB.find(m=>m.id===id) || yogaPose(id);
 
 /* ============================== STATE ============================== */
-const BUILD='2026-09-20 14:05';
+const BUILD='2026-09-20 17:30';
 const KEY='groundwork.v1';
 let S = {
   setup:false,
@@ -4309,7 +4309,9 @@ function subAcct(){
     <label class="row"><span>Publish workouts publicly<br><span class="tiny muted">Unencrypted. Lets your friends see you trained, never what you lifted.</span></span>
       <input type="checkbox" ${S.nostr.publishWorkouts?'checked':''} style="width:20px;height:20px;flex:0 0 auto;accent-color:var(--brass)" onchange="S.nostr.publishWorkouts=this.checked;save()"></label>
     <label class="row"><span>Relays</span>
-      <button onclick="relayEdit()" style="text-decoration:underline;font-size:14px">${(S.nostr.relays||[]).length} connected</button></label></div>`:''}`
+      <button onclick="relayEdit()" style="text-decoration:underline;font-size:14px">${(S.nostr.relays||[]).length} connected</button></label></div>`:''}
+  ${S.nostr.mode==='amber'?`<div class="card"><button class="btn ghost sm" style="margin-top:0" onclick="signerDiag()">Show what Amber is sent</button>
+    <p class="tiny muted" style="margin:10px 0 0">For when Amber says a request is malformed. Copy it into a bug report rather than describing it.</p></div>`:''}`
   :`<div class="card">
     <p class="small muted" style="margin:0">Optional. Gives you an encrypted backup of your history, readable only by you.</p>
     ${canAmber()
@@ -4327,8 +4329,11 @@ function subAcct(){
       <p class="tiny muted" style="margin:0 0 6px">If Amber opens but nothing comes back:</p>
       <button class="btn ghost sm" style="margin-top:0" onclick="pasteSignIn()">Paste what it copied</button>
     </div>
-    ${!CAN_CLIP?`<div class="flag" style="margin-top:14px"><b>This copy cannot read the clipboard.</b> That needs an https address — opened from a downloaded file the browser refuses it. The app now asks Amber to reply over a <code>groundwork://</code> link instead, but pasting by hand still works if that does not arrive.</div>`:''}
-    <p class="tiny muted" style="margin:12px 0 0">Your key stays in Amber. It replies over a link back into this app, falling back to the clipboard if that does not arrive.</p>`:''}
+    ${(!CAN_CLIP && !Native.Amber)?`<div class="flag" style="margin-top:14px"><b>This copy cannot read the clipboard.</b> That needs an https address — opened from a downloaded file the browser refuses it. Pasting by hand still works.</div>`:''}
+    <p class="tiny muted" style="margin:12px 0 0">Your key stays in Amber. ${Native.Amber
+      ? 'The installed app asks it over an Android intent and gets the answer straight back.'
+      : 'In a browser it replies by copying the answer, which this app then reads.'}</p>
+    <button class="btn ghost sm" onclick="signerDiag()">Show what Amber is sent</button>`:''}
   </div>`);
 }
 
@@ -5272,27 +5277,63 @@ function npubDecode(s){
 function shortNpub(hex){ if(!hex) return ''; const n=npubEncode(hex); return n.slice(0,10)+'\u2026'+n.slice(-6); }
 
 /* --- Amber, over NIP-55 ---
-   Amber decides how to read a request by whether the browser stamped
+
+   Amber decides how to read a request by whether the sender stamped
    Browser.EXTRA_APPLICATION_ID on the intent: present, it parses the
-   nostrsigner: URL; absent, it reads the parameters from intent extras.
-   Chromium stopped setting that extra (Brave included), so a plain
-   nostrsigner: URL reaches the extras branch with no type and is rejected
-   as malformed. The request therefore goes out as an intent: URL, where
-   Android's Intent.parseUri turns each S.<name> field into a String extra.
+   nostrsigner: URL; absent, it reads type, pubkey and the rest from intent
+   extras. Chromium stopped setting that extra (DontClobberTabsWithChromeAppId,
+   default-on in stable from late August 2026), and Capacitor never set it —
+   its whole launchIntent is `new Intent(ACTION_VIEW, url); startActivity(it)`.
 
-   No callbackUrl. A web page has no scheme Amber can return to, and asking
-   for one is the second half of the malformed-request problem. Amber puts
-   the answer on the clipboard instead and the page reads it when it regains
-   focus — the approach noStrudel uses, which works in the wild. Clipboard
-   reads can be refused, so there is a paste fallback.
+   So there are two platforms here and they need different things.
 
-   Amber also URL-decodes the whole URI and splits on "?" before parsing any
-   JSON, so a literal ? in a payload would truncate the request.
-   encodeURIComponent escapes it to %3F, which survives that split. */
+   Inside the APK the request does not go out as a URL at all. A Capacitor
+   plugin builds the Intent and fills in the extras, which is the flow NIP-55
+   specifies for Android apps, and the answer arrives on the activity result.
+   No EXTRA_APPLICATION_ID, no callbackUrl, no deep link, no clipboard, and
+   nothing a browser release note can take away. See scripts/patch-android.py.
+
+   In a browser there is no plugin, so the request goes out as an intent: URL —
+   `intent:<payload>#Intent;scheme=nostrsigner;S.type=…;end` — which Chrome
+   parses with Intent.parseUri, turning each S.<name> into a String extra and
+   landing in the same extras branch. That form works in a browser and only in
+   a browser: its scheme is literally "intent", so Capacitor's plain
+   Uri.parse finds nothing on the device that claims it and the button looks
+   dead. That is what the APK used to send.
+
+   No callbackUrl on the browser route. A web page has no scheme Amber can
+   return to — groundwork:// belongs to the APK — and asking for one is the
+   second half of the malformed-request problem. Amber puts the answer on the
+   clipboard instead and the page reads it when it regains focus, the approach
+   noStrudel uses. Clipboard reads can be refused, so there is a paste
+   fallback. */
 
 const SIGNER_SCHEME='nostrsigner';
-/* `result` is what NIP-55 calls the returned value, so use its name. */
-const AMBER_CALLBACK='groundwork://amber?result=';
+
+/* The signer the person picked at sign-in. NIP-55 says to leave the package
+   off get_public_key so Android offers a chooser between whatever signers are
+   installed, and to pin it on every later call so the same one answers
+   without asking again. */
+let signerPkg=null;
+function signerPkgGet(){ return signerPkg || (S.nostr && S.nostr.signerPkg) || ''; }
+
+/* Amber URL-decodes the whole request and splits it on "?" before it parses
+   any JSON, so a literal ? truncates what it signs — a note that asks a
+   question, a zap request carrying an LNURL with a query string. Percent
+   encoding does not help, because the decode happens before the split.
+
+   ? does: JSON parses it back to the same character, so the event Amber
+   signs is byte-for-byte the one whose id we already computed.
+
+   Which is why this only touches a payload that really is JSON. A NIP-44
+   ciphertext must come back byte-exact, and quietly rewriting one would be a
+   backup that no longer decrypts — worse than a request that gets refused. */
+function signerPayload(p){
+  const s=String(p==null?'':p);
+  if(s.indexOf('?')<0) return s;
+  try{ JSON.parse(s); }catch(e){ return s; }
+  return s.replace(/\?/g,'\\u003f');
+}
 
 /* The kinds this app signs, named up front so Amber can grant once at sign-in
    rather than asking again on every backup and every zap. */
@@ -5307,30 +5348,28 @@ const SIGNER_PERMS=[
   {type:'nip44_decrypt'}
 ];
 
-/* A plain NIP-55 URI, and deliberately *not* Chrome's `intent:…#Intent;…;end`
-   form, which is what this used to build.
-
-   That syntax works in Chrome for Android and nowhere else. Inside the APK,
-   Capacitor hands an unrecognised scheme to `new Intent(ACTION_VIEW,
-   Uri.parse(url))` — and the scheme of an `intent:` URL is literally "intent",
-   which nothing on the device claims. Android throws ActivityNotFoundException,
-   Capacitor logs it, and the button appears dead. Parsing it properly would
-   need Intent.parseUri(URI_INTENT_SCHEME), which Capacitor does not do.
-
-   `nostrsigner:` parses to the scheme Amber actually registers, so ACTION_VIEW
-   resolves. The <queries> block Android 11+ needs to see it at all is already
-   in scripts/patch-android.py. */
-function signerUrl(type, payload, extraFields){
+/* Every parameter a request carries, whichever route it takes. The browser
+   turns these into S.<name> fields; the plugin puts them on the Intent. */
+function signerExtras(type, extraFields){
   const q = Object.assign({
     compressionType:'none',
     returnType:'signature',
     type:type,
-    appName:'Groundwork',
-    callbackUrl:AMBER_CALLBACK
+    appName:'Groundwork'
   }, extraFields||{});
   if(type==='get_public_key' && !q.permissions) q.permissions=JSON.stringify(SIGNER_PERMS);
-  const qs=Object.keys(q).map(k=>k+'='+encodeURIComponent(q[k])).join('&');
-  return SIGNER_SCHEME+':'+(payload?encodeURIComponent(payload):'')+'?'+qs;
+  return q;
+}
+
+/* The browser route. Intent.parseUri decodes each S.<name> value, so
+   encodeURIComponent is what keeps a ";" or an "=" inside one from being read
+   as the start of the next field. */
+function amberIntentUrl(data, extras, pkg){
+  const fields=Object.keys(extras).map(k=>'S.'+k+'='+encodeURIComponent(extras[k])).join(';');
+  return 'intent:' + (data?encodeURIComponent(data):'')
+    + '#Intent;scheme=' + SIGNER_SCHEME + ';'
+    + (pkg?'package='+pkg+';':'')
+    + fields + ';end';
 }
 
 /* Whether a signer could be there at all. Amber is an Android app; offering
@@ -5338,8 +5377,8 @@ function signerUrl(type, payload, extraFields){
 function canAmber(){ return Native.on || /Android/i.test(navigator.userAgent||''); }
 
 /* Anything coming back from a signer is one of four shapes. Used to stop a
-   stale clipboard being mistaken for an answer now that the callback URL is
-   the real route home. */
+   stale clipboard — a shopping list, a link — being handed to the caller as
+   if it were a public key. */
 function looksLikeSignerResult(t){
   const s=String(t||'').trim();
   if(!s) return false;
@@ -5377,16 +5416,15 @@ window.addEventListener('focus',()=>{
   amberTryClipboard();
 });
 
-/* The fallback route home, for signers or Android versions where the callback
-   URL does not arrive. Two changes now that the callback is the main road:
+/* The route home on the browser side. With no callbackUrl in the request,
+   Amber copies the answer instead, and this reads it when the page comes back.
 
-   It waits longer, so a deep link already on its way wins the race. Whichever
-   arrives first clears `waiting`, and the loser then finds nothing to do.
+   It waits a moment first, because a deep link may still be on its way from an
+   older build's request. Whichever arrives first clears `waiting`, and the
+   loser then finds nothing to do.
 
-   And it only accepts something shaped like an answer. Amber does not copy
-   anything when it has a callback URL, so whatever is on the clipboard is
-   probably a shopping list — and handing that to the caller as a public key
-   is worse than asking. */
+   And it only accepts something shaped like an answer, rather than handing
+   whatever happened to be on the clipboard to the caller. */
 function amberTryClipboard(){
   setTimeout(()=>{
     if(!waiting) return;
@@ -5400,10 +5438,11 @@ function amberTryClipboard(){
   },700);
 }
 
-/* The way home. The manifest has registered groundwork:// since the first
-   release and nothing has ever listened for it — every answer came back by
-   reading the clipboard, which needs a secure context, a permission prompt,
-   and the page surviving the trip.
+/* A groundwork:// link arriving from outside. Nothing asks for one any more —
+   the APK gets its answer on the activity result and the browser route reads
+   the clipboard — but the manifest has registered the scheme since the first
+   release, and a signer holding a request from an older build may still reply
+   this way.
 
    Deliberately only settles a request that is already in flight, or finishes a
    sign-in the page was reloaded in the middle of. A groundwork:// link from
@@ -5460,14 +5499,86 @@ function pasteSignIn(){
   }, {placeholder:'npub1…', ok:'Sign in'});
 }
 
+/* What the next request would actually be, verbatim.
+
+   Two device round trips have now been spent inferring this from an error
+   screen. If there is a third it should start from what the signer was
+   handed, so this builds a real get_public_key request without sending it. */
+function signerText(){
+  const extras=signerExtras('get_public_key');
+  const lines=[
+    'Groundwork ' + BUILD,
+    'platform: ' + (Native.on ? 'installed app' : 'browser'),
+    'signer plugin: ' + (Native.Amber ? 'registered' : 'not present'),
+    'route: ' + (Native.Amber ? 'Android intent with extras' : 'intent: URL'),
+    'pinned signer: ' + (signerPkgGet() || 'none yet'),
+    ''
+  ];
+  if(Native.Amber){
+    lines.push('data: nostrsigner:');
+    Object.keys(extras).forEach(k=>lines.push('extra ' + k + ': ' + extras[k]));
+  }else{
+    lines.push(amberIntentUrl('', extras, ''));
+  }
+  return lines.join('\n');
+}
+function signerDiag(){
+  const t=signerText();
+  askText('This is the request, exactly as it goes out. Nothing has been sent.',
+    t, v=>walletCopy(v||t), {multiline:true, ok:'Copy it'});
+  setTimeout(()=>{
+    const el=document.getElementById('modalinput');
+    if(el && el.select){ el.focus(); el.select(); }
+  },80);
+}
+
 const AMB_KEY='gw.amber';
+
+/* One door, two routes. Every caller is unchanged. */
 function amberCall(type, payload, extraFields){
+  const data=signerPayload(payload);
+  const extras=signerExtras(type, extraFields);
+  return Native.Amber ? nativeSignerCall(type, data, extras)
+                      : webSignerCall(type, data, extras);
+}
+
+/* Inside the APK. A promise straight off the activity result, so none of the
+   machinery below applies: nothing to wait on, nothing to time out, no
+   clipboard to read, no page to survive the trip. */
+async function nativeSignerCall(type, data, extras){
+  let r;
+  try{
+    r=await Native.Amber.request({
+      type, payload:data, extras,
+      /* the chooser on sign-in, the chosen signer thereafter */
+      pkg: type==='get_public_key' ? '' : signerPkgGet()
+    });
+  }catch(e){
+    const m=String((e&&e.message)||e||'');
+    if(m.indexOf('no-signer')>=0)
+      throw new Error('No signer is installed. Install Amber, open it once, then try again.');
+    if(m.indexOf('rejected')>=0) throw new Error('Amber refused that request');
+    if(m.indexOf('cancelled')>=0) throw new Error('Cancelled');
+    throw new Error(m||'The signer did not answer');
+  }
+  if(r && r.pkg){
+    signerPkg=r.pkg;
+    if(S.nostr && S.nostr.signerPkg!==r.pkg){ S.nostr.signerPkg=r.pkg; saveSoon(); }
+  }
+  /* returnType is signature, so `result` is the answer. Some versions send
+     the whole signed event back as well; amberSign knows both shapes. */
+  const v=String((r && (r.result || r.event)) || '').trim();
+  if(!v) throw new Error('The signer returned nothing');
+  return v;
+}
+
+function webSignerCall(type, data, extras){
   return new Promise((resolve,reject)=>{
     if(waiting) amberFail('Replaced by a newer request');
     // Some browsers reload the page on the way back from an external app, which
     // would lose the promise. Leave a note so the next load can finish the job.
     try{ sessionStorage.setItem(AMB_KEY, JSON.stringify({type, at:Date.now()})); }catch(e){}
-    const url=signerUrl(type,payload,extraFields);
+    const url=amberIntentUrl(data, extras, type==='get_public_key'?'':signerPkgGet());
     // an anchor click, because some browsers ignore location.href for intent:
     try{
       const a=document.createElement('a');
@@ -5488,7 +5599,10 @@ function amberCall(type, payload, extraFields){
     setTimeout(()=>{
       if(waiting && waiting.resolve===resolve && !everHidden)
         amberFail(Native.on
-          ? 'Nothing opened, so no signer answered. Check Amber is installed, open it once, then try again.'
+          /* Native.on without Native.Amber means an APK built before the
+             signer plugin existed. It cannot open an intent: URL at all, so
+             say that rather than blaming Amber. */
+          ? 'This build cannot reach a signer. Install the latest APK, or connect a bunker instead.'
           : 'Nothing opened. Amber is an Android app — in a browser, use a bunker or a browser extension instead.');
     },4000);
     setTimeout(()=>{ if(waiting&&waiting.resolve===resolve) amberFail('Amber did not answer. Is it installed?'); },120000);
@@ -5689,7 +5803,9 @@ async function nostrLogin(mode){
     const pk=await Signer.getPublicKey(mode);
     if(!pk||pk.length!==64) throw new Error('That key did not look right');
     S.nostr={mode, pk, relays:(S.nostr&&S.nostr.relays)||RELAYS_DEFAULT.slice(),
-      autoBackup:Native.on||mode==='nip07', publishWorkouts:false};
+      autoBackup:Native.on||mode==='nip07', publishWorkouts:false,
+      /* which signer answered the chooser, so nothing asks again */
+      signerPkg:signerPkg||''};
     save(); render(); toast('Signed in as '+shortNpub(pk));
     fetchOwnProfile();
   }catch(e){ toast(e.message||'Sign-in failed'); }
@@ -6960,7 +7076,11 @@ async function chJoin(c){
    No-ops in a browser. Comes alive inside the Capacitor shell. */
 const Native = {
   get on(){ return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()); },
-  get LN(){ return window.Capacitor?.Plugins?.LocalNotifications; }
+  get LN(){ return window.Capacitor?.Plugins?.LocalNotifications; },
+  /* The NIP-55 signer plugin, written by scripts/patch-android.py. Absent in
+     a browser, and absent in an APK built before it existed — both of which
+     fall back to the intent: URL route. */
+  get Amber(){ return window.Capacitor?.Plugins?.Amber; }
 };
 
 const NUDGES=[
