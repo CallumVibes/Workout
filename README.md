@@ -8,16 +8,29 @@ The whole app is one file: `www/index.html`. No build step, no framework, no bun
 
 Optional, and off until you sign in. Four ways in, under **You → Nostr account**:
 
-- **Amber** (NIP-55). The main path on Android, and only offered on Android. The app hands Amber a request over a `nostrsigner:` link and Amber replies on a `groundwork://` link. Your private key never enters this app.
+- **Amber** (NIP-55). The main path on Android, and only offered on Android. In the APK the request goes out as an Android intent and the answer comes back on the activity result; in a browser it goes out as an `intent:` URL and Amber copies the answer. Your private key never enters this app.
 - **Bunker** (NIP-46). Paste the `bunker://` address from nsecBunker, nsec.app, Amber's bunker mode or similar. Your key stays in the signer and every signature is a round trip over a relay — so this is the one route that works everywhere, desktop included.
 - **Browser extension** (NIP-07). Only appears if `window.nostr` exists, so it's for desktop browsers, not the APK.
 - **npub, read-only**. Restores a backup, can't make one.
 
-#### A note on the Amber link
+#### Why reaching Amber takes two different routes
 
-The first release built Chrome's `intent:…#Intent;scheme=nostrsigner;…;end` URL. That works in Chrome for Android and nowhere else — and specifically not in the APK, where Capacitor hands an unknown scheme to `new Intent(ACTION_VIEW, Uri.parse(url))`. The scheme of an `intent:` URL is literally `intent`, nothing claims it, and the tap did nothing at all. It now builds a plain NIP-55 `nostrsigner:` URI.
+Amber decides how to read a request by whether the sender stamped `Browser.EXTRA_APPLICATION_ID` on the intent. With it, it parses the `nostrsigner:` URL. Without it, it reads `type`, `pubkey` and the rest from the intent's **extras**.
 
-Two things went with it. The `groundwork://` deep link that `scripts/patch-android.py` has always registered is finally listened for, so answers come back over the link rather than by scraping the clipboard — which needed a secure context, a permission prompt, and the page surviving the trip. And if nothing takes the intent, the app says so in about four seconds instead of sitting silent for two minutes.
+Two separate things stopped setting that extra. Chromium removed it (`DontClobberTabsWithChromeAppId`, default-on in stable from late August 2026). And Capacitor never set it — the whole of `Bridge.launchIntent` is `new Intent(ACTION_VIEW, url); startActivity(it)`, with no `Intent.parseUri` either.
+
+That is both of the failures this app saw, from the same two lines:
+
+- An `intent:…#Intent;…;end` URL, which the first release sent, has the scheme `intent`. Nothing on the device claims it, `startActivity` throws, Capacitor logs it, and **the tap did nothing at all**.
+- A plain `nostrsigner:` URL, which replaced it, resolves to Amber — and lands in the extras branch with no extras to read. **"Invalid request."**
+
+So the APK no longer sends a URL. `scripts/patch-android.py` writes a small Capacitor plugin (`AmberPlugin.java`) that builds the Intent, fills in the extras and gets the answer on the activity result. That is the flow NIP-55 specifies for Android apps, and it depends on none of the above: no `EXTRA_APPLICATION_ID`, no `callbackUrl`, no deep link, no clipboard. Sign-in leaves the package off so Android offers a chooser between whatever signers are installed; the one that answers is remembered and pinned on every later call.
+
+A browser has no plugin, so it keeps the `intent:` URL — which is right *there*, because Chrome does call `Intent.parseUri`, turning each `S.<name>` into an extra and landing in the same branch. It carries no `callbackUrl`, because a web page has no scheme Amber can return to, so Amber copies the answer and the page reads it on the way back, with a paste fallback.
+
+One more thing Amber does: it URL-decodes the request and splits it on `?` before parsing any JSON, so a question mark in a note would truncate what it signs. Percent-encoding does not survive that, `?` does — and only a payload that really is JSON is touched, because a NIP-44 ciphertext has to come back byte-exact.
+
+**You → Nostr account → Show what Amber is sent** prints the exact request without sending it. Two device round trips went on inferring this from an error screen; a third should start from what the signer was actually handed.
 
 ### Encrypted backup
 
@@ -123,7 +136,7 @@ Four defaults, editable under **You → Nostr account → Relays**. One `wss://`
 
 ### What needs a real device
 
-Amber is an Android app, so NIP-55 only works in the installed APK — not in a browser, and the button is not offered in one. Relay connections are WebSockets, which a browser preview's security policy will also block. Build the APK to test any of this.
+Amber is an Android app, so NIP-55 only works on Android — and the signer plugin only exists in the APK, so that route cannot be exercised anywhere else at all. The button is not offered on a desktop. Relay connections are WebSockets, which a browser preview's security policy will also block. Build the APK to test any of this.
 
 Bunker sign-in is the exception: it is relays all the way down, so it works in a browser as well as the APK. If Amber ever misbehaves, that is the route that does not depend on an Android intent surviving a WebView.
 
