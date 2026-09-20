@@ -5,12 +5,13 @@ Patches the Android project that Capacitor generates.
 Run by CI after `npx cap add android`. Everything here is idempotent, so
 running it twice on the same project changes nothing the second time.
 
-Four jobs:
+Five jobs:
   1. Declare the permissions local notifications need on Android 13+.
   2. Register the groundwork:// deep link so a signer can hand results back.
   3. Declare that we look for a nostrsigner, which Android 11+ hides otherwise.
   4. Write the Amber plugin, which is the only route to a signer that works
      from inside the APK. See AMBER_PLUGIN below for why.
+  5. Write the notification icon that capacitor.config.json names.
 """
 
 import glob
@@ -21,6 +22,34 @@ import sys
 MANIFEST = "android/app/src/main/AndroidManifest.xml"
 ASSET_CFG = "android/app/src/main/assets/capacitor.config.json"
 JAVA_ROOT = "android/app/src/main/java"
+DRAWABLE = "android/app/src/main/res/drawable"
+
+# capacitor.config.json names this icon and nothing generates it. Without it
+# the plugin falls back to android.R.drawable.ic_dialog_info, so a reminder
+# wears a generic system glyph instead of the app's own mark.
+#
+# A status bar icon is a silhouette: Android throws away the colour and keeps
+# the alpha, so this is the three-bar mark drawn in flat white, with the third
+# bar an outline the way the launcher icon has it.
+STAT_ICON = """<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M2.7,4h3.6a1.2,1.2 0 0 1 1.2,1.2v13.6a1.2,1.2 0 0 1 -1.2,1.2h-3.6a1.2,1.2 0 0 1 -1.2,-1.2v-13.6a1.2,1.2 0 0 1 1.2,-1.2z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M10.2,4h3.6a1.2,1.2 0 0 1 1.2,1.2v13.6a1.2,1.2 0 0 1 -1.2,1.2h-3.6a1.2,1.2 0 0 1 -1.2,-1.2v-13.6a1.2,1.2 0 0 1 1.2,-1.2z" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.2"
+        android:pathData="M18.3,4.6h2.4a1.2,1.2 0 0 1 1.2,1.2v12.4a1.2,1.2 0 0 1 -1.2,1.2h-2.4a1.2,1.2 0 0 1 -1.2,-1.2v-12.4a1.2,1.2 0 0 1 1.2,-1.2z" />
+</vector>
+"""
 
 PERMISSIONS = [
     "android.permission.POST_NOTIFICATIONS",
@@ -216,6 +245,14 @@ def patch_plugin():
     print(f"Plugin: AmberPlugin + MainActivity written into {pkg}")
 
 
+def patch_icon():
+    os.makedirs(DRAWABLE, exist_ok=True)
+    open(os.path.join(DRAWABLE, "ic_stat_icon.xml"), "w", encoding="utf-8").write(
+        STAT_ICON
+    )
+    print("Icon: ic_stat_icon written")
+
+
 def patch_manifest():
     if not os.path.exists(MANIFEST):
         sys.exit(f"Could not find {MANIFEST} — did `npx cap add android` run?")
@@ -257,4 +294,5 @@ def patch_config():
 if __name__ == "__main__":
     patch_manifest()
     patch_plugin()
+    patch_icon()
     patch_config()

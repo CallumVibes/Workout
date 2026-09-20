@@ -273,9 +273,23 @@ And a plain timer with a bell, because some people want silence and an app insis
 
 One notification a day at a time you choose in the app, under **You → Daily reminder**.
 
-It skips any day you've already checked in or trained, and it reschedules every time the app is opened. On a Saturday where you're short of your weekly target, it says so instead of using the usual wording.
+It skips any day you've already checked in or trained, and it reschedules every time the app is opened. On a Saturday where you're short of your weekly target, it says so instead of using the usual wording. A month is queued at a time, so the reminders outlast a few weeks of not opening the app — which is the stretch where a nudge is worth most.
 
 Reminders do nothing in a browser — they need the installed app. Android will ask for notification permission the first time you turn them on.
+
+**No Google Play Services anywhere.** There is no FCM, no push, no `google-services.json`, and nothing in the dependency tree that wants one — `@capacitor/local-notifications` is `AlarmManager` and `NotificationManagerCompat`, and the plugin registers its own `BOOT_COMPLETED` receiver so reminders survive a reboot. This works identically on a phone that has never had a Google app on it, GrapheneOS included.
+
+#### Two reasons they used not to arrive
+
+Neither had anything to do with Play Services. GrapheneOS is just where they got noticed.
+
+**The channel did not exist.** Every reminder was tagged `channelId: 'groundwork-daily'` and nothing ever created that channel. The plugin takes the id as given and only auto-creates its own `default`; `createChannel` has to be called from JS and never was. Since Android 8 a notification posted to a channel that does not exist is **discarded by the system** — logcat says `No Channel found for pkg=…` and nothing appears. So every reminder this app had ever scheduled was thrown away at delivery. `notifChannel()` now creates it at the top of `notifSchedule`, which is a no-op when it already exists.
+
+Its importance is HIGH, chosen deliberately because a channel belongs to the person once it exists: Android ignores an app trying to change one afterwards, and only they can, in system settings.
+
+**Exact alarms are pre-denied on Android 14+.** `scripts/patch-android.py` declares `SCHEDULE_EXACT_ALARM`, but declaring is not having — an app targeting API 34, which Capacitor 6 does, is pre-denied unless it is an alarm clock or a calendar. The plugin degrades quietly to an inexact alarm, so a 19:00 reminder lands whenever Doze next opens a window. The app now checks, says so on the reminder screen, and offers the **Alarms & reminders** setting. It never blocks on it: a late nudge beats no nudge.
+
+While there: `capacitor.config.json` names `ic_stat_icon` and nothing generated it, so the reminder wore `android.R.drawable.ic_dialog_info` — a generic system glyph. `patch-android.py` now writes the drawable, the app's three-bar mark in white, which is what a status bar icon has to be.
 
 ## Equipment
 
