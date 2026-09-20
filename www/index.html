@@ -978,7 +978,6 @@ const CARDIO=[
 ];
 function cardioOf(k){ return CARDIO.find(c=>c.k===k); }
 function cardioLog(){ return S.cardio||[]; }
-function cardioOn(day){ return cardioLog().some(c=>c.d===day); }
 function cardioAdd(k,mins,dist){
   mins=parseInt(mins)||0; if(mins<=0) return false;
   S.cardio=cardioLog().concat([{d:dayKey(new Date()), k, m:mins, km:parseFloat(dist)||null, at:Date.now()}]);
@@ -2238,7 +2237,7 @@ function guidesFor(k){
 const byStr = id => STR.find(s=>s.id===id) || MOB.find(m=>m.id===id) || yogaPose(id);
 
 /* ============================== STATE ============================== */
-const BUILD='2026-09-20 12:20';
+const BUILD='2026-09-20 14:05';
 const KEY='groundwork.v1';
 let S = {
   setup:false,
@@ -2265,7 +2264,18 @@ function load(){
   S.variety=S.variety||'normal';
   if(S.tierOverride===undefined) S.tierOverride=null;
 }
-function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+function save(){ clearTimeout(_saveT); _saveT=null;
+  try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+
+/* Writing state means stringifying all of it, which is a few milliseconds
+   once somebody has years of history — fine once, not fine on every tap of a
+   weight stepper. This coalesces a burst of taps into one write. Only used
+   where the thing being saved is a preference that is written again anyway;
+   anything that must survive being killed calls save() directly. */
+let _saveT=null;
+function saveSoon(){ if(_saveT) return; _saveT=setTimeout(save, 500); }
+/* and never leave a write pending when the app goes away */
+document.addEventListener('visibilitychange',()=>{ if(_saveT && document.visibilityState!=='visible') save(); });
 
 /* --- week / streak maths --- */
 function mondayOf(d){ const x=new Date(d); const day=(x.getDay()+6)%7; x.setHours(0,0,0,0); x.setDate(x.getDate()-day); return x; }
@@ -2297,7 +2307,33 @@ function streak(){
   }
   return {cur,best:Math.max(best,cur)};
 }
-function totalReps(){ let t=0; S.logs.forEach(l=>l.entries.forEach(e=>e.sets.forEach(s=>{ if(!s.hold) t+=s.reps; }))); return t; }
+/* One pass over the history, cached until the history changes.
+
+   These three used to be separate scans, and `trainedOn` and `metOn` were
+   `S.logs.some(...)` building a Date for every log. That is fine on its own
+   and quietly quadratic in context: dayStreak walks back one day at a time
+   over the whole streak and asks about each, so 800 sessions meant 640,000
+   date constructions and a render that took a fifth of a second. Now it is
+   two sets and an integer, built once. */
+let _dayIndex=null;
+function dayIndex(){
+  const n=S.logs.length;
+  const sig=n+'|'+(n?S.logs[n-1].date:'')+'|'+(n?S.logs[0].date:'')
+    +'|'+Object.keys(S.checkins||{}).length+'|'+(S.cardio||[]).length;
+  if(_dayIndex && _dayIndex.sig===sig) return _dayIndex;
+  const trained=new Set(), met=new Set();
+  let reps=0;
+  S.logs.forEach(l=>{
+    const k=dayKey(new Date(l.date));
+    trained.add(k); met.add(k);
+    l.entries.forEach(e=>e.sets.forEach(x=>{ if(!x.hold) reps+=x.reps; }));
+  });
+  (S.cardio||[]).forEach(c=>{ if(c&&c.d) met.add(c.d); });
+  Object.keys(S.checkins||{}).forEach(k=>{ if(S.checkins[k]) met.add(k); });
+  _dayIndex={sig, trained, met, reps};
+  return _dayIndex;
+}
+function totalReps(){ return dayIndex().reps; }
 /* Strength drops off after a couple of weeks away. Coming back at the level
    you left at is the quickest way to hurt yourself and quit again. */
 function daysSinceLast(){
@@ -2372,8 +2408,8 @@ function stats(){ const st=streak(); const d=dayStreak(); return {bestStreak:st.
    One missed day is forgiven. Two missed days in a row resets. --- */
 function dayKey(d){ const x=new Date(d); x.setHours(0,0,0,0);
   return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); }
-function trainedOn(k){ return S.logs.some(l=>dayKey(new Date(l.date))===k); }
-function metOn(k){ return !!S.checkins[k] || trainedOn(k) || cardioOn(k); }
+function trainedOn(k){ return dayIndex().trained.has(k); }
+function metOn(k){ return dayIndex().met.has(k); }
 function checkedInToday(){ return !!S.checkins[dayKey(new Date())]; }
 function dayStreak(){
   const today=new Date(); let cur=0, gaps=0;
@@ -2966,21 +3002,6 @@ function lastSummary(){
   return `${when} — ${nm}, ${l.entries.length} exercises, ${reps} reps. ${days>=4?'Worth getting the next one in.':'Rest day is doing its job.'}`;
 }
 
-function learnRow(title, sub, onclick, searchText, tickId, num){
-  return `<div class="accordion" data-find="${esc((title+' '+(sub||'')+' '+(searchText||'')).toLowerCase())}">
-    <button class="achead" onclick="${onclick}">
-      <span class="lrow">
-        ${num?`<span class="lnum">${num}</span>`:''}
-        <span class="lt">
-          <span>${title}</span>
-          ${sub?`<span class="lsub">${sub}</span>`:''}
-        </span>
-        ${tickId!=null?`<svg id="tick${tickId}" class="tick${(S.read||{})[title]?' on':''}" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>`:''}
-      </span>
-      <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
-    </button>
-    <div class="acbody">${searchText===null?'':''}</div></div>`;
-}
 function guideRow(x, num){
   const plain=x.g.b.replace(/<[^>]+>/g,' ');
   return `<div class="accordion" data-find="${esc((x.g.t+' '+plain).toLowerCase())}">
@@ -4841,7 +4862,7 @@ function bump(k,f,d){
   const r=run.rows[k]; if(!r) return;
   const en=run.entries[r.ei], s=en.sets[r.si];
   s[f]=Math.max(f==='weight'?0:1, Math.round((s[f]+d)*2)/2);
-  if(f==='weight'){ S.weights[en.exId]=s.weight; save(); }
+  if(f==='weight'){ S.weights[en.exId]=s.weight; saveSoon(); }
   const row=document.querySelectorAll('.setrow')[k];
   const el=row?row.querySelectorAll('.val')[f==='reps'?0:1]:null;
   if(el) el.textContent=s[f];
@@ -6295,14 +6316,12 @@ function zapNote(id){
   S.social.zapped=(S.social.zapped||[]).concat([id]).slice(-400); save();
 }
 
-/* Resolve a person to something we can actually pay. Separated from the
-   paying so it can be tested without a wallet anywhere near it. */
-async function zapResolve(pk, sats){
-  const a=zapAddress(pk);
-  if(!a) throw new Error(nameOf(pk)+' has no lightning address in their nostr profile, so there is nothing to pay.');
-  if(a.kind==='lud06') throw new Error(nameOf(pk)+' uses an older LNURL rather than a lightning address, which this app cannot read. Ask them for an address like name@example.com.');
-  const url=lnurlFor(a.value);
-  if(!url) throw new Error('Their lightning address does not look like one this app is willing to fetch.');
+/* The lookup, from a lightning address. Separated from the paying so it can
+   be tested without a wallet anywhere near it, and from `zapResolve` because
+   sending has an address in hand while zapping has to find one first. */
+async function lnResolve(addr, sats){
+  const url=lnurlFor(addr);
+  if(!url) throw new Error('That lightning address is not one this app is willing to fetch.');
   const meta=await lnFetch(url);
   if(!meta || meta.tag!=='payRequest' || !meta.callback) throw new Error('That address is not set up to receive.');
   if(!/^https:\/\//i.test(meta.callback)) throw new Error('Their server asked us to use an insecure address.');
@@ -6310,6 +6329,14 @@ async function zapResolve(pk, sats){
   if(sats<min) throw new Error('They do not accept less than '+min+' sats.');
   if(sats>max) throw new Error('They do not accept more than '+max.toLocaleString()+' sats.');
   return {meta, min, max, zappable: !!(meta.allowsNostr && meta.nostrPubkey)};
+}
+
+/* Resolve a *person* to something we can pay. */
+async function zapResolve(pk, sats){
+  const a=zapAddress(pk);
+  if(!a) throw new Error(nameOf(pk)+' has no lightning address in their nostr profile, so there is nothing to pay.');
+  if(a.kind==='lud06') throw new Error(nameOf(pk)+' uses an older LNURL rather than a lightning address, which this app cannot read. Ask them for an address like name@example.com.');
+  return await lnResolve(a.value, sats);
 }
 
 /* The NIP-57 request. Signed by Amber, handed to their server, and echoed
@@ -6485,7 +6512,7 @@ async function sendGo(d){
     if(d.kind==='address'){
       zapBusy('Looking up '+esc(d.value)+'…');
       /* same LNURL lookup and host checks as a zap; the difference is below */
-      const res=await zapResolve2(d.value, d.sats);
+      const res=await lnResolve(d.value, d.sats);
       zapBusy('Asking for an invoice…');
       /* no `nostr` parameter, so their server issues a plain invoice and
          publishes no zap receipt — a payment, not an announcement */
@@ -6510,20 +6537,6 @@ async function sendGo(d){
     ask(String(e && e.message || 'That did not work').slice(0,300), ()=>{}, 'Right');
   }
   walletBusy=false;
-}
-
-/* zapResolve takes a pubkey because zaps always have one. Sending does not,
-   so this is the same lookup starting from the address itself. */
-async function zapResolve2(addr, sats){
-  const url=lnurlFor(addr);
-  if(!url) throw new Error('That lightning address is not one this app is willing to fetch.');
-  const meta=await lnFetch(url);
-  if(!meta || meta.tag!=='payRequest' || !meta.callback) throw new Error('That address is not set up to receive.');
-  if(!/^https:\/\//i.test(meta.callback)) throw new Error('Their server asked us to use an insecure address.');
-  const min=Math.ceil((meta.minSendable||1000)/1000), max=Math.floor((meta.maxSendable||1e11)/1000);
-  if(sats<min) throw new Error('They do not accept less than '+min+' sats.');
-  if(sats>max) throw new Error('They do not accept more than '+max.toLocaleString()+' sats.');
-  return {meta, min, max};
 }
 
 function zapChip(pk, evId){
