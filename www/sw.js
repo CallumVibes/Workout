@@ -6,7 +6,7 @@
    people signing in with a bunker. Each is fetched the first time it is
    wanted, and the handler below caches it from then on, so both still work
    offline afterwards. */
-const CACHE = 'groundwork-v10';
+const CACHE = 'groundwork-v13';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
