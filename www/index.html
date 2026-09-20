@@ -2237,7 +2237,7 @@ function guidesFor(k){
 const byStr = id => STR.find(s=>s.id===id) || MOB.find(m=>m.id===id) || yogaPose(id);
 
 /* ============================== STATE ============================== */
-const BUILD='2026-09-20 17:30';
+const BUILD='2026-09-20 19:15';
 const KEY='groundwork.v1';
 let S = {
   setup:false,
@@ -4267,7 +4267,29 @@ function subRemind(){
       : `<div class="flag" style="margin-top:14px"><b>Not available here.</b> ${IOS
           ? 'iPhone home-screen apps cannot schedule their own reminders — that is an Apple restriction, not something the app can work around. Set a repeating alarm on your phone for the same time instead; it does the same job.'
           : 'Reminders need the installed app. In a browser tab there is nothing to schedule against.'}</div>`}
-  </div>`;
+  </div>
+  ${(Native.on && S.notify)?`<div class="card" id="exactcard">
+    <h3 style="font-size:15px">Arriving on time</h3>
+    <p class="tiny muted" style="margin:8px 0 0">Checking…</p>
+  </div>`:''}
+  ${Native.on?`<p class="tiny muted" style="margin:14px 2px 0">Reminders are set by the phone itself. No Google services, no account, nothing leaves the device — they work the same on a phone that has never had a Google app on it.</p>`:''}`;
+  if(Native.on && S.notify) paintExact();
+}
+
+/* Filled in after the check, because it is a round trip to the plugin and the
+   screen should not sit blank waiting for it. */
+async function paintExact(){
+  const box=document.getElementById('exactcard');
+  if(!box) return;
+  const state=await notifExact();
+  if(!document.getElementById('exactcard')) return;   // navigated away
+  box.innerHTML = state==='granted'
+    ? `<h3 style="font-size:15px">Arriving on time</h3>
+       <p class="tiny muted" style="margin:8px 0 0">Android lets this app set an alarm for the exact minute, so your reminder turns up when you asked for it.</p>`
+    : `<h3 style="font-size:15px">These may arrive late</h3>
+       <p class="small muted" style="margin:8px 0 0">Android has not given this app permission to set an alarm for an exact time, so a reminder can be up to an hour behind — sometimes more if the phone has been sitting idle.</p>
+       <p class="tiny muted" style="margin:10px 0 0">It is under <b>Alarms &amp; reminders</b>. Reminders still work without it.</p>
+       <button class="btn ghost sm" onclick="notifExactAsk()">Open settings</button>`;
 }
 
 function subLook(){
@@ -7093,6 +7115,57 @@ const NUDGES=[
   'Showing up on the off days is the whole trick.'
 ];
 
+/* The channel every reminder is posted to.
+
+   This is why no reminder this app scheduled has ever appeared. Since Android
+   8 a notification whose channel does not exist is discarded by the system —
+   logcat says "No Channel found for pkg=…" and nothing is shown. The app has
+   always tagged its reminders `groundwork-daily` and has never created it:
+   the plugin takes the id as given and only ever creates its own `default`.
+
+   Nothing to do with Google Play Services, which this app has never used for
+   anything. Local notifications are AlarmManager and nothing else, so they
+   work the same on a phone that has never seen a Google app.
+
+   Importance is worth getting right the first time, because a channel belongs
+   to the person once it exists: Android ignores an app trying to change one
+   afterwards, and only they can, in system settings. HIGH for something
+   switched on deliberately. */
+const NOTIF_CHANNEL='groundwork-daily';
+async function notifChannel(){
+  if(!Native.on || !Native.LN || !Native.LN.createChannel) return false;
+  try{
+    await Native.LN.createChannel({
+      id:NOTIF_CHANNEL,
+      name:'Daily reminder',
+      description:'One nudge a day for the check-in',
+      importance:4,                 // sound, and a heads-up
+      visibility:1,                 // public: a nudge, not anything private
+      vibration:true
+    });
+    return true;
+  }catch(e){ return false; }        // an older plugin, or below Android 8
+}
+
+/* Exact alarms. Declaring SCHEDULE_EXACT_ALARM is not the same as having it:
+   an app targeting Android 14 is pre-denied unless it is an alarm clock or a
+   calendar. Without it the plugin quietly falls back to an inexact alarm, so
+   a 19:00 reminder turns up whenever Doze next opens a window.
+
+   Worth asking for, never worth blocking on. A late nudge beats no nudge. */
+async function notifExact(){
+  if(!Native.on || !Native.LN || !Native.LN.checkExactNotificationSetting) return 'granted';
+  try{
+    const r=await Native.LN.checkExactNotificationSetting();
+    return (r && r.exact_alarm) || 'granted';
+  }catch(e){ return 'granted'; }    // an older plugin without the method
+}
+async function notifExactAsk(){
+  if(!Native.on || !Native.LN || !Native.LN.changeExactNotificationSetting) return;
+  try{ await Native.LN.changeExactNotificationSetting(); }catch(e){}
+  render();
+}
+
 async function notifInit(){
   if(!Native.on) return;
   try{
@@ -7106,7 +7179,15 @@ async function notifAsk(){
     const r=await Native.LN.requestPermissions();
     const ok = r.display==='granted';
     S.notify=ok; save();
-    if(ok){ await notifSchedule(); toast('Reminders on'); }
+    if(ok){
+      await notifSchedule();
+      toast('Reminders on');
+      /* one offer, then never again unprompted — the settings screen keeps
+         the button for anyone who wants it later */
+      if(await notifExact()!=='granted')
+        ask('Android has not given this app permission to set an alarm for an exact time, so a reminder may arrive up to an hour late.\n\nYou can allow it under Alarms & reminders.',
+          ()=>notifExactAsk(), 'Open settings');
+    }
     else toast('Android blocked reminders — turn them on in app settings');
     render();
     return ok;
@@ -7115,13 +7196,19 @@ async function notifAsk(){
 async function notifSchedule(){
   if(!Native.on || !S.notify) return;
   try{
+    /* Before anything is queued, every time, because creating a channel that
+       already exists is a no-op and a notification without one is binned. */
+    await notifChannel();
     const pend=await Native.LN.getPending();
     if(pend.notifications?.length) await Native.LN.cancel(pend);
     if(!S.notify) return;
 
     const [hh,mm]=(S.notifyAt||'19:00').split(':').map(Number);
     const list=[]; const now=new Date();
-    for(let i=0;i<14;i++){
+    /* A month, not a fortnight. Nothing re-queues these but opening the app,
+       and the stretch where a nudge is worth most is the one where you have
+       stopped opening it. */
+    for(let i=0;i<30;i++){
       const d=new Date(); d.setDate(d.getDate()+i); d.setHours(hh,mm,0,0);
       if(d<=now) continue;
       const k=dayKey(d);
@@ -7136,7 +7223,7 @@ async function notifSchedule(){
           : NUDGES[i % NUDGES.length],
         schedule:{ at:d, allowWhileIdle:true },
         smallIcon:'ic_stat_icon',
-        channelId:'groundwork-daily'
+        channelId:NOTIF_CHANNEL
       });
     }
     if(list.length) await Native.LN.schedule({notifications:list});
