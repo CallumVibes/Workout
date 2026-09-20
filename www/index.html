@@ -969,8 +969,12 @@ function quoteToday(){ return quoteFor(Math.floor(new Date().setHours(0,0,0,0)/8
 const CARDIO=[
   {k:'jog',  n:'Jog',  dist:true,  def:30, icon:'M13 4.5a1.6 1.6 0 1 0 0-.1M7 20l3-5 3 2 1 3M10 15l-1-5 4-2 3 3 2 .5'},
   {k:'bike', n:'Ride', dist:true,  def:30, icon:'M6 18a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 18a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM9 15l3-6 3 3h3M12 9l-1-3h3'},
-  {k:'yoga', n:'Yoga', dist:false, def:20, icon:'M12 5a1.6 1.6 0 1 0 0-.1M12 8.5v5M12 13.5c-1.8 0-3.2 1.1-4 3.5M12 13.5c1.8 0 3.2 1.1 4 3.5M5 11h14'},
-  {k:'sit',  n:'Meditation', dist:false, def:10, icon:'M12 5a1.6 1.6 0 1 0 0-.1M12 8.5v4.5M9 19h6M8.5 13l-2.5 6M15.5 13l2.5 6'}
+  {k:'yoga', n:'Yoga', dist:false, def:20, guide:true,
+   guideHint:'Three flows, each a sequence of holds with a figure and a clock. Pick by how long you have.',
+   icon:'M12 5a1.6 1.6 0 1 0 0-.1M12 8.5v5M12 13.5c-1.8 0-3.2 1.1-4 3.5M12 13.5c1.8 0 3.2 1.1 4 3.5M5 11h14'},
+  {k:'sit',  n:'Meditation', dist:false, def:10, guide:true,
+   guideHint:'Three guided sessions, or a plain timer if you would rather be left alone.',
+   icon:'M12 5a1.6 1.6 0 1 0 0-.1M12 8.5v4.5M9 19h6M8.5 13l-2.5 6M15.5 13l2.5 6'}
 ];
 function cardioOf(k){ return CARDIO.find(c=>c.k===k); }
 function cardioLog(){ return S.cardio||[]; }
@@ -987,6 +991,255 @@ function cardioSince(days){
   return cardioLog().filter(c=>new Date(c.d).getTime()>=cut);
 }
 function cardioMinutes(days){ return cardioSince(days).reduce((a,c)=>a+c.m,0); }
+
+/* ============================== A CLOCK ==============================
+
+   For jogs and rides: start it, go out, stop it when you are back.
+
+   No location is used and none is asked for. The app never touches
+   geolocation, so there is no permission prompt and nothing to refuse. What
+   a run needs from you is a distance, and a treadmill, a bike computer or a
+   map you looked at afterwards all give you that. Watching where you are is
+   somebody else's business model.
+
+   The clock is *computed* from Date.now() rather than counted. Every other
+   timer in this app decrements a counter once a second, which is fine for a
+   thirty-second stretch and would be badly wrong here: a backgrounded WebView
+   throttles timers to roughly one a minute, so a counted clock would come
+   back from a half-hour run claiming four minutes. The interval below only
+   repaints — the number it paints is arithmetic on wall-clock time, so it is
+   right whether it ticked once or a thousand times.
+
+   The run is written to storage as it goes, so a WebView killed while your
+   phone was in a pocket does not take the run with it. */
+
+function runState(){ return S.cardioRun||null; }
+function runElapsedMs(){
+  const r=runState(); if(!r) return 0;
+  const end = r.pausedAt || Date.now();
+  return Math.max(0, end - r.startedAt - (r.pausedMs||0));
+}
+function runMinutes(){ return Math.max(1, Math.round(runElapsedMs()/60000)); }
+/* Named for the run, not for clocks in general: the session player already
+   has a clockText() for its twelve-minute block, and the later declaration
+   silently wins. This one used to be called that too, which meant the run
+   clock read the player's countdown variable and sat at 0:00. */
+function runClockText(ms){
+  const t=Math.floor(ms/1000), h=Math.floor(t/3600), m=Math.floor((t%3600)/60), s=t%60;
+  return (h?h+':'+String(m).padStart(2,'0'):String(m))+':'+String(s).padStart(2,'0');
+}
+/* Runners think in minutes per kilometre, cyclists in kilometres per hour. */
+function paceText(k, mins, km){
+  km=parseFloat(km)||0;
+  if(!km || !mins) return '';
+  if(k==='bike') return (km/(mins/60)).toFixed(1)+' km/h';
+  const per=mins/km, mm=Math.floor(per), ss=Math.round((per-mm)*60);
+  return (ss===60?(mm+1)+':00':mm+':'+String(ss).padStart(2,'0'))+' per km';
+}
+function runStart(k){
+  S.cardioRun={k, startedAt:Date.now(), pausedMs:0, pausedAt:0};
+  save(); cardioDraft=null;
+  document.getElementById('player').classList.add('on');
+  document.body.style.overflow='hidden';
+  drawRun();
+}
+function runPause(){
+  const r=runState(); if(!r||r.pausedAt) return;
+  r.pausedAt=Date.now(); save(); drawRun();
+}
+function runResume(){
+  const r=runState(); if(!r||!r.pausedAt) return;
+  r.pausedMs=(r.pausedMs||0)+(Date.now()-r.pausedAt); r.pausedAt=0; save(); drawRun();
+}
+function runDiscard(){
+  ask('Throw this one away? Nothing gets logged.', ()=>{
+    S.cardioRun=null; save(); runClose();
+  }, 'Throw it away', true);
+}
+function runClose(){
+  clearInterval(run_t); run_t=null;
+  document.getElementById('player').classList.remove('on');
+  document.body.style.overflow=''; render();
+}
+
+let run_t=null;
+function drawRun(){
+  const r=runState(); if(!r) return;
+  const c=cardioOf(r.k)||{n:'Session'};
+  const paused=!!r.pausedAt;
+  document.getElementById('pfill').style.width='0%';
+  document.getElementById('pbody').innerHTML=`
+  <div class="topbar" style="margin-bottom:16px">
+    <div><div class="tiny muted">${c.n} · ${paused?'paused':'running'}</div>
+      <h1 style="font-size:21px;margin-top:2px">Out there</h1></div>
+    <button class="tiny muted" onclick="runDiscard()" style="text-decoration:underline">Discard</button>
+  </div>
+  <div class="card" style="text-align:center;padding:30px 16px">
+    <div class="num" id="runclock" style="font-size:58px;line-height:1;color:${paused?'var(--muted)':'var(--pine)'};font-variant-numeric:tabular-nums">${runClockText(runElapsedMs())}</div>
+    <div class="tiny muted" style="margin-top:6px">${paused?'Paused':'Started '+new Date(r.startedAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div>
+  </div>
+  ${paused
+    ? `<button class="btn pine" onclick="runResume()">Carry on</button>`
+    : `<button class="btn ghost" onclick="runPause()">Pause</button>`}
+  <button class="btn" style="background:var(--brass);color:var(--surface)" onclick="runFinish()">Finish</button>
+  <p class="tiny muted" style="margin:14px 0 0;text-align:center;line-height:1.6">
+    The clock reads real time, so it keeps counting with the screen off or the app closed.${
+    (cardioOf(r.k)||{}).dist?'<br>Distance goes in at the end — nothing here is tracking where you are.':''}</p>
+  <div style="height:20px"></div>`;
+  clearInterval(run_t);
+  /* repaint only; the value is arithmetic, so a throttled tick costs accuracy
+     on the display for a second and nothing at all in the log */
+  run_t=setInterval(()=>{
+    const el=document.getElementById('runclock');
+    if(!el){ clearInterval(run_t); run_t=null; return; }
+    if(!(runState()||{}).pausedAt) el.textContent=runClockText(runElapsedMs());
+  },1000);
+}
+
+function runFinish(){
+  const r=runState(); if(!r) return;
+  const c=cardioOf(r.k)||{}, mins=runMinutes();
+  clearInterval(run_t); run_t=null;
+  if(!c.dist){ runSave(mins, null); return; }
+  askText(c.n+' done — '+mins+' minute'+(mins===1?'':'s')+'.\n\nHow far did you go? Leave it blank if you would rather not say.',
+    '', v=>runSave(mins, v), {numeric:true, placeholder:'km', ok:'Log it'});
+}
+function runSave(mins, km){
+  const r=runState(); if(!r) return;
+  const k=r.k;
+  cardioAdd(k, mins, km);
+  S.cardioRun=null; save();
+  runClose();
+  const p=paceText(k, mins, km);
+  toast((cardioOf(k)||{n:'Session'}).n+' logged'+(p?' — '+p:''));
+}
+
+/* Offered on Today when a run was left going: the app was closed mid-run,
+   or the phone killed it. */
+function runResumeCard(){
+  const r=runState(); if(!r) return '';
+  const c=cardioOf(r.k)||{n:'session'}, mins=Math.round(runElapsedMs()/60000);
+  return `<div class="card" style="margin-top:14px;border-color:var(--pine)">
+    <h3 style="font-size:16px">A ${c.n.toLowerCase()} is still running</h3>
+    <p class="small muted" style="margin:8px 0 0">${mins} minute${mins===1?'':'s'} so far, started ${new Date(r.startedAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}. The clock kept going while the app was shut.</p>
+    <button class="btn pine sm" onclick="runOpen()">Pick it back up</button>
+    <button class="btn ghost sm" onclick="runFinish()">Finish it now</button>
+    <button class="btn ghost sm" onclick="runDiscard()">Throw it away</button>
+  </div>`;
+}
+function runOpen(){
+  if(!runState()) return;
+  document.getElementById('player').classList.add('on');
+  document.body.style.overflow='hidden';
+  drawRun();
+}
+
+/* ---- guided flows and sessions ----
+
+   One step runner for both. A yoga step has a pose and reuses holdStart and
+   holdRun, exactly as a cooldown stretch does; a meditation step has words
+   and a clock and no figure. Either way it ends at cardioAdd, so the day
+   streak, the Progress card, points and medals all see it without knowing
+   anything new. */
+
+let guide=null;
+function guideStart(k, id){
+  if(k==='sit' && id==='timer'){ sitTimerAsk(); return; }
+  const src = k==='yoga' ? yogaOf(id) : sitOf(id);
+  if(!src) return;
+  guide={k, id, i:0, startedAt:Date.now(),
+    steps: k==='yoga'
+      ? src.poses.map(pid=>{ const p=byStr(pid); return p?{pose:p, sec:p.sec||40, side:!!p.side,
+          t:p.name, how:p.how}:null; }).filter(Boolean)
+      : src.steps.map(st=>({pose:null, sec:st.sec, side:false, t:st.t, how:st.how})),
+    name: src.n};
+  cardioDraft=null;
+  document.getElementById('player').classList.add('on');
+  document.body.style.overflow='hidden';
+  drawGuide();
+}
+function drawGuide(){
+  if(!guide) return;
+  const st=guide.steps[guide.i], n=guide.steps.length;
+  document.getElementById('pfill').style.width=(guide.i/n*100)+'%';
+  document.getElementById('pbody').innerHTML=`
+  <div class="topbar" style="margin-bottom:16px">
+    <div style="min-width:0"><div class="tiny muted">${esc(guide.name)} · ${guide.i+1} of ${n}</div>
+      <h1 style="font-size:21px;margin-top:2px">${esc(st.t)}</h1></div>
+    <button class="tiny muted" onclick="guideQuit()" style="text-decoration:underline;flex:0 0 auto">Quit</button>
+  </div>
+  ${st.pose?`<div onclick="figPlay(byStr('${st.pose.id}'),'gf')" style="cursor:pointer">${figure(st.pose,'gf')}</div>`:''}
+
+  <div class="card" style="margin-top:14px;text-align:center">
+    <div class="num" id="holdT" style="font-size:52px;line-height:1;color:var(--pine)">${st.sec}</div>
+    <div class="tiny muted">${st.side?'seconds each side':'seconds'}</div>
+    <button class="btn pine" id="holdBtn" onclick="holdStart(${st.sec},${st.side?1:0})">Start${st.side?' — first side':''}</button>
+    <p class="tiny muted" style="margin:10px 0 0">Five seconds to get set, then the clock starts.</p>
+  </div>
+
+  <div class="card">
+    <p class="small" style="margin:0;line-height:1.6">${st.how}</p>
+    ${st.pose&&st.pose.target?`<p class="tiny muted" style="margin:10px 0 0">${st.pose.target}</p>`:''}
+  </div>
+
+  <button class="btn" onclick="guideNext()">${guide.i===n-1?'Finish':'Next'}</button>
+  <button class="btn ghost sm" onclick="guideNext()">Skip this one</button>
+  <div style="height:20px"></div>`;
+  if(st.pose) setTimeout(()=>figPlay(st.pose,'gf'),120);
+}
+function guideNext(){
+  if(!guide) return;
+  clearInterval(st_t); stopAll();
+  if(guide.i < guide.steps.length-1){ guide.i++; drawGuide(); document.getElementById('player').scrollTo(0,0); }
+  else guideFinish();
+}
+function guideQuit(){
+  ask('Stop here? Nothing gets logged.', ()=>{
+    clearInterval(st_t); stopAll(); guide=null;
+    document.getElementById('player').classList.remove('on');
+    document.body.style.overflow=''; render();
+  }, 'Stop', true);
+}
+function guideFinish(){
+  if(!guide) return;
+  clearInterval(st_t); stopAll();
+  /* the minutes actually spent, not the nominal length of the flow */
+  const mins=Math.max(1, Math.round((Date.now()-guide.startedAt)/60000));
+  const k=guide.k, name=guide.name;
+  cardioAdd(k, mins, null);
+  guide=null;
+  document.getElementById('pfill').style.width='100%';
+  document.getElementById('pbody').innerHTML=`
+    <div style="padding-top:44px;text-align:center">
+      <div class="num" style="font-size:62px;line-height:1;color:var(--pine)">${mins}</div>
+      <div class="muted small">minute${mins===1?'':'s'}</div>
+      <h1 style="font-size:23px;margin-top:24px">${esc(name)} done.</h1>
+      <p class="muted small" style="margin:10px auto 0;max-width:32ch">Logged, and it holds your day streak. It does not count towards your ${S.target} strength sessions — different job.</p>
+      ${quoteToday()?`<p class="quote">${quoteToday()}</p>`:''}
+      <button class="btn" onclick="guideClose()">Done</button>
+      <div style="height:26px"></div>
+    </div>`;
+  if(navigator.vibrate) navigator.vibrate([18,50,18]);
+}
+function guideClose(){
+  document.getElementById('player').classList.remove('on');
+  document.body.style.overflow=''; go('today');
+}
+
+/* A bell and nothing else. */
+function sitTimerAsk(){
+  askText('How long?', '10', v=>{
+    const m=Math.max(1, Math.min(120, parseInt(v,10)||0));
+    if(!m) return;
+    guide={k:'sit', id:'timer', i:0, startedAt:Date.now(), name:'Timer',
+      steps:[{pose:null, sec:m*60, side:false, t:m+' minutes',
+        how:'Sit however is comfortable. Nothing to follow and nothing to get right — the clock will tell you when it is done.'}]};
+    cardioDraft=null;
+    document.getElementById('player').classList.add('on');
+    document.body.style.overflow='hidden';
+    drawGuide();
+  }, {numeric:true, ok:'Start'});
+}
 
 /* the little logging form, opened from Today */
 let cardioDraft=null;
@@ -1018,6 +1271,14 @@ function cardioPaint(){
     <div style="display:flex;justify-content:space-between;align-items:baseline">
       <h3 style="font-size:15px">${c.n}</h3>
       <button class="tiny muted" onclick="cardioClose()" style="text-decoration:underline">Cancel</button></div>
+    ${c.guide?`<p class="small muted" style="margin:10px 0 0">${c.guideHint}</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        ${guidesFor(c.k).map(g=>`<button class="chip" onclick="guideStart('${c.k}','${g.id}')">${g.n} · ${g.mins} min</button>`).join('')}
+      </div>
+      <p class="tiny muted" style="margin:12px 0 0">Or log it by hand:</p>`:''}
+    ${c.dist?`<p class="small muted" style="margin:10px 0 0">Start the clock and it keeps time while you are out, or put the minutes in yourself.</p>
+      <button class="btn pine sm" onclick="runStart('${c.k}')">Start the clock</button>
+      <p class="tiny muted" style="margin:12px 0 0">Or log it by hand:</p>`:''}
     <div style="display:flex;align-items:center;gap:12px;margin-top:12px">
       <div class="stepper">
         <button onclick="cardioBump(-5)" aria-label="less">−</button>
@@ -1026,7 +1287,7 @@ function cardioPaint(){
       </div><span class="unit">minutes</span>
       ${c.dist?`<input type="number" id="cdkm" class="qty" step="0.1" placeholder="km" style="width:72px">`:''}
     </div>
-    <button class="btn pine sm" onclick="cardioSave()">Log it</button>
+    <button class="btn ${c.dist||c.guide?'ghost':'pine'} sm" onclick="cardioSave()">Log it</button>
     <p class="tiny muted" style="margin:10px 0 0">${c.dist?'Distance is optional. ':''}This does not count towards your ${S.target} strength sessions, but it holds your day streak.</p>
   </div>`;
 }
@@ -1844,10 +2105,140 @@ const STR=[
    pose:{a:{h:[50,19],n:[50,31],p:[50,58],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[47,19],wa:[57,28],eb:[60,33],wb:[51,20],floor:95},
          b:{h:[50,19],n:[50,31],p:[50,58],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[46,17],wa:[60,37],eb:[59,30],wb:[49,18],floor:95}}}
 ];
-const byStr = id => STR.find(s=>s.id===id) || MOB.find(m=>m.id===id);
+
+/* ============================== YOGA AND BREATHING ==============================
+
+   Guided, the way a workout is: a figure, a clock, and a sentence telling you
+   what to do with your body. The machinery is the cooldown player's — a yoga
+   pose and a cooldown stretch are the same shape of thing, so `byStr` resolves
+   both and `drawCool` renders either without knowing the difference.
+
+   Poses are shared between flows rather than duplicated, so a pose is drawn
+   once and appears wherever it belongs. Three of them already existed as
+   stretches and are reused rather than redrawn.
+
+   Nothing here claims to be a yoga class. It is a sequence of held positions
+   with a timer, which is the part an app can usefully do. */
+
+const YOGA_POSES=[
+  {id:'ycat', name:'Cat and cow', target:'Spine', sec:45,
+   how:'On hands and knees. Breathe out and round your back towards the ceiling, tucking your chin. Breathe in and let your belly sink as you look forward. One round per breath, no faster.',
+   pose:{a:{h:[84,42],n:[74,47],p:[44,52],ka:[42,62],fa:[34,71],kb:[42,62],fb:[34,71],ea:[74,59],wa:[74,71],eb:[74,59],wb:[74,71],floor:72},
+         b:{h:[76,56],n:[73,47],p:[44,41],ka:[42,60],fa:[34,71],kb:[42,60],fb:[34,71],ea:[73,59],wa:[73,71],eb:[73,59],wb:[73,71],floor:72}}},
+  {id:'ydog', name:'Downward dog', target:'Hamstrings, calves, shoulders', sec:45,
+   how:'From hands and knees, tuck your toes and push your hips up and back into an upside-down V. Bend your knees as much as you need to keep your back long — a straight back matters more than straight legs.',
+   /* The far arm and leg are offset rather than laid exactly over the near
+      ones. figNormalise only spreads limbs for upright torsos, and without
+      the spread this pose draws as a plain triangle: two lines, no body. */
+   pose:{a:{h:[41,52],n:[36,46],p:[60,23],ka:[74,44],fa:[88,66],kb:[71,47],fb:[84,66],ea:[27,55],wa:[18,66],eb:[30,53],wb:[22,64],floor:67},
+         b:{h:[40,54],n:[35,48],p:[60,25],ka:[76,46],fa:[90,66],kb:[72,44],fb:[85,64],ea:[26,57],wa:[18,66],eb:[29,55],wb:[22,64],floor:67}}},
+  {id:'yfold', name:'Standing forward fold', target:'Back of the legs, lower back', sec:40,
+   how:'Stand with your feet hip width. Soften your knees and fold forward from the hips, letting your head and arms hang. Do not force it — let the weight of your head do the work.',
+   pose:{a:{h:[50,17],n:[50,29],p:[50,57],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[45,44],wa:[45,58],eb:[55,44],wb:[55,58],floor:95},
+         b:{h:[62,74],n:[56,66],p:[50,57],ka:[50,76],fa:[50,94],kb:[50,76],fb:[50,94],ea:[52,76],wa:[50,88],eb:[52,76],wb:[50,88],floor:95}}},
+  {id:'ylunge', name:'Low lunge', target:'Hip flexors, front of the thigh', sec:40, side:true,
+   how:'Step one foot forward between your hands and lower the back knee to the floor. Sink your hips forward and lift your chest. You should feel it down the front of the back hip.',
+   pose:{a:{h:[44,26],n:[44,38],p:[46,58],ka:[62,70],fa:[68,90],kb:[30,84],fb:[18,90],ea:[40,50],wa:[40,64],eb:[50,50],wb:[50,64],floor:91},
+         b:{h:[44,20],n:[44,32],p:[47,54],ka:[66,68],fa:[70,90],kb:[28,84],fb:[16,90],ea:[41,40],wa:[43,26],eb:[49,40],wb:[47,26],floor:91}}},
+  {id:'ycobra', name:'Cobra', target:'Front of the body, lower back', sec:35,
+   how:'Lie face down, hands under your shoulders. Press gently and lift your chest, keeping your hips on the floor and your elbows close. Go only as high as stays comfortable in the lower back.',
+   pose:{a:{h:[24,64],n:[33,66],p:[60,69],ka:[76,70],fa:[90,70],kb:[76,70],fb:[90,70],ea:[32,62],wa:[30,70],eb:[32,62],wb:[30,70],floor:71},
+         b:{h:[22,48],n:[31,56],p:[60,69],ka:[76,70],fa:[90,70],kb:[76,70],fb:[90,70],ea:[30,60],wa:[30,70],eb:[30,60],wb:[30,70],floor:71}}},
+  {id:'ypigeon', name:'Pigeon', target:'Glutes and outer hip', sec:50, side:true,
+   how:'From hands and knees, bring one knee forward behind that hand and let the shin angle across. Slide the other leg back and let your hips settle. Come down onto your forearms if it is comfortable.',
+   pose:{a:{h:[32,44],n:[40,50],p:[58,62],ka:[46,70],fa:[30,68],kb:[76,70],fb:[92,70],ea:[36,58],wa:[34,70],eb:[44,58],wb:[42,70],floor:71},
+         b:{h:[26,58],n:[36,58],p:[58,62],ka:[46,70],fa:[30,68],kb:[76,70],fb:[92,70],ea:[30,64],wa:[24,70],eb:[38,64],wb:[32,70],floor:71}}},
+  {id:'ytwist', name:'Seated twist', target:'Spine and ribs', sec:40, side:true,
+   how:'Sit tall with your legs out. Bend one knee and put that foot flat over the other leg. Turn your chest towards the bent knee, using your arm against it as a gentle lever. Grow taller as you turn.',
+   pose:{a:{h:[42,32],n:[42,44],p:[42,66],ka:[56,54],fa:[58,70],kb:[70,68],fb:[86,68],ea:[38,54],wa:[40,66],eb:[48,52],wb:[56,56],floor:71},
+         b:{h:[46,32],n:[45,44],p:[42,66],ka:[56,54],fa:[58,70],kb:[70,68],fb:[86,68],ea:[36,52],wa:[30,62],eb:[52,50],wb:[60,58],floor:71}}},
+  {id:'ybridge', name:'Supported bridge', target:'Hips and lower back', sec:45,
+   how:'Lie on your back, knees bent, feet flat and close to your hips. Press through your heels and lift your hips to a straight ramp. Hold, breathing into your ribs rather than your belly.',
+   pose:{a:{h:[21,63],n:[30,67],p:[58,68],ka:[76,55],fa:[82,70],kb:[76,55],fb:[82,70],ea:[40,72],wa:[50,73],eb:[40,72],wb:[50,73],floor:73},
+         b:{h:[21,63],n:[30,67],p:[59,50],ka:[77,50],fa:[82,70],kb:[77,50],fb:[82,70],ea:[40,72],wa:[50,73],eb:[40,72],wb:[50,73],floor:73}}},
+  {id:'yknees', name:'Knees to chest', target:'Lower back', sec:35,
+   how:'On your back, draw both knees in and wrap your arms around them. Let your lower back spread into the floor. Rock gently side to side if that feels good.',
+   pose:{a:{h:[22,62],n:[31,66],p:[60,68],ka:[70,54],fa:[76,66],kb:[70,54],fb:[76,66],ea:[38,62],wa:[54,60],eb:[38,62],wb:[54,60],floor:72},
+         b:{h:[24,60],n:[32,64],p:[60,68],ka:[62,50],fa:[66,62],kb:[62,50],fb:[66,62],ea:[38,58],wa:[52,54],eb:[38,58],wb:[52,54],floor:72}}},
+  {id:'ysupine', name:'Lying spinal twist', target:'Lower back and hips', sec:45, side:true,
+   how:'On your back, bring one knee up and let it fall across your body while you look the other way. Keep both shoulders on the floor even if the knee does not reach it.',
+   pose:{a:{h:[22,62],n:[31,66],p:[58,68],ka:[70,56],fa:[76,68],kb:[74,66],fb:[90,68],ea:[28,52],wa:[16,48],eb:[32,72],wb:[46,74],floor:73},
+         b:{h:[24,60],n:[32,64],p:[58,70],ka:[66,78],fa:[74,72],kb:[74,66],fb:[90,68],ea:[28,52],wa:[16,48],eb:[32,74],wb:[46,76],floor:73}}},
+  {id:'ylegsup', name:'Legs up the wall', target:'Everything, gently', sec:60,
+   how:'Sit side-on to a wall, then swing your legs up it and lie back. Shuffle your hips as close as is comfortable. Arms wherever they fall. This one does more than it looks like it does.',
+   pose:{a:{h:[18,66],n:[28,66],p:[56,68],ka:[62,48],fa:[66,28],kb:[62,48],fb:[66,28],ea:[26,72],wa:[38,74],eb:[26,72],wb:[38,74],floor:75},
+         b:{h:[18,66],n:[28,66],p:[58,68],ka:[64,46],fa:[68,26],kb:[64,46],fb:[68,26],ea:[26,72],wa:[38,74],eb:[26,72],wb:[38,74],floor:75}}},
+  {id:'ybreath', name:'Sitting and breathing', target:'Winding down', sec:60,
+   how:'Sit however is comfortable — cross-legged, on a cushion, on a chair. Rest your hands on your knees, lengthen your spine, and breathe out for longer than you breathe in.',
+   pose:{a:{h:[50,30],n:[50,42],p:[50,64],ka:[64,68],fa:[44,72],kb:[36,68],fb:[56,72],ea:[42,52],wa:[38,64],eb:[58,52],wb:[62,64],floor:73},
+         b:{h:[50,28],n:[50,40],p:[50,64],ka:[64,68],fa:[44,72],kb:[36,68],fb:[56,72],ea:[41,50],wa:[37,63],eb:[59,50],wb:[63,63],floor:73}}}
+];
+
+/* Flows reference poses by id, so a pose is authored once. `child`, `ham` and
+   `hipflex` come from the cooldown stretches. */
+const YOGA=[
+  {id:'loosen', n:'Loosen up', mins:8,
+   blurb:'A short one for a rest day, or before anything else. Mostly spine and hips.',
+   poses:['ycat','ydog','yfold','ylunge','yknees']},
+  {id:'full', n:'Full body', mins:20,
+   blurb:'The long one. Standing work first, floor work after, finishing flat on your back.',
+   poses:['ycat','ydog','yfold','ylunge','ycobra','ypigeon','ytwist','ybridge','ysupine','child']},
+  {id:'wind', n:'Wind down', mins:12,
+   blurb:'Floor-based and slow, for the evening. Nothing here should raise your heart rate.',
+   poses:['yknees','ysupine','ybridge','ylegsup','child','ybreath']}
+];
+function yogaOf(id){ return YOGA.find(f=>f.id===id); }
+function yogaPose(id){ return YOGA_POSES.find(p=>p.id===id); }
+
+/* ---- meditation ----
+
+   Timed steps with something to read at the top of each. No pose, no figure
+   — the step renderer leaves the space empty rather than drawing a stick
+   figure sitting still for four minutes.
+
+   The plain timer is there because some people want a bell and silence, and
+   an app insisting on talking them through it is the opposite of the point. */
+const SIT=[
+  {id:'breath', n:'Breath focus', mins:10,
+   blurb:'The plainest one. Count breaths, lose count, start again. Losing count is not failing at it.',
+   steps:[
+     {sec:60, t:'Settle', how:'Sit upright but not rigid. Let your shoulders drop. Take three slow breaths out, longer than the breaths in, and let your face soften.'},
+     {sec:180, t:'Count to ten', how:'Breathe normally through your nose. Count each breath out: one, two, up to ten, then start again at one. Do not change how you are breathing — just count it.'},
+     {sec:240, t:'Keep going', how:'You will lose count. That is what minds do and it is not a mistake. When you notice, start again at one without making anything of it. Noticing is the whole exercise.'},
+     {sec:120, t:'Let the counting go', how:'Stop counting. Stay with the feeling of breathing — air at the nostrils, ribs moving. If thoughts carry you off, come back to the next breath out.'}
+   ]},
+  {id:'body', n:'Body scan', mins:12,
+   blurb:'Attention moved slowly from head to feet. Good when your head is busy and your body has been ignored all day.',
+   steps:[
+     {sec:60, t:'Settle', how:'Lie down or sit back. Close your eyes if that is comfortable. Feel the weight of yourself against whatever is holding you up.'},
+     {sec:150, t:'Head and face', how:'Bring attention to your scalp, forehead, the space between your eyebrows, your jaw. Jaws hold more than people expect. Let it hang slightly open.'},
+     {sec:150, t:'Shoulders and arms', how:'Move down to your neck, shoulders, upper arms, forearms, hands. Notice tension without trying to fix it. Often it goes on its own once noticed.'},
+     {sec:150, t:'Chest and belly', how:'Feel your ribs move. Let your belly be soft rather than held in. Nothing to correct here, just somewhere to put your attention.'},
+     {sec:150, t:'Hips and legs', how:'Hips, thighs, knees, calves, ankles, feet. Take your time. If you trained today, this is where you will find it.'},
+     {sec:90, t:'All of it at once', how:'Let go of the parts and feel yourself as a whole, breathing, lying or sitting there. Stay a minute, then open your eyes slowly.'}
+   ]},
+  {id:'unwind', n:'Wind down', mins:8,
+   blurb:'For the end of the day, when you want your head to stop before you try to sleep.',
+   steps:[
+     {sec:60, t:'Put the day down', how:'Sit or lie somewhere comfortable. Breathe out slowly three times. There is nothing to solve in the next eight minutes.'},
+     {sec:180, t:'Longer out than in', how:'Breathe in for a count of four, out for a count of six or seven. The long out-breath is the part that calms you down; the maths is not important, the ratio is.'},
+     {sec:180, t:'Somewhere else', how:'Let the counting go. Notice sounds without following them, thoughts without arguing with them. They can carry on without you.'},
+     {sec:60, t:'Finish', how:'Take one deliberate breath. Notice that you feel slightly different from eight minutes ago, or notice that you do not. Both are fine.'}
+   ]}
+];
+function sitOf(id){ return SIT.find(s=>s.id===id); }
+
+/* What the cardio card offers for each activity. */
+function guidesFor(k){
+  if(k==='yoga') return YOGA.map(f=>({id:f.id, n:f.n, mins:f.mins}));
+  if(k==='sit') return SIT.map(s=>({id:s.id, n:s.n, mins:s.mins})).concat([{id:'timer', n:'Just a timer', mins:10}]);
+  return [];
+}
+
+const byStr = id => STR.find(s=>s.id===id) || MOB.find(m=>m.id===id) || yogaPose(id);
 
 /* ============================== STATE ============================== */
-const BUILD='2026-09-20 10:40';
+const BUILD='2026-09-20 12:20';
 const KEY='groundwork.v1';
 let S = {
   setup:false,
@@ -2447,6 +2838,8 @@ function viewToday(){
     <button class="btn ghost sm" onclick="dismissExtraNudge()">Leave it as it is</button>
   </div>`:''}
 
+  ${runResumeCard()}
+
   ${deloadNow()?`<div class="card" style="margin-top:14px;border-color:var(--pine)">
     <h3 style="font-size:16px">This week is the easy one</h3>
     <p class="small muted" style="margin:8px 0 0">Six weeks on target without a light one. A set comes off everything and the targets sit mid-range for seven days. This is not a reward for good behaviour \u2014 it is the week the last six turn into something you can see in a mirror.</p>
@@ -2645,6 +3038,34 @@ function viewLearn(){
       return `<div class="accordion" data-find="${esc(find)}">
         <button class="achead" onclick="acc(this,null,'${x.id}')">
           <span class="lrow"><span class="lt"><span>${x.name}</span><span class="lsub">${sub}</span></span></span>
+          <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+        <div class="acbody"></div></div>`}).join('')}</div>
+
+  <div class="lsec"><h2>Yoga and breathing</h2>
+    <p class="tiny muted">The poses the flows are built from, and what each session is for. Start one from the Today screen.</p>
+    ${YOGA.map(f=>`<div class="accordion" data-find="${esc((f.n+' '+f.blurb+' yoga flow').toLowerCase())}">
+      <button class="achead" onclick="this.nextElementSibling.classList.toggle('on');this.classList.toggle('on')">
+        <span class="lrow"><span class="lt"><span>${f.n}</span><span class="lsub">${f.mins} minutes · ${f.poses.length} poses</span></span></span>
+        <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <div class="acbody"><p class="small muted" style="margin:0 0 10px">${f.blurb}</p>
+        <ul class="exlist">${f.poses.map(pid=>{const p=byStr(pid);
+          return p?`<li><span>${p.name}</span><span class="meta">${p.sec}s${p.side?' each side':''}</span></li>`:''}).join('')}</ul>
+        <button class="btn ghost sm" onclick="guideStart('yoga','${f.id}')">Start this flow</button></div></div>`).join('')}
+    ${SIT.map(x=>`<div class="accordion" data-find="${esc((x.n+' '+x.blurb+' meditation breathing').toLowerCase())}">
+      <button class="achead" onclick="this.nextElementSibling.classList.toggle('on');this.classList.toggle('on')">
+        <span class="lrow"><span class="lt"><span>${x.n}</span><span class="lsub">${x.mins} minutes · guided</span></span></span>
+        <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <div class="acbody"><p class="small muted" style="margin:0 0 10px">${x.blurb}</p>
+        <ul class="exlist">${x.steps.map(st=>`<li><span>${st.t}</span><span class="meta">${Math.round(st.sec/60*10)/10} min</span></li>`).join('')}</ul>
+        <button class="btn ghost sm" onclick="guideStart('sit','${x.id}')">Start this session</button></div></div>`).join('')}
+    ${YOGA_POSES.map(x=>{
+      const find=(x.name+' '+(x.target||'')+' '+x.how+' yoga').toLowerCase();
+      return `<div class="accordion" data-find="${esc(find)}">
+        <button class="achead" onclick="acc(this,null,'${x.id}')">
+          <span class="lrow"><span class="lt"><span>${x.name}</span><span class="lsub">${x.target||'yoga pose'}</span></span></span>
           <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
         </button>
         <div class="acbody"></div></div>`}).join('')}</div>
@@ -3936,6 +4357,13 @@ function subWallet(){
     <p class="tiny muted" style="margin:5px 0 0">Creates a lightning invoice to pay from another wallet.</p>
     <button class="btn pine sm" onclick="walletDoReceive()">Create an invoice</button>
     <div id="wrecv"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:15px">Send</h3>
+    <p class="tiny muted" style="margin:5px 0 0">An invoice, a lightning address, or a Spark address. It works out which from what you paste.</p>
+    <button class="btn pine sm" onclick="sendAsk()">Send sats</button>
+    <p class="tiny muted" style="margin:10px 0 0">Zapping somebody on the Social tab is the other way out of here, and the one that shows up on nostr.</p>
   </div>
 
   <div class="card">
@@ -5991,6 +6419,113 @@ async function zapGoNow(){
   }
   walletBusy=false;
 }
+/* ---------------------------- sending ----------------------------
+
+   Three things can be pasted and they are told apart by shape, because
+   asking "is this an invoice or an address?" is a question the app can
+   answer itself.
+
+   Everything the zap path refuses, this refuses, and for the same reasons —
+   it is the same code. The only difference is that no zap request is signed,
+   so paying a lightning address here is a private payment rather than
+   something published to nostr. */
+
+function sendKind(v){
+  const s=String(v||'').trim();
+  if(!s) return null;
+  const low=s.toLowerCase().replace(/^lightning:/,'');
+  if(/^ln(bc|tb|bcrt)[0-9]/i.test(low) || /^lnbc1/i.test(low)) return {kind:'invoice', value:low};
+  if(/^sp1[a-z0-9]{20,}$/i.test(low)) return {kind:'spark', value:low};
+  if(low.indexOf('@')>0) return {kind:'address', value:low};
+  return {kind:'unknown', value:s};
+}
+
+function sendAsk(){
+  if(!hasWallet()){ toast('Set up a wallet first'); return; }
+  askText('Paste an invoice, a lightning address, or a Spark address.', '', v=>{
+    const d=sendKind(v);
+    if(!d || d.kind==='unknown'){
+      ask('That is not something this app knows how to pay.\n\nIt takes a lightning invoice starting lnbc, an address like name@example.com, or a Spark address starting sp1.', ()=>{}, 'Right');
+      return;
+    }
+    if(d.kind==='invoice') sendInvoice(d.value);
+    else sendAmount(d);
+  }, {multiline:true, placeholder:'lnbc… / name@example.com / sp1…', ok:'Continue'});
+}
+
+/* An invoice names its own amount, so there is nothing to ask — only to
+   confirm. A zero-amount invoice is refused rather than quietly turned into
+   a box asking how much, which is a different thing from what was pasted. */
+function sendInvoice(inv){
+  const sats=bolt11Sats(inv);
+  if(sats==null){
+    ask('That invoice does not name an amount, so there is nothing to confirm. Ask them for one with the amount on it.', ()=>{}, 'Right');
+    return;
+  }
+  ask('Send '+sats.toLocaleString()+' sats?\n\nThis cannot be undone.',
+    ()=>sendGo({kind:'invoice', invoice:inv, sats}), 'Send it');
+}
+
+function sendAmount(d){
+  askText('How many sats to '+(d.kind==='spark'?'that Spark address':esc(d.value))+'?',
+    String(S.spark.defaultZap||100), v=>{
+      const n=Math.max(1, Math.min(10000000, parseInt(v,10)||0));
+      if(!n) return;
+      if(n>=ZAP_CONFIRM_OVER){
+        ask('Send '+n.toLocaleString()+' sats? That is a large amount and it cannot be undone.',
+          ()=>sendGo(Object.assign({}, d, {sats:n})), 'Send it');
+      } else sendGo(Object.assign({}, d, {sats:n}));
+    }, {numeric:true, ok:'Continue'});
+}
+
+async function sendGo(d){
+  if(walletBusy) return;
+  walletBusy=true;
+  try{
+    if(d.kind==='address'){
+      zapBusy('Looking up '+esc(d.value)+'…');
+      /* same LNURL lookup and host checks as a zap; the difference is below */
+      const res=await zapResolve2(d.value, d.sats);
+      zapBusy('Asking for an invoice…');
+      /* no `nostr` parameter, so their server issues a plain invoice and
+         publishes no zap receipt — a payment, not an announcement */
+      d.invoice=await zapInvoice({meta:res.meta, zappable:false}, null, null, d.sats);
+    }
+    if(d.kind==='spark'){
+      zapBusy('Sending '+d.sats.toLocaleString()+' sats…');
+      const w=await walletOpen();
+      await w.transfer({receiverSparkAddress:d.value, amountSats:d.sats});
+    } else {
+      zapBusy('Paying '+d.sats.toLocaleString()+' sats…');
+      await zapPay(d.invoice);
+    }
+    S.spark.balance = S.spark.balance!=null ? Math.max(0, S.spark.balance-d.sats) : null;
+    save();
+    modalClose();
+    toast('Sent '+d.sats.toLocaleString()+' sats');
+    walletBalance(true).catch(()=>{});
+    render();
+  }catch(e){
+    modalClose();
+    ask(String(e && e.message || 'That did not work').slice(0,300), ()=>{}, 'Right');
+  }
+  walletBusy=false;
+}
+
+/* zapResolve takes a pubkey because zaps always have one. Sending does not,
+   so this is the same lookup starting from the address itself. */
+async function zapResolve2(addr, sats){
+  const url=lnurlFor(addr);
+  if(!url) throw new Error('That lightning address is not one this app is willing to fetch.');
+  const meta=await lnFetch(url);
+  if(!meta || meta.tag!=='payRequest' || !meta.callback) throw new Error('That address is not set up to receive.');
+  if(!/^https:\/\//i.test(meta.callback)) throw new Error('Their server asked us to use an insecure address.');
+  const min=Math.ceil((meta.minSendable||1000)/1000), max=Math.floor((meta.maxSendable||1e11)/1000);
+  if(sats<min) throw new Error('They do not accept less than '+min+' sats.');
+  if(sats>max) throw new Error('They do not accept more than '+max.toLocaleString()+' sats.');
+  return {meta, min, max};
+}
+
 function zapChip(pk, evId){
   if(!S.nostr || pk===S.nostr.pk || !Signer.canWrite) return '';
   const done=evId && zapped(evId);
@@ -6615,7 +7150,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 load();
 amberResume();
 if(S.nostr && S.nostr.pk) setTimeout(fetchOwnProfile, 1200);
-figNormalise([...EX,...STR,...MOB]);
+figNormalise([...EX,...STR,...MOB,...YOGA_POSES]);
 if(S.theme && S.theme!=='auto') document.documentElement.setAttribute('data-theme',S.theme);
 if(S.webfonts) loadWebFonts();
 renderTabs();

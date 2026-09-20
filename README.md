@@ -78,7 +78,9 @@ This is the first thing in the app that makes an HTTPS request. Everything else 
 
 ### The wallet
 
-**You → Wallet** sets up a [Spark](https://spark.money) wallet on the device. Balance, receive by invoice, a default zap amount, and the twelve words.
+**You → Wallet** sets up a [Spark](https://spark.money) wallet on the device. Balance, receive by invoice, send, a default zap amount, and the twelve words.
+
+Sending takes three things and works out which is which from what you paste: a bolt11 invoice, a lightning address like `name@example.com`, or a Spark `sp1…` address. It reuses the zap path's checks, so it refuses exactly what a zap refuses — https only, no IP literals or private hosts, and the invoice amount verified against what you agreed before anything moves. An invoice with no amount on it is refused rather than quietly turned into a box asking how much, which is a different thing from what you pasted. Paying a lightning address here sends no zap request, so it is a private payment rather than something published to nostr.
 
 It is a tips wallet and the app says so everywhere it can. The keys live in this app's storage, which Android may clear when space runs short.
 
@@ -157,6 +159,7 @@ The `android/` folder is deliberately **not** committed. CI generates it on ever
 Edit `www/index.html` and push. Everything you'd want to adjust is near the top of the `<script>` block:
 
 - `EX` — the twenty-eight exercises, their rep ranges, cues, mistakes and difficulty ladders
+- `YOGA` / `YOGA_POSES` / `SIT` — the flows, the poses they are built from, and the meditation sessions
 - `PLAN2` — the slot table: which movement pattern and muscle group each session slot is for, and which exercises may fill it
 - `TIERS`, `SHAPES`, `SET_FLOOR` — the coach's dials (see **How the workout is chosen**)
 - `SESSIONS` — the names and cooldowns for Session A and Session B
@@ -222,6 +225,36 @@ How much of this happens is a setting: **Steady**, **Balanced** or **Restless**,
 ### What it will never do
 
 Move you up a rung, add weight, or drop you back down without asking. Those stay as offers on screen with two buttons. The app decides how much work you do and which movements do it; you decide how hard each one gets.
+
+## Everything else you do
+
+The **Anything else today?** card on Today covers the things that are not lifting. None of it counts towards your weekly strength sessions — different job — but all of it holds the day streak.
+
+### Jogs and rides
+
+Start the clock and it keeps time while you are out, or type the minutes in afterwards as before. At the end it asks for a distance and works out your pace: minutes per kilometre for a jog, km/h for a ride. Leave the distance blank and it just logs the time.
+
+**No location is used and none is requested.** The app never touches geolocation, so there is no permission prompt to refuse, and a test asserts that stays true by replacing `navigator.geolocation` with something that throws. Distance is a number you type, which is what a treadmill, a bike computer or a map you looked at afterwards gives you anyway.
+
+The clock is *computed* from `Date.now()` rather than counted. Every other timer in the app decrements a counter once a second, which is fine for a thirty-second stretch and would be badly wrong here: a backgrounded WebView throttles timers to roughly one a minute, so a counted clock would come back from a half-hour run claiming four minutes. The interval only repaints; the number it paints is arithmetic on wall-clock time. A run in progress is written to storage as it goes, so a WebView killed while your phone was in a pocket does not take the run with it — Today offers to pick it back up, finish it, or throw it away.
+
+### Yoga
+
+Three flows, guided the way a workout is — a figure, a clock, and a sentence telling you what to do with your body:
+
+- **Loosen up**, about eight minutes. Spine and hips, good on a rest day.
+- **Full body**, about twenty. Standing work first, floor work after.
+- **Wind down**, about twelve. Floor-based and slow, for the evening.
+
+Twelve poses shared between them, so a pose is drawn once and appears wherever it belongs; three more come from the cooldown stretches rather than being redrawn. The player is the cooldown stretch player — a yoga pose and a cooldown stretch are the same shape of thing, so the same code renders either.
+
+It is not a yoga class. It is a sequence of held positions with a timer, which is the part an app can usefully do.
+
+### Meditation
+
+Three guided sessions — **breath focus**, **body scan** and **wind down** — as timed steps with something to read at the top of each. No figure: a stick figure sitting still for four minutes helps nobody.
+
+And a plain timer with a bell, because some people want silence and an app insisting on talking them through it is the opposite of the point.
 
 ## Reminders
 
